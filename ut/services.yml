@@ -1,0 +1,29 @@
+imports:
+    - { resource: credentials.yml }
+
+parameters:
+
+services:
+    app:
+        class: Application
+        factory: [Oasis\SlimApp\Application, app]
+        properties:
+            logging:
+                - '@log.handler.console'
+                - '@log.handler.file'
+    log.handler.console:
+        class: Oasis\Mlib\Logging\ConsoleHandler
+    log.handler.file:
+        class: Oasis\Mlib\Logging\LocalFileHandler
+        arguments:
+            - %app.logpath%
+
+    memcached:
+        class: \Memcached
+        calls:
+            - [addServer, ['127.0.0.1', 9999]]
+
+    dummy:
+        class: Dummy
+        properties:
+            name: %db.username%
