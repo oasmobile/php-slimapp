@@ -8,7 +8,6 @@
 
 namespace Oasis\SlimApp;
 
-use Oasis\Mlib\Utils\StringUtils;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -33,13 +32,8 @@ class SlimAppCompilerPass implements CompilerPassInterface
                     && !class_exists($class)
                 ) {
                     foreach ($defaultNamespaces as $ns) {
-                        if (StringUtils::stringEndsWith($ns, "\\")) {
-                            $ns = substr($ns, 0, strlen($ns) - 1);
-                        }
-                        if (StringUtils::stringStartsWith($class, "\\")) {
-                            $class = substr($class, 1);
-                        }
-                        
+                        $ns         = trim($ns, "\\");
+                        $class      = trim($class, "\\");
                         $full_class = "$ns\\$class";
                         if (class_exists($full_class)) {
                             $definition->setClass($full_class);
@@ -54,13 +48,8 @@ class SlimAppCompilerPass implements CompilerPassInterface
                     && !class_exists($class = $factory[0])
                 ) {
                     foreach ($defaultNamespaces as $ns) {
-                        if (StringUtils::stringEndsWith($ns, "\\")) {
-                            $ns = substr($ns, 0, strlen($ns) - 1);
-                        }
-                        if (StringUtils::stringStartsWith($class, "\\")) {
-                            $class = substr($class, 1);
-                        }
-
+                        $ns         = trim($ns, "\\");
+                        $class      = trim($class, "\\");
                         $full_class = "$ns\\$class";
                         if (class_exists($full_class)) {
                             $definition->setFactory([$full_class, $factory[1]]);
