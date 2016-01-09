@@ -6,6 +6,7 @@
  * Date: 2016-01-09
  * Time: 14:40
  */
+namespace Oasis\SlimApp;
 
 use Oasis\SlimApp\Application;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -38,7 +39,7 @@ class Dummy {
 }
 Application::app()->init(__DIR__ . "/ut", new TestConfig());
 
-/** @var Memcached $memcached */
+/** @var \Memcached $memcached */
 $memcached = Application::app()->getService('memcached', \Memcached::class);
 $memcached->set('abc', 88);
 var_dump($memcached->get('abc'));

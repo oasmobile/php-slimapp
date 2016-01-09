@@ -59,6 +59,7 @@ class Application
         $this->configDataProvider->setCascadeDelimiter(".");
 
         $this->container = new ContainerBuilder();
+        $this->container->addCompilerPass(new SlimAppCompilerPass());
         foreach ($this->configs as $k => $v) {
             $this->container->setParameter("app.$k", $v);
         }

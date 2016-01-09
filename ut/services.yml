@@ -2,11 +2,14 @@ imports:
     - { resource: credentials.yml }
 
 parameters:
+    default.namespace:
+        - Oasis
+        - Oasis\SlimApp
 
 services:
     app:
         class: Application
-        factory: [Oasis\SlimApp\Application, app]
+        factory: [Application, app]
         properties:
             logging:
                 - '@log.handler.console'
@@ -25,5 +28,6 @@ services:
 
     dummy:
         class: Dummy
+        factory: ['@app', app]
         properties:
             name: %db.username%
