@@ -29,6 +29,7 @@ class SlimAppCachedContainer extends Container
         $this->services = array();
         $this->methodMap = array(
             'app' => 'getAppService',
+            'cli.command.dummy' => 'getCli_Command_DummyService',
             'dummy' => 'getDummyService',
             'log.handler.console' => 'getLog_Handler_ConsoleService',
             'log.handler.file' => 'getLog_Handler_FileService',
@@ -59,9 +60,22 @@ class SlimAppCachedContainer extends Container
         $this->services['app'] = $instance = \Oasis\SlimApp\SlimApp::app();
 
         $instance->logging = array(0 => $this->get('log.handler.console'), 1 => $this->get('log.handler.file'));
-        $instance->cli = array('name' => 'Slim App Console', 'version' => 1.1000000000000001, 'commands' => NULL);
+        $instance->cli = array('name' => 'Slim App Console', 'version' => 1.1000000000000001, 'commands' => array(0 => $this->get('cli.command.dummy')));
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'cli.command.dummy' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Oasis\SlimApp\tests\DummyCommand A Oasis\SlimApp\tests\DummyCommand instance.
+     */
+    protected function getCli_Command_DummyService()
+    {
+        return $this->services['cli.command.dummy'] = new \Oasis\SlimApp\tests\DummyCommand();
     }
 
     /**

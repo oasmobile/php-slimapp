@@ -18,12 +18,15 @@ services:
                 name: Slim App Console
                 version: 1.1
                 commands: # array of command object
+                    - '@cli.command.dummy'
     log.handler.console:
         class: Oasis\Mlib\Logging\ConsoleHandler
     log.handler.file:
         class: Oasis\Mlib\Logging\LocalFileHandler
         arguments:
             - %app.logpath%
+    cli.command.dummy:
+        class: tests\DummyCommand
 
     memcached:
         class: Memcached
