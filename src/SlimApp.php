@@ -139,7 +139,7 @@ class SlimApp
     public function getConsoleApplication()
     {
         if (!$this->consoleApp) {
-            $this->consoleApp = new Application($this->consoleConfig['name'], $this->consoleConfig['version']);
+            $this->consoleApp = new ConsoleApplication($this->consoleConfig['name'], $this->consoleConfig['version']);
             if (is_array($this->consoleConfig['commands'])) {
                 $this->consoleApp->addCommands($this->consoleConfig['commands']);
             }
