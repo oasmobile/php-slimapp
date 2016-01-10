@@ -74,7 +74,7 @@ class Application
 
         $this->container->get('app');
 
-        mdebug("Application [%s] initialized", static::class);
+        //mdebug("Application [%s] initialized", static::class);
     }
 
     public function getService($id, $type = null)
