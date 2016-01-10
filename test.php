@@ -8,7 +8,7 @@
  */
 namespace Oasis\SlimApp;
 
-use Oasis\SlimApp\Application;
+use Oasis\SlimApp\SlimApp;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -37,15 +37,20 @@ class TestConfig implements ConfigurationInterface
 class Dummy {
     public $name;
 }
-Application::app()->init(__DIR__ . "/ut", new TestConfig());
+SlimApp::app()->init(__DIR__ . "/ut", new TestConfig());
 
 /** @var \Memcached $memcached */
-$memcached = Application::app()->getService('memcached', \Memcached::class);
+$memcached = SlimApp::app()->getService('memcached', \Memcached::class);
 $memcached->set('abc', 88);
 var_dump($memcached->get('abc'));
 
-$configValue = Application::app()->getMandatoryConfig('datapath');
+$configValue = SlimApp::app()->getMandatoryConfig('datapath');
 var_dump($configValue);
 
-$dummy = Application::app()->getService('dummy');
+$dummy = SlimApp::app()->getService('dummy');
 var_dump($dummy);
+
+
+var_dump(strtr(ucwords("a.nice.t-shirt", "._-"), ["." => "", "_" => "", "-" => ""]));
+
+SlimApp::app()->getConsoleApplication()->run();

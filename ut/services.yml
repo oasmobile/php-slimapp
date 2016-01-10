@@ -8,12 +8,16 @@ parameters:
 
 services:
     app:
-        class: Application
-        factory: [Application, app]
+        class: SlimApp
+        factory: [SlimApp, app]
         properties:
             logging:
                 - '@log.handler.console'
                 - '@log.handler.file'
+            cli:
+                name: Slim App Console
+                version: 1.1
+                commands: # array of command object
     log.handler.console:
         class: Oasis\Mlib\Logging\ConsoleHandler
     log.handler.file:
@@ -22,7 +26,7 @@ services:
             - %app.logpath%
 
     memcached:
-        class: \Memcached
+        class: Memcached
         calls:
             - [addServer, ['127.0.0.1', 9999]]
 

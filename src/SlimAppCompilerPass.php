@@ -30,6 +30,7 @@ class SlimAppCompilerPass implements CompilerPassInterface
             foreach ($container->getDefinitions() as $definition) {
                 if (($class = $definition->getClass())
                     && !class_exists($class)
+                    && !class_exists("\\" . $class)
                 ) {
                     foreach ($defaultNamespaces as $ns) {
                         $ns         = trim($ns, "\\");
@@ -37,6 +38,7 @@ class SlimAppCompilerPass implements CompilerPassInterface
                         $full_class = "$ns\\$class";
                         if (class_exists($full_class)) {
                             $definition->setClass($full_class);
+
                             break;
                         }
                     }
@@ -46,6 +48,7 @@ class SlimAppCompilerPass implements CompilerPassInterface
                     && is_array($factory)
                     && (0 !== strpos($factory[0], "@"))
                     && !class_exists($class = $factory[0])
+                    && !class_exists("\\" . $class)
                 ) {
                     foreach ($defaultNamespaces as $ns) {
                         $ns         = trim($ns, "\\");
