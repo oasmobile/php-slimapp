@@ -8,27 +8,28 @@
 
 namespace Oasis\SlimApp\tests;
 
-use Symfony\Component\Console\Command\Command;
+use Oasis\SlimApp\AbstractParallelCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DummyCommand extends Command
+class DummyCommand extends AbstractParallelCommand
 {
     protected function configure()
     {
+        parent::configure();
         $this->setName('dummy')->setDescription('dummy command');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function doExecute(InputInterface $input, OutputInterface $output)
     {
         mdebug("message");
-        minfo("message");
-        mnotice("message");
-        mwarning("message");
-        merror("message");
-        mcritical("message");
-        malert("message");
-        memergency("message");
+        return -1;
+        //minfo("message");
+        //mnotice("message");
+        //mwarning("message");
+        //merror("message");
+        //mcritical("message");
+        //malert("message");
+        //memergency("message");
     }
-    
 }
