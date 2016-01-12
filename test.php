@@ -53,4 +53,6 @@ SlimApp::app()->init(__DIR__ . "/ut", new TestConfig());
 //
 //var_dump(strtr(ucwords("a.nice.t-shirt", "._-"), ["." => "", "_" => "", "-" => ""]));
 
+var_dump(SlimApp::app()->getServiceIds());
+
 SlimApp::app()->getConsoleApplication()->run();

@@ -19,6 +19,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -31,7 +32,7 @@ class SlimApp
     protected $configs;
     /** @var  ArrayDataProvider */
     protected $configDataProvider;
-    /** @var  ContainerBuilder */
+    /** @var  Container */
     protected $container;
     /** @var  Application */
     protected $consoleApp;
@@ -76,22 +77,22 @@ class SlimApp
         );
 
         if (!$containerConfigCache->isFresh()) {
-            $this->container = new ContainerBuilder();
-            $this->container->addCompilerPass(new SlimAppCompilerPass());
+            $builder = new ContainerBuilder();
+            $builder->addCompilerPass(new SlimAppCompilerPass());
             foreach ($this->configs as $k => $v) {
-                $this->container->setParameter("app.$k", $v);
+                $builder->setParameter("app.$k", $v);
             }
 
             $loader = new YamlFileLoader(
-                $this->container,
+                $builder,
                 $locator
             );
             $loader->load($this->services_file);
 
-            $this->container->compile();
+            $builder->compile();
 
-            $dumper      = new PhpDumper($this->container);
-            $resources   = $this->container->getResources();
+            $dumper      = new PhpDumper($builder);
+            $resources   = $builder->getResources();
             $resources[] = new FileResource(__FILE__);
             $containerConfigCache->write(
                 $dumper->dump(['class' => 'SlimAppCachedContainer', 'namespace' => __NAMESPACE__]),
@@ -108,6 +109,11 @@ class SlimApp
         $this->container->get('app');
 
         //mdebug("SlimApp [%s] initialized", static::class);
+    }
+
+    public function getServiceIds()
+    {
+        return $this->container->getServiceIds();
     }
 
     public function getService($id, $type = null)
