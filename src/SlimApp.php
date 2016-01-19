@@ -21,7 +21,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
@@ -39,7 +38,7 @@ class SlimApp
     protected $container;
     protected $loggingPath  = null;
     protected $loggingLevel = Logger::DEBUG;
-    /** @var  Application */
+    /** @var  ConsoleApplication */
     protected $consoleApp;
     /** @var  array */
     protected $consoleConfig;
@@ -157,6 +156,9 @@ class SlimApp
         return $this->configDataProvider->getOptional($key, $expectedType, $defaultValue);
     }
 
+    /**
+     * @return ConsoleApplication
+     */
     public function getConsoleApplication()
     {
         if (!$this->consoleApp) {
