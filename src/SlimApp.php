@@ -10,6 +10,8 @@ namespace Oasis\SlimApp;
 
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
+use Oasis\Mlib\Logging\LocalErrorHandler;
+use Oasis\Mlib\Logging\LocalFileHandler;
 use Oasis\Mlib\Logging\MLogging;
 use Oasis\Mlib\Utils\AbstractDataProvider;
 use Oasis\Mlib\Utils\ArrayDataProvider;
@@ -110,6 +112,11 @@ class SlimApp
         $this->container = new SlimAppCachedContainer;
 
         $this->container->get('app');
+        
+        $logger = new LocalFileHandler($this->loggingPath, "%date%/%script%.log", $this->loggingLevel);
+        $logger->install();
+        $logger = new LocalErrorHandler($this->loggingPath, "%date%/%script%.error", $this->loggingLevel);
+        $logger->install();
 
         //mdebug("SlimApp [%s] initialized", static::class);
     }
