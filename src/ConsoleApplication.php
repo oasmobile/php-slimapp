@@ -19,8 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsoleApplication extends Application
 {
-    protected $loggingPath       = null;
-    protected $loggingLevel      = Logger::DEBUG;
+    protected $loggingPath  = null;
+    protected $loggingLevel = Logger::DEBUG;
     /** @var callable[] */
     protected $exceptionHandlers = [];
 
@@ -108,7 +108,7 @@ class ConsoleApplication extends Application
             return parent::doRunCommand($command, $input, $output);
         } catch (\Exception $e) {
             foreach ($this->exceptionHandlers as $handler) {
-                call_user_func($handler, $e);
+                call_user_func_array($handler, [$e, $command, $input, $output]);
             }
             throw $e;
         }
