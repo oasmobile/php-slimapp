@@ -21,8 +21,6 @@ class ConsoleApplication extends Application
 {
     protected $loggingPath  = null;
     protected $loggingLevel = Logger::DEBUG;
-    /** @var callable[] */
-    protected $exceptionHandlers = [];
 
     /**
      * @return int
@@ -60,11 +58,6 @@ class ConsoleApplication extends Application
         $this->loggingPath = $loggingPath;
     }
 
-    public function installExceptionHandler(callable $callback)
-    {
-        $this->exceptionHandlers[] = $callback;
-    }
-
     protected function configureIO(InputInterface $input, OutputInterface $output)
     {
         parent::configureIO($input, $output);
@@ -93,25 +86,18 @@ class ConsoleApplication extends Application
 
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {
-        try {
-            $name   = $command->getName();
-            $name   = strtr($name, ":", ".");
-            $logger = new LocalFileHandler(
-                $this->getLoggingPath(), "%date%/%script%.$name.log", $this->getLoggingLevel()
-            );
-            $logger->install();
-            $logger = new LocalErrorHandler(
-                $this->getLoggingPath(), "%date%/%script%.$name.error", $this->getLoggingLevel()
-            );
-            $logger->install();
+        $name   = $command->getName();
+        $name   = strtr($name, ":", ".");
+        $logger = new LocalFileHandler(
+            $this->getLoggingPath(), "%date%/%script%.$name.log", $this->getLoggingLevel()
+        );
+        $logger->install();
+        $logger = new LocalErrorHandler(
+            $this->getLoggingPath(), "%date%/%script%.$name.error", $this->getLoggingLevel()
+        );
+        $logger->install();
 
-            return parent::doRunCommand($command, $input, $output);
-        } catch (\Exception $e) {
-            foreach ($this->exceptionHandlers as $handler) {
-                call_user_func_array($handler, [$e, $command, $input, $output]);
-            }
-            throw $e;
-        }
+        return parent::doRunCommand($command, $input, $output);
     }
 
 }

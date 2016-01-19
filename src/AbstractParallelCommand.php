@@ -8,13 +8,12 @@
 
 namespace Oasis\SlimApp;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
-abstract class AbstractParallelCommand extends Command
+abstract class AbstractParallelCommand extends AbstractAlertableCommand
 {
     private $parallelCount = 0;
     private $pids          = [];
@@ -30,6 +29,8 @@ abstract class AbstractParallelCommand extends Command
 
     protected function configure()
     {
+        parent::configure();
+
         $this->addOption(
             'parallel',
             null,
