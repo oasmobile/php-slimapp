@@ -5,6 +5,10 @@ parameters:
     default.namespace:
         - Oasis
         - Oasis\SlimApp
+    sns.config:
+        profile: minhao
+        region: us-east-1
+
 
 services:
     app:
@@ -12,19 +16,22 @@ services:
         factory: [SlimApp, app]
         properties:
             logging:
-                - '@log.handler.console'
-                - '@log.handler.file'
+                path: %app.logpath%
+                level: debug
+                handlers:
+                    - '@log.handler.sns'
+#                    - '@log.handler.console'
+#                    - '@log.handler.file'
             cli:
                 name: Slim App Console
                 version: 1.1
                 commands: # array of command object
                     - '@cli.command.dummy'
-    log.handler.console:
-        class: Oasis\Mlib\Logging\ConsoleHandler
-    log.handler.file:
-        class: Oasis\Mlib\Logging\LocalFileHandler
+    log.handler.sns:
+        class: Oasis\Mlib\Logging\AwsSnsHandler
         arguments:
-            - %app.logpath%
+            - '@sns.publisher'
+            - message from slimapp
     cli.command.dummy:
         class: tests\DummyCommand
 
@@ -38,3 +45,9 @@ services:
         factory: ['@app', app]
         properties:
             name: %db.username%
+
+    sns.publisher:
+        class: Oasis\Mlib\AwsWrappers\SnsPublisher
+        arguments:
+            - %sns.config%
+            - "arn:aws:sns:us-east-1:315771499375:dynamodb"

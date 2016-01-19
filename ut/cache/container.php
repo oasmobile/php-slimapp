@@ -31,9 +31,9 @@ class SlimAppCachedContainer extends Container
             'app' => 'getAppService',
             'cli.command.dummy' => 'getCli_Command_DummyService',
             'dummy' => 'getDummyService',
-            'log.handler.console' => 'getLog_Handler_ConsoleService',
-            'log.handler.file' => 'getLog_Handler_FileService',
+            'log.handler.sns' => 'getLog_Handler_SnsService',
             'memcached' => 'getMemcachedService',
+            'sns.publisher' => 'getSns_PublisherService',
         );
 
         $this->aliases = array();
@@ -59,7 +59,7 @@ class SlimAppCachedContainer extends Container
     {
         $this->services['app'] = $instance = \Oasis\SlimApp\SlimApp::app();
 
-        $instance->logging = array(0 => $this->get('log.handler.console'), 1 => $this->get('log.handler.file'));
+        $instance->logging = array('path' => '/data/logs/slimapp', 'level' => 'debug', 'handlers' => array(0 => $this->get('log.handler.sns')));
         $instance->cli = array('name' => 'Slim App Console', 'version' => 1.1000000000000001, 'commands' => array(0 => $this->get('cli.command.dummy')));
 
         return $instance;
@@ -96,29 +96,16 @@ class SlimAppCachedContainer extends Container
     }
 
     /**
-     * Gets the 'log.handler.console' service.
+     * Gets the 'log.handler.sns' service.
      *
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \Oasis\Mlib\Logging\ConsoleHandler A Oasis\Mlib\Logging\ConsoleHandler instance.
+     * @return \Oasis\Mlib\Logging\AwsSnsHandler A Oasis\Mlib\Logging\AwsSnsHandler instance.
      */
-    protected function getLog_Handler_ConsoleService()
+    protected function getLog_Handler_SnsService()
     {
-        return $this->services['log.handler.console'] = new \Oasis\Mlib\Logging\ConsoleHandler();
-    }
-
-    /**
-     * Gets the 'log.handler.file' service.
-     *
-     * This service is shared.
-     * This method always returns the same instance of the service.
-     *
-     * @return \Oasis\Mlib\Logging\LocalFileHandler A Oasis\Mlib\Logging\LocalFileHandler instance.
-     */
-    protected function getLog_Handler_FileService()
-    {
-        return $this->services['log.handler.file'] = new \Oasis\Mlib\Logging\LocalFileHandler('/data/logs/slimapp');
+        return $this->services['log.handler.sns'] = new \Oasis\Mlib\Logging\AwsSnsHandler($this->get('sns.publisher'), 'message from slimapp');
     }
 
     /**
@@ -136,6 +123,19 @@ class SlimAppCachedContainer extends Container
         $instance->addServer('127.0.0.1', 9999);
 
         return $instance;
+    }
+
+    /**
+     * Gets the 'sns.publisher' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Oasis\Mlib\AwsWrappers\SnsPublisher A Oasis\Mlib\AwsWrappers\SnsPublisher instance.
+     */
+    protected function getSns_PublisherService()
+    {
+        return $this->services['sns.publisher'] = new \Oasis\Mlib\AwsWrappers\SnsPublisher(array('profile' => 'minhao', 'region' => 'us-east-1'), 'arn:aws:sns:us-east-1:315771499375:dynamodb');
     }
 
     /**
@@ -197,6 +197,10 @@ class SlimAppCachedContainer extends Container
             'default.namespace' => array(
                 0 => 'Oasis',
                 1 => 'Oasis\\SlimApp',
+            ),
+            'sns.config' => array(
+                'profile' => 'minhao',
+                'region' => 'us-east-1',
             ),
         );
     }

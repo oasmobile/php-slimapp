@@ -39,20 +39,4 @@ class Dummy {
 }
 SlimApp::app()->init(__DIR__ . "/ut", new TestConfig());
 
-///** @var \Memcached $memcached */
-//$memcached = SlimApp::app()->getService('memcached', \Memcached::class);
-//$memcached->set('abc', 88);
-//var_dump($memcached->get('abc'));
-//
-//$configValue = SlimApp::app()->getMandatoryConfig('datapath');
-//var_dump($configValue);
-//
-//$dummy = SlimApp::app()->getService('dummy');
-//var_dump($dummy);
-//
-//
-//var_dump(strtr(ucwords("a.nice.t-shirt", "._-"), ["." => "", "_" => "", "-" => ""]));
-
-var_dump(SlimApp::app()->getServiceIds());
-
 SlimApp::app()->getConsoleApplication()->run();

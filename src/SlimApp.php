@@ -9,6 +9,7 @@
 namespace Oasis\SlimApp;
 
 use Monolog\Handler\HandlerInterface;
+use Monolog\Logger;
 use Oasis\Mlib\Logging\MLogging;
 use Oasis\Mlib\Utils\AbstractDataProvider;
 use Oasis\Mlib\Utils\ArrayDataProvider;
@@ -34,6 +35,8 @@ class SlimApp
     protected $configDataProvider;
     /** @var  Container */
     protected $container;
+    protected $loggingPath  = null;
+    protected $loggingLevel = Logger::DEBUG;
     /** @var  Application */
     protected $consoleApp;
     /** @var  array */
@@ -126,6 +129,11 @@ class SlimApp
         return $service;
     }
 
+    public function getParameter($k)
+    {
+        return $this->container->getParameter($k);
+    }
+
     public function getMandatoryConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE)
     {
         // normalize key
@@ -146,6 +154,8 @@ class SlimApp
     {
         if (!$this->consoleApp) {
             $this->consoleApp = new ConsoleApplication($this->consoleConfig['name'], $this->consoleConfig['version']);
+            $this->consoleApp->setLoggingPath($this->loggingPath);
+            $this->consoleApp->setLoggingLevel($this->loggingLevel);
             if (is_array($this->consoleConfig['commands'])) {
                 $this->consoleApp->addCommands($this->consoleConfig['commands']);
             }
@@ -168,11 +178,19 @@ class SlimApp
             throw new InvalidConfigurationException("logging property should be an array of log handlers!");
         }
 
-        foreach ($value as $handler) {
-            if (!$handler instanceof HandlerInterface) {
-                throw new InvalidConfigurationException("logging property should be an array of log handlers!");
+        if (is_array($value['handlers'])) {
+            foreach ($value['handlers'] as $handler) {
+                if (!$handler instanceof HandlerInterface) {
+                    throw new InvalidConfigurationException("logging property should be an array of log handlers!");
+                }
+                MLogging::addHandler($handler);
             }
-            MLogging::addHandler($handler, get_class($handler));
+        }
+        if (isset($value['path'])) {
+            $this->loggingPath = $value['path'];
+        }
+        if (isset($value['level'])) {
+            $this->loggingLevel = $value['level'];
         }
     }
 

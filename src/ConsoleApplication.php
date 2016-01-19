@@ -9,34 +9,95 @@
 namespace Oasis\SlimApp;
 
 use Monolog\Logger;
-use Oasis\Mlib\Logging\MLogging;
+use Oasis\Mlib\Logging\ConsoleHandler;
+use Oasis\Mlib\Logging\LocalErrorHandler;
+use Oasis\Mlib\Logging\LocalFileHandler;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsoleApplication extends Application
 {
+    protected $loggingPath  = null;
+    protected $loggingLevel = Logger::DEBUG;
+
+    /**
+     * @return int
+     */
+    public function getLoggingLevel()
+    {
+        return $this->loggingLevel;
+    }
+
+    /**
+     * @param int $loggingLevel
+     */
+    public function setLoggingLevel($loggingLevel)
+    {
+        $this->loggingLevel = $loggingLevel;
+    }
+
+    /**
+     * @return null
+     */
+    public function getLoggingPath()
+    {
+        if ($this->loggingPath === null) {
+            $this->loggingPath = sys_get_temp_dir() . "/logs";
+        }
+
+        return $this->loggingPath;
+    }
+
+    /**
+     * @param null $loggingPath
+     */
+    public function setLoggingPath($loggingPath)
+    {
+        $this->loggingPath = $loggingPath;
+    }
+
     protected function configureIO(InputInterface $input, OutputInterface $output)
     {
         parent::configureIO($input, $output);
 
+        $level = Logger::DEBUG;
         switch ($output->getVerbosity()) {
             case OutputInterface::VERBOSITY_VERY_VERBOSE:
-                MLogging::setMinLogLevel(Logger::INFO);
+                $level = Logger::INFO;
                 break;
             case OutputInterface::VERBOSITY_VERBOSE:
-                MLogging::setMinLogLevel(Logger::NOTICE);
+                $level = Logger::NOTICE;
                 break;
             case OutputInterface::VERBOSITY_DEBUG:
-                MLogging::setMinLogLevel(Logger::DEBUG);
+                $level = Logger::DEBUG;
                 break;
             case OutputInterface::VERBOSITY_NORMAL:
-                MLogging::setMinLogLevel(Logger::WARNING);
+                $level = Logger::WARNING;
                 break;
             case OutputInterface::VERBOSITY_QUIET:
-                MLogging::setMinLogLevel(Logger::CRITICAL);
+                $level = Logger::CRITICAL;
                 break;
         }
+        $handler = new ConsoleHandler($level);
+        $handler->install();
     }
-    
+
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    {
+        $name   = $command->getName();
+        $name = strtr($name, ":", ".");
+        $logger = new LocalFileHandler(
+            $this->getLoggingPath(), "%date%/%script%.$name.log", $this->getLoggingLevel()
+        );
+        $logger->install();
+        $logger = new LocalErrorHandler(
+            $this->getLoggingPath(), "%date%/%script%.$name.error", $this->getLoggingLevel()
+        );
+        $logger->install();
+
+        return parent::doRunCommand($command, $input, $output);
+    }
+
 }

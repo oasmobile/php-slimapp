@@ -17,18 +17,17 @@ class DummyCommand extends AbstractParallelCommand
     protected function configure()
     {
         parent::configure();
-        $this->setName('dummy')->setDescription('dummy command');
+        $this->setName('dummy:job')->setDescription('dummy command');
     }
 
     protected function doExecute(InputInterface $input, OutputInterface $output)
     {
         mdebug("message");
-        return -1;
-        //minfo("message");
-        //mnotice("message");
-        //mwarning("message");
-        //merror("message");
-        //mcritical("message");
+        minfo("message");
+        mnotice("message");
+        mwarning("message");
+        merror("message");
+        mcritical("message");
         //malert("message");
         //memergency("message");
     }
