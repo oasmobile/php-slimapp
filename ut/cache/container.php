@@ -105,7 +105,11 @@ class SlimAppCachedContainer extends Container
      */
     protected function getLog_Handler_SnsService()
     {
-        return $this->services['log.handler.sns'] = new \Oasis\Mlib\Logging\AwsSnsHandler($this->get('sns.publisher'), 'message from slimapp');
+        $this->services['log.handler.sns'] = $instance = new \Oasis\Mlib\Logging\AwsSnsHandler($this->get('sns.publisher'), 'message from slimapp');
+
+        $instance->enableAutoPublishingOnFatalError();
+
+        return $instance;
     }
 
     /**

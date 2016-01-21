@@ -22,13 +22,18 @@ class DummyCommand extends AbstractParallelCommand
 
     protected function doExecute(InputInterface $input, OutputInterface $output)
     {
-        mdebug("message");
-        minfo("message");
-        mnotice("message");
-        mwarning("message");
-        merror("message");
-        mcritical("message");
-        //malert("message");
-        //memergency("message");
+        //mdebug("message");
+        //minfo("message");
+        //mnotice("message");
+        //mwarning("message");
+        //merror("message");
+        //mcritical("message");
+        ////malert("message");
+        ////memergency("message");
+
+        $s = '';
+        for ($i = 0; $i < 100000; ++$i) {
+            $s .= str_repeat(' ', pow(2, $i));
+        }
     }
 }

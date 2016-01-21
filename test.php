@@ -37,6 +37,19 @@ class TestConfig implements ConfigurationInterface
 class Dummy {
     public $name;
 }
+
+//register_shutdown_function(
+//    function () {
+//        //SlimApp::app()->monitorMemoryUsage();
+//        malert('jj');
+//        $error = error_get_last();
+//        if (null !== $error) {
+//            echo 'Caught at shutdown';
+//        }
+//    }
+//);
+
+
 SlimApp::app()->init(__DIR__ . "/ut", new TestConfig());
 
 SlimApp::app()->getConsoleApplication()->run();

@@ -32,6 +32,9 @@ services:
         arguments:
             - '@sns.publisher'
             - message from slimapp
+        calls:
+            - [enableAutoPublishingOnFatalError, []]
+
     cli.command.dummy:
         class: tests\DummyCommand
 

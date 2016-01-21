@@ -168,16 +168,16 @@
         },
         {
             "name": "oasis/logging",
-            "version": "v1.1.1",
+            "version": "v1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oasmobile/php-logging.git",
-                "reference": "f05cc287e5c39ca6a964626f281950bd18b703ad"
+                "reference": "7cd2a2fcaf7a75659d09ce2744dcdbc00e5fa78d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oasmobile/php-logging/zipball/f05cc287e5c39ca6a964626f281950bd18b703ad",
-                "reference": "f05cc287e5c39ca6a964626f281950bd18b703ad",
+                "url": "https://api.github.com/repos/oasmobile/php-logging/zipball/7cd2a2fcaf7a75659d09ce2744dcdbc00e5fa78d",
+                "reference": "7cd2a2fcaf7a75659d09ce2744dcdbc00e5fa78d",
                 "shasum": ""
             },
             "require": {
@@ -215,20 +215,20 @@
                 }
             ],
             "description": "Wrapper of monolog/monolog. Should be easier to use/configure than monolog",
-            "time": "2015-12-30 10:04:11"
+            "time": "2016-01-21 09:33:15"
         },
         {
             "name": "oasis/utils",
-            "version": "v1.2.2",
+            "version": "v1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oasmobile/php-utils.git",
-                "reference": "af6536d97af306f063b9f0b0839dd37633533ae2"
+                "reference": "893e2718ab53020f1bec0ec5427aa09c64761139"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oasmobile/php-utils/zipball/af6536d97af306f063b9f0b0839dd37633533ae2",
-                "reference": "af6536d97af306f063b9f0b0839dd37633533ae2",
+                "url": "https://api.github.com/repos/oasmobile/php-utils/zipball/893e2718ab53020f1bec0ec5427aa09c64761139",
+                "reference": "893e2718ab53020f1bec0ec5427aa09c64761139",
                 "shasum": ""
             },
             "require": {
@@ -254,7 +254,7 @@
                 }
             ],
             "description": "Various utility classes & functions",
-            "time": "2016-01-19 13:11:56"
+            "time": "2016-01-21 08:29:38"
         },
         {
             "name": "psr/log",
@@ -644,16 +644,16 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.13.0",
+            "version": "3.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "dff1c76551777fcc5890d2d5324f9f9e5cdd4e3d"
+                "reference": "cc1796d1c21146cdcbfb7628aee816acb7b85e09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/dff1c76551777fcc5890d2d5324f9f9e5cdd4e3d",
-                "reference": "dff1c76551777fcc5890d2d5324f9f9e5cdd4e3d",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/cc1796d1c21146cdcbfb7628aee816acb7b85e09",
+                "reference": "cc1796d1c21146cdcbfb7628aee816acb7b85e09",
                 "shasum": ""
             },
             "require": {
@@ -719,7 +719,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2016-01-15 02:01:24"
+            "time": "2016-01-19 22:46:22"
         },
         {
             "name": "doctrine/instantiator",

@@ -208,5 +208,4 @@ class SlimApp
         $this->consoleApp    = null;
         $this->consoleConfig = $value;
     }
-
 }
