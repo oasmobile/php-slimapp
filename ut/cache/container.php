@@ -84,7 +84,7 @@ class SlimAppCachedContainer extends Container
      * This service is shared.
      * This method always returns the same instance of the service.
      *
-     * @return \Oasis\SlimApp\Dummy A Oasis\SlimApp\Dummy instance.
+     * @return \Dummy A Dummy instance.
      */
     protected function getDummyService()
     {
