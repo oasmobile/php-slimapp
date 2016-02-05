@@ -68,11 +68,12 @@ class CommandRunner
                 mnotice("Will wait %d seconds for next run of %s", $this->nextRun - $now, $this->name);
                 sleep($this->nextRun - $now);
             }
-            $ret           = $this->application->run($this->input, $this->output);
+            $ret = $this->application->run($this->input, $this->output);
             exit($ret);
         }
         else {
             $this->lastRun = $this->nextRun;
+
             return $pid;
         }
     }
@@ -88,7 +89,13 @@ class CommandRunner
             }
         }
 
-        mdebug("Process exit, last run = %d, next run = %d", $this->lastRun, $this->nextRun);
+        mdebug(
+            "Process exit for command %s, exit code = %d, last run = %d, next run = %d",
+            $this->name,
+            $exitStatus,
+            $this->lastRun,
+            $this->nextRun
+        );
 
         if ($this->once) {
             $this->stopped = true;
