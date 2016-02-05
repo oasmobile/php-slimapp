@@ -111,7 +111,8 @@ class SlimApp
         $this->container = new SlimAppCachedContainer;
 
         $this->container->get('app');
-        
+
+        // NOTE: loggers below will be overriden if running in console mode
         $logger = new LocalFileHandler($this->loggingPath, "%date%/%script%.log", $this->loggingLevel);
         $logger->install();
         $logger = new LocalErrorHandler($this->loggingPath, "%date%/%script%.error", $this->loggingLevel);

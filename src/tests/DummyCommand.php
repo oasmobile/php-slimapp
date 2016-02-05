@@ -10,6 +10,7 @@ namespace Oasis\SlimApp\tests;
 
 use Oasis\SlimApp\AbstractParallelCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DummyCommand extends AbstractParallelCommand
@@ -18,18 +19,18 @@ class DummyCommand extends AbstractParallelCommand
     {
         parent::configure();
         $this->setName('dummy:job')->setDescription('dummy command');
+        $this->addArgument('a');
+        $this->addOption('tt', null, InputOption::VALUE_REQUIRED);
     }
 
     protected function doExecute(InputInterface $input, OutputInterface $output)
     {
-        //mnotice("I'm started, my pid = %d", getmypid());
-        $a = [1, 2, 4, 8, 16, 32];
-        $k = array_search(8, $a);
-        array_splice($a, $k, 1);
-        //var_dump($a);
+        $a  = $input->getArgument('a');
+        $tt = $input->getOption('tt');
+        minfo('I got a: %s', $a);
+        minfo('I got tt: %s', json_encode($tt));
 
-        //usleep(10000);
-        return self::EXIT_CODE_RESTART;
+        return self::EXIT_CODE_OK;
 
         //mdebug("message");
         //minfo("message");

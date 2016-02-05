@@ -30,6 +30,7 @@ class SlimAppCachedContainer extends Container
         $this->methodMap = array(
             'app' => 'getAppService',
             'cli.command.dummy' => 'getCli_Command_DummyService',
+            'cli.command.sentinel' => 'getCli_Command_SentinelService',
             'dummy' => 'getDummyService',
             'log.handler.sns' => 'getLog_Handler_SnsService',
             'memcached' => 'getMemcachedService',
@@ -60,7 +61,7 @@ class SlimAppCachedContainer extends Container
         $this->services['app'] = $instance = \Oasis\SlimApp\SlimApp::app();
 
         $instance->logging = array('path' => '/data/logs/slimapp', 'level' => 'debug', 'handlers' => array(0 => $this->get('log.handler.sns')));
-        $instance->cli = array('name' => 'Slim App Console', 'version' => 1.1000000000000001, 'commands' => array(0 => $this->get('cli.command.dummy')));
+        $instance->cli = array('name' => 'Slim App Console', 'version' => 1.1000000000000001, 'commands' => array(0 => $this->get('cli.command.dummy'), 1 => $this->get('cli.command.sentinel')));
 
         return $instance;
     }
@@ -76,6 +77,19 @@ class SlimAppCachedContainer extends Container
     protected function getCli_Command_DummyService()
     {
         return $this->services['cli.command.dummy'] = new \Oasis\SlimApp\tests\DummyCommand();
+    }
+
+    /**
+     * Gets the 'cli.command.sentinel' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return \Oasis\SlimApp\tests\TestSentinelCommand A Oasis\SlimApp\tests\TestSentinelCommand instance.
+     */
+    protected function getCli_Command_SentinelService()
+    {
+        return $this->services['cli.command.sentinel'] = new \Oasis\SlimApp\tests\TestSentinelCommand();
     }
 
     /**

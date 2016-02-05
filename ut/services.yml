@@ -27,6 +27,7 @@ services:
                 version: 1.1
                 commands: # array of command object
                     - '@cli.command.dummy'
+                    - '@cli.command.sentinel'
     log.handler.sns:
         class: Oasis\Mlib\Logging\AwsSnsHandler
         arguments:
@@ -37,6 +38,8 @@ services:
 
     cli.command.dummy:
         class: tests\DummyCommand
+    cli.command.sentinel:
+        class: tests\TestSentinelCommand
 
     memcached:
         class: Memcached

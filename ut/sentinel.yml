@@ -1,0 +1,15 @@
+commands:
+    dummy:
+        name: dummy:job
+        args:
+            a: moking
+            --tt: true
+#            -vvv:
+        parallel: 8
+        once: false
+        # alert on abnormal exit (exit != 0)
+        alert: false
+        # interval: num of seconds between last end and next start
+        interval: 0
+        # frequency: min seconds between two start
+        frequency: 0
