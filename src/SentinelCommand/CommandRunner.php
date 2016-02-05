@@ -68,6 +68,7 @@ class CommandRunner
                 mnotice("Will wait %d seconds for next run of %s", $this->nextRun - $now, $this->name);
                 sleep($this->nextRun - $now);
             }
+            $this->application->setAutoExit(false); // we will handle exit on our own
             $ret = $this->application->run($this->input, $this->output);
             if ($ret != AbstractDaemonSentinelCommand::EXIT_CODE_OK
                 && $this->alert
