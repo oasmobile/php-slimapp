@@ -62,16 +62,16 @@ class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
 
     protected function waitForBackgroundProcesses()
     {
-        $lastMemory = memory_get_usage(true);
+        //$lastMemory = memory_get_usage(true);
         while (true) {
-            $memory = memory_get_usage(true);
-            if ($memory != $lastMemory) {
-                echo(
-                    sprintf("memory change: %d, from %d to %d", $memory - $lastMemory, $lastMemory, $memory)
-                    . PHP_EOL
-                );
-            }
-            $lastMemory = $memory;
+            //$memory = memory_get_usage(true);
+            //if ($memory != $lastMemory) {
+            //    echo(
+            //        sprintf("memory change: %d, from %d to %d", $memory - $lastMemory, $lastMemory, $memory)
+            //        . PHP_EOL
+            //    );
+            //}
+            //$lastMemory = $memory;
 
             $status = 0;
             $pid    = pcntl_waitpid(-1, $status, WNOHANG);

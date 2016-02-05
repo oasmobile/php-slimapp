@@ -46,6 +46,8 @@ class CommandRunner
         $this->interval  = $command['interval'];
         $this->frequency = $command['frequency'];
         $this->alert     = $command['alert'];
+
+        $this->nextRun = time();
     }
 
     public function run()
@@ -85,6 +87,8 @@ class CommandRunner
                 mwarning("Daemon command %s failed with exit code = %d", $this->name, $exitStatus);
             }
         }
+
+        mdebug("Process exit, last run = %d, next run = %d", $this->lastRun, $this->nextRun);
 
         if ($this->once) {
             $this->stopped = true;
