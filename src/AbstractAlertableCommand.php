@@ -15,6 +15,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class AbstractAlertableCommand extends Command
 {
+    const EXIT_CODE_OK           = 0;
+    const EXIT_CODE_RESTART      = 0xe1;
+    const EXIT_CODE_COMMON_ERROR = 0xff;
+
     protected function configure()
     {
         $this->addOption('alert', null, InputOption::VALUE_NONE, 'trigger alert when exception is thrown');

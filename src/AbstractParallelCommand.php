@@ -15,10 +15,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 abstract class AbstractParallelCommand extends AbstractAlertableCommand
 {
-    const EXIT_CODE_OK           = 0;
-    const EXIT_CODE_RESTART      = 0xe1;
-    const EXIT_CODE_COMMON_ERROR = 0xff;
-
     private $parallelCount = 0;
     private $pids          = [];
     private $isFailed      = false;

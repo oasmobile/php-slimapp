@@ -86,7 +86,7 @@ class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
                     throw new \LogicException("Cannot find command runner for process pid = %d", $pid);
                 }
                 unset($this->runningProcesses[$pid]);
-                $runner->onProcessExit($exitStatus);
+                $runner->onProcessExit($exitStatus, $pid);
                 $newPid = $runner->run();
                 if ($newPid > 0) {
                     $this->runningProcesses[$newPid] = $runner;

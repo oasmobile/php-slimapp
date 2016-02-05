@@ -69,7 +69,17 @@ class CommandRunner
                 sleep($this->nextRun - $now);
             }
             $ret = $this->application->run($this->input, $this->output);
-            exit($ret);
+            if ($ret != AbstractDaemonSentinelCommand::EXIT_CODE_OK
+                && $this->alert
+            ) {
+                // alert in child process is better, because we can get more trace here
+                malert("Daemon command %s failed with exit code = %d", $this->name, $ret);
+
+                exit(AbstractDaemonSentinelCommand::EXIT_CODE_OK); // exit OK because alert is already sent
+            }
+            else {
+                exit($ret);
+            }
         }
         else {
             $this->lastRun = $this->nextRun;
@@ -78,17 +88,17 @@ class CommandRunner
         }
     }
 
-    public function onProcessExit($exitStatus)
+    public function onProcessExit($exitStatus, $pid)
     {
-
         mdebug(
-            "Process exit for command %s, exit code = %d, last run = %d, next run = %d",
+            "Process [%d] exits for command %s, exit code = %d, last run = %d, next run = %d",
+            $pid,
             $this->name,
             $exitStatus,
             $this->lastRun,
             $this->nextRun
         );
-    
+
         if ($exitStatus != 0) {
             if ($this->alert) {
                 malert("Daemon command %s failed with exit code = %d", $this->name, $exitStatus);
