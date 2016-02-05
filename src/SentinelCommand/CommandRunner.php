@@ -66,11 +66,11 @@ class CommandRunner
                 mnotice("Will wait %d seconds for next run of %s", $this->nextRun - $now, $this->name);
                 sleep($this->nextRun - $now);
             }
-            $this->lastRun = time();
             $ret           = $this->application->run($this->input, $this->output);
             exit($ret);
         }
         else {
+            $this->lastRun = $this->nextRun;
             return $pid;
         }
     }
