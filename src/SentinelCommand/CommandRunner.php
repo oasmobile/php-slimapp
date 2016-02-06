@@ -101,15 +101,6 @@ class CommandRunner
 
     public function onProcessExit($exitStatus, $pid)
     {
-        mdebug(
-            "Process [%d] exits for command %s, exit code = %d, last run = %d, next run = %d",
-            $pid,
-            $this->name,
-            $exitStatus,
-            $this->lastRun,
-            $this->nextRun
-        );
-
         if ($exitStatus != 0) {
             if ($this->alert) {
                 malert("Daemon command %s failed with exit code = %d", $this->name, $exitStatus);
@@ -133,5 +124,14 @@ class CommandRunner
                 }
             }
         }
+
+        mdebug(
+            "Process [%d] exits for command %s, exit code = %d, last run = %d, next run = %d",
+            $pid,
+            $this->name,
+            $exitStatus,
+            $this->lastRun,
+            $this->nextRun
+        );
     }
 }
