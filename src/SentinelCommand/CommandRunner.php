@@ -68,8 +68,18 @@ class CommandRunner
                 mnotice("Will wait %d seconds for next run of %s", $this->nextRun - $now, $this->name);
                 sleep($this->nextRun - $now);
             }
+
+            // run using application
             $this->application->setAutoExit(false); // we will handle exit on our own
-            $ret = $this->application->run($this->input, $this->output);
+            $this->application->setCatchExceptions(false); // we will catch on our own
+            try {
+                $ret = $this->application->run($this->input, $this->output);
+            } catch (\Exception $e) {
+                mtrace($e, "Exception while running command {$this->name}", "error");
+                $ret = AbstractDaemonSentinelCommand::EXIT_CODE_COMMON_ERROR;
+            }
+
+            // Check if we should alert
             if ($ret != AbstractDaemonSentinelCommand::EXIT_CODE_OK
                 && $this->alert
             ) {
