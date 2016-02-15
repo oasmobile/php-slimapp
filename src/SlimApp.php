@@ -61,11 +61,13 @@ class SlimApp
         $locator = new FileLocator([$configPath]);
 
         // read config.yml first
-        $yamlFiles = $locator->locate($this->config_file, null, false);
-        $rawData   = [];
+        $configResources = [];
+        $yamlFiles       = $locator->locate($this->config_file, null, false);
+        $rawData         = [];
         foreach ($yamlFiles as $file) {
-            $config    = Yaml::parse(file_get_contents($file));
-            $rawData[] = $config;
+            $configResources[] = new FileResource(realpath($file));
+            $config            = Yaml::parse(file_get_contents($file));
+            $rawData[]         = $config;
         }
         $processor                = new Processor();
         $this->configs            = $processor->processConfiguration($configurationInterface, $rawData);
@@ -98,6 +100,7 @@ class SlimApp
             $dumper      = new PhpDumper($builder);
             $resources   = $builder->getResources();
             $resources[] = new FileResource(__FILE__);
+            $resources   = array_merge($resources, $configResources);
             $containerConfigCache->write(
                 $dumper->dump(['class' => 'SlimAppCachedContainer', 'namespace' => __NAMESPACE__]),
                 $resources
