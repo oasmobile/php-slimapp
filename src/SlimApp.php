@@ -72,7 +72,6 @@ class SlimApp
         $processor                = new Processor();
         $this->configs            = $processor->processConfiguration($configurationInterface, $rawData);
         $this->configDataProvider = new ArrayDataProvider($this->configs);
-        $this->configDataProvider->setCascadeDelimiter(".");
 
         // read container info
         $cacheFilePath        = $configPath . "/cache/container.php";
