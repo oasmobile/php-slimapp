@@ -46,6 +46,9 @@ class SlimApp
     protected $config_file   = "config.yml";
     protected $services_file = "services.yml";
 
+    /**
+     * @return static
+     */
     public static function app()
     {
         static $inst = null;
