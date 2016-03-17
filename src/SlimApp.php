@@ -10,6 +10,7 @@ namespace Oasis\SlimApp;
 
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
+use Oasis\Mlib\Http\SilexKernel;
 use Oasis\Mlib\Logging\LocalErrorHandler;
 use Oasis\Mlib\Logging\LocalFileHandler;
 use Oasis\Mlib\Logging\MLogging;
@@ -30,6 +31,9 @@ use Symfony\Component\Yaml\Yaml;
 
 class SlimApp
 {
+    /** @var  bool */
+    protected $isDebugMode;
+
     /** @var array */
     protected $configs;
     /** @var  ArrayDataProvider */
@@ -42,6 +46,10 @@ class SlimApp
     protected $consoleApp;
     /** @var  array */
     protected $consoleConfig;
+    /** @var  SilexKernel */
+    protected $silexKernel;
+    /** @var  array */
+    protected $httpConfig;
 
     protected $config_file   = "config.yml";
     protected $services_file = "services.yml";
@@ -61,6 +69,12 @@ class SlimApp
 
     public function init($configPath, ConfigurationInterface $configurationInterface)
     {
+        if (!is_dir($configPath)) {
+            throw new \InvalidArgumentException(
+                "Config path must be a directory containing config file. Path given = " . $configPath
+            );
+        }
+
         $locator = new FileLocator([$configPath]);
 
         // read config.yml first
@@ -72,24 +86,40 @@ class SlimApp
             $config            = Yaml::parse(file_get_contents($file));
             $rawData[]         = $config;
         }
-        $processor                = new Processor();
-        $this->configs            = $processor->processConfiguration($configurationInterface, $rawData);
+        $processor     = new Processor();
+        $this->configs = $processor->processConfiguration($configurationInterface, $rawData);
+        if (!isset($this->configs['dir.config'])) {
+            $this->configs['dir.config'] = $configPath;
+        }
+
         $this->configDataProvider = new ArrayDataProvider($this->configs);
 
         // read container info
         $cacheFilePath        = $configPath . "/cache/container.php";
-        $isDebug              = $this->configDataProvider->getOptional('is_debug', ArrayDataProvider::BOOL_TYPE, true);
+        $this->isDebugMode    = $this->configDataProvider->getOptional('is_debug', ArrayDataProvider::BOOL_TYPE, true);
         $containerConfigCache = new ConfigCache(
             $cacheFilePath,
-            $isDebug
+            $this->isDebugMode
         );
 
+        // refresh container if dirty
         if (!$containerConfigCache->isFresh()) {
             $builder = new ContainerBuilder();
             $builder->addCompilerPass(new SlimAppCompilerPass());
-            foreach ($this->configs as $k => $v) {
-                $builder->setParameter("app.$k", $v);
-            }
+            $recursiveSetParameter = function (callable $recursiveCallback,
+                                               ContainerBuilder $builder,
+                                               array $configs,
+                                               $prefix = 'app.') {
+                foreach ($configs as $k => &$v) {
+                    if (!is_array($v)) {
+                        $builder->setParameter($prefix . "$k", $v);
+                    }
+                    else {
+                        call_user_func($recursiveCallback, $recursiveCallback, $builder, $v, $prefix . "$k" . ".");
+                    }
+                }
+            };
+            call_user_func($recursiveSetParameter, $recursiveSetParameter, $builder, $this->configs);
 
             $loader = new YamlFileLoader(
                 $builder,
@@ -108,8 +138,9 @@ class SlimApp
                 $resources
             );
             //mdebug("container dumped");
-
         }
+
+        // create container instance
         /** @noinspection PhpIncludeInspection */
         require_once $cacheFilePath;
         /** @noinspection PhpUndefinedClassInspection */
@@ -179,12 +210,29 @@ class SlimApp
         return $this->consoleApp;
     }
 
+    public function getHttpKernel()
+    {
+        if (!$this->silexKernel) {
+            $this->silexKernel = new SilexKernel($this->httpConfig, $this->isDebugMode);
+        }
+
+        return $this->silexKernel;
+    }
+
     function __set($name, $value)
     {
         $methodName = sprintf("set%sProperty", strtr(ucwords($name, "._-"), ["." => "", "_" => "", "-" => ""]));
         if (method_exists($this, $methodName)) {
             call_user_func([$this, $methodName], $value);
         }
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isDebug()
+    {
+        return $this->isDebugMode;
     }
 
     protected function setLoggingProperty($value)
@@ -213,5 +261,11 @@ class SlimApp
     {
         $this->consoleApp    = null;
         $this->consoleConfig = $value;
+    }
+
+    protected function setHttpProperty($value)
+    {
+        $this->silexKernel = null;
+        $this->httpConfig  = $value;
     }
 }

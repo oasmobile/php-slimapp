@@ -1,2 +1,3 @@
-logpath:    /data/logs/slimapp
-datapath:    /data/slimapp
+dir:
+    log:    /data/logs/slimapp
+    data:   /data/slimapp
