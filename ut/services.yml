@@ -36,6 +36,11 @@ services:
                         - Oasis\SlimApp\Ut\
                 error_handlers: '@http.error_handler'
                 view_handlers: '@http.view_handler'
+                cors:
+                    -
+                        path:       /cors/*
+                        origins:    "*"
+
 
     log.handler.sns:
         class: Oasis\Mlib\Logging\AwsSnsHandler
