@@ -19,8 +19,27 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsoleApplication extends Application
 {
+    /** @var SlimApp */
+    protected $slimapp = null;
+
     protected $loggingPath  = null;
     protected $loggingLevel = Logger::DEBUG;
+
+    /**
+     * @return SlimApp
+     */
+    public function getSlimapp()
+    {
+        return $this->slimapp;
+    }
+
+    /**
+     * @param SlimApp $slimapp
+     */
+    public function setSlimapp($slimapp)
+    {
+        $this->slimapp = $slimapp;
+    }
 
     /**
      * @return int

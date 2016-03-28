@@ -16,6 +16,8 @@ use Oasis\Mlib\Logging\LocalFileHandler;
 use Oasis\Mlib\Logging\MLogging;
 use Oasis\Mlib\Utils\AbstractDataProvider;
 use Oasis\Mlib\Utils\ArrayDataProvider;
+use Oasis\SlimApp\BuiltInCommands\ClearCacheCommand;
+use Oasis\SlimApp\BuiltInCommands\ValidateServicesCommand;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -51,8 +53,10 @@ class SlimApp
     /** @var  array */
     protected $httpConfig;
 
-    protected $config_file   = "config.yml";
-    protected $services_file = "services.yml";
+    protected $configPath;
+    protected $configFilename  = "config.yml";
+    protected $serviceFilename = "services.yml";
+    protected $configCachePath = '';
 
     /**
      * @return static
@@ -67,19 +71,22 @@ class SlimApp
         return $inst;
     }
 
-    public function init($configPath, ConfigurationInterface $configurationInterface)
+    public function init($configPath, ConfigurationInterface $configurationInterface, $configCachePath = null)
     {
         if (!is_dir($configPath)) {
             throw new \InvalidArgumentException(
                 "Config path must be a directory containing config file. Path given = " . $configPath
             );
         }
+        $this->configPath = $configPath;
 
-        $locator = new FileLocator([$configPath]);
+        $this->configCachePath = $configCachePath ? : $this->configPath . "/cache";
+
+        $locator = new FileLocator([$this->configPath]);
 
         // read config.yml first
         $configResources = [];
-        $yamlFiles       = $locator->locate($this->config_file, null, false);
+        $yamlFiles       = $locator->locate($this->configFilename, null, false);
         $rawData         = [];
         foreach ($yamlFiles as $file) {
             $configResources[] = new FileResource(realpath($file));
@@ -89,13 +96,13 @@ class SlimApp
         $processor     = new Processor();
         $this->configs = $processor->processConfiguration($configurationInterface, $rawData);
         if (!isset($this->configs['dir.config'])) {
-            $this->configs['dir.config'] = $configPath;
+            $this->configs['dir.config'] = $this->configPath;
         }
 
         $this->configDataProvider = new ArrayDataProvider($this->configs);
 
         // read container info
-        $cacheFilePath        = $configPath . "/cache/container.php";
+        $cacheFilePath        = $this->configCachePath . "/container.php";
         $this->isDebugMode    = $this->configDataProvider->getOptional('is_debug', ArrayDataProvider::BOOL_TYPE, true);
         $containerConfigCache = new ConfigCache(
             $cacheFilePath,
@@ -125,7 +132,7 @@ class SlimApp
                 $builder,
                 $locator
             );
-            $loader->load($this->services_file);
+            $loader->load($this->serviceFilename);
 
             $builder->compile();
 
@@ -200,8 +207,19 @@ class SlimApp
     {
         if (!$this->consoleApp) {
             $this->consoleApp = new ConsoleApplication($this->consoleConfig['name'], $this->consoleConfig['version']);
+            $this->consoleApp->setSlimapp($this);
             $this->consoleApp->setLoggingPath($this->loggingPath);
             $this->consoleApp->setLoggingLevel($this->loggingLevel);
+
+            // Add built-in commands
+            $this->consoleApp->addCommands(
+                [
+                    new ClearCacheCommand(),
+                    new ValidateServicesCommand(),
+                ]
+            );
+
+            // Add custom commands
             if (is_array($this->consoleConfig['commands'])) {
                 $this->consoleApp->addCommands($this->consoleConfig['commands']);
             }
@@ -233,6 +251,22 @@ class SlimApp
     public function isDebug()
     {
         return $this->isDebugMode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConfigCachePath()
+    {
+        return $this->configCachePath;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getConfigPath()
+    {
+        return $this->configPath;
     }
 
     protected function setLoggingProperty($value)
