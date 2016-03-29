@@ -55,6 +55,7 @@ class InitializeProjectCommand extends Command
     
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->fs = new Filesystem();
         $this->input  = $input;
         $this->output = $output;
         
