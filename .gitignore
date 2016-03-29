@@ -1,3 +1,5 @@
+/config/cache
 /ut/cache
 /vendor
 /.idea/
+/init-ut/

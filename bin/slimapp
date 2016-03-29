@@ -1,0 +1,49 @@
+#! /usr/bin/env php
+<?php
+/**
+ * Created by PhpStorm.
+ * User: minhao
+ * Date: 2016-03-29
+ * Time: 10:18
+ */
+
+use Oasis\SlimApp\SlimApp;
+
+$autoloadFiles = [
+    __DIR__ . '/../../../../bootstrap.php',
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+];
+
+/** @var SlimApp $app */
+$app        = null;
+$autoloaded = false;
+foreach ($autoloadFiles as $autoloadFile) {
+    if (file_exists($autoloadFile)) {
+        /** @noinspection PhpIncludeInspection */
+        $returnValue = require_once $autoloadFile;
+        if ($returnValue instanceof SlimApp) {
+            $app = $returnValue;
+        }
+        $autoloaded = true;
+        break;
+    }
+}
+
+if (!$autoloaded) {
+    echo <<<ERROR
+{$_SERVER['argv'][0]} is put under a wrong directory. No bootstrap (bootstrap.php/autoload.php ...) file can be found.
+
+ERROR;
+    exit(1);
+}
+
+/** @noinspection PhpIncludeInspection */
+if (!$app instanceof SlimApp) {
+    $app = SlimApp::app();
+}
+
+$app->getConsoleApplication()->run();
+
+
+

@@ -17,6 +17,7 @@ use Oasis\Mlib\Logging\MLogging;
 use Oasis\Mlib\Utils\AbstractDataProvider;
 use Oasis\Mlib\Utils\ArrayDataProvider;
 use Oasis\SlimApp\BuiltInCommands\ClearCacheCommand;
+use Oasis\SlimApp\BuiltInCommands\InitializeProjectCommand;
 use Oasis\SlimApp\BuiltInCommands\ValidateServicesCommand;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -112,7 +113,7 @@ class SlimApp
         // refresh container if dirty
         if (!$containerConfigCache->isFresh()) {
             $builder = new ContainerBuilder();
-            $builder->addCompilerPass(new SlimAppCompilerPass());
+            $builder->addCompilerPass(new SlimAppCompilerPass(static::class));
             $recursiveSetParameter = function (callable $recursiveCallback,
                                                ContainerBuilder $builder,
                                                array $configs,
@@ -206,7 +207,9 @@ class SlimApp
     public function getConsoleApplication()
     {
         if (!$this->consoleApp) {
-            $this->consoleApp = new ConsoleApplication($this->consoleConfig['name'], $this->consoleConfig['version']);
+            $name             = $this->consoleConfig['name'] ? : 'UNKNOWN';
+            $version          = $this->consoleConfig['version'] ? : 'UNKNOWN';
+            $this->consoleApp = new ConsoleApplication($name, $version);
             $this->consoleApp->setSlimapp($this);
             $this->consoleApp->setLoggingPath($this->loggingPath);
             $this->consoleApp->setLoggingLevel($this->loggingLevel);
@@ -216,6 +219,7 @@ class SlimApp
                 [
                     new ClearCacheCommand(),
                     new ValidateServicesCommand(),
+                    new InitializeProjectCommand(),
                 ]
             );
 

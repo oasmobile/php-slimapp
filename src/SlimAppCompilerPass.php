@@ -13,7 +13,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class SlimAppCompilerPass implements CompilerPassInterface
 {
-    
+    protected $classname;
+
+    public function __construct($classname)
+    {
+        $this->classname = $classname;
+    }
+
     /**
      * You can modify the container here before it is dumped to PHP code.
      *
@@ -27,7 +33,15 @@ class SlimAppCompilerPass implements CompilerPassInterface
                 $defaultNamespaces = [$defaultNamespaces];
             }
 
-            foreach ($container->getDefinitions() as $definition) {
+            foreach ($container->getDefinitions() as $id => $definition) {
+
+                // We need to prepare 'app' service
+                if ($id == 'app') {
+                    $definition->setClass($this->classname);
+                    $definition->setFactory([$this->classname, 'app']);
+                    continue;
+                }
+
                 if (($class = $definition->getClass())
                     && !class_exists($class)
                     && !class_exists("\\" . $class)
