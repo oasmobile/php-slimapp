@@ -13,7 +13,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -70,6 +69,7 @@ class InitializeProjectCommand extends Command
         $this->prepareBootstrapFile();
         
         $this->applyTempFiles();
+        $this->dumpComposerAutoload();
     }
     
     protected function ensureProjectRoot()
@@ -360,7 +360,7 @@ SRC;
         $cacheDir        = $helper->ask($this->input, $this->output, $question);
         
         $suggestTemplateDir = "{$this->rootDir}/templates";
-        $question        = new Question(
+        $question           = new Question(
             "Please provide the template directory <info>[$suggestTemplateDir]</info>: ",
             $suggestTemplateDir
         );
@@ -434,18 +434,33 @@ SRC;
     {
         $helper = $this->getHelper('question');
         $this->output->writeln("All configuration accepted. Will start to generate needed files.");
-        
-        $fs = new Filesystem();
+
+        $overwriteAll = false;
+        $fs           = new Filesystem();
         foreach ($this->tempFiles as $tempFile) {
             $this->output->writeln(
                 "Generating file <comment>$tempFile</comment> ..."
             );
             if ($fs->exists($tempFile)) {
-                $question  = new ConfirmationQuestion(
-                    "File <comment>$tempFile</comment> exists, overwrite? <info>[y/n]</info>: "
-                );
-                $overwrite = $helper->ask($this->input, $this->output, $question);
-                if ($overwrite) {
+                $shouldOverwrite = false;
+                if (!$overwriteAll) {
+                    $question  = new Question(
+                        "File <comment>$tempFile</comment> exists, overwrite? <info>[yes/no/all]</info>: ",
+                        "y"
+                    );
+                    $overwrite = $helper->ask($this->input, $this->output, $question);
+                    if (preg_match('/^a/i', $overwrite)) {
+                        $overwriteAll    = true;
+                        $shouldOverwrite = true;
+                    }
+                    elseif (preg_match('/^y/i', $overwrite)) {
+                        $shouldOverwrite = true;
+                    }
+                }
+                else {
+                    $shouldOverwrite = true;
+                }
+                if ($shouldOverwrite) {
                     $fs->remove($tempFile);
                 }
                 else {
@@ -454,9 +469,24 @@ SRC;
             }
             $fs->copy($tempFile . ".tmp", $tempFile);
             $fs->remove($tempFile . ".tmp");
-            $this->output->writeln(
-                "Done."
-            );
+            $this->output->writeln("<info>Done.</info>");
+        }
+    }
+
+    protected function dumpComposerAutoload()
+    {
+        $this->output->writeln("Will now update autoload file ...");
+        $oldDir = getcwd();
+        chdir($this->rootDir);
+        system("composer dumpautoload", $retval);
+        chdir($oldDir);
+
+        if ($retval == 0) {
+            $this->output->writeln("<info>Done.</info>");
+        }
+        else {
+            $this->output->writeln("<error>Error while updating autoload file.</error>");
+            exit(1);
         }
     }
     
