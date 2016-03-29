@@ -446,7 +446,7 @@ SRC;
                                 "namespaces" => [$this->projectNamespace],
                             ],
                             "twig"      => [
-                                "template_dir" => "%app.dir.tempates%",
+                                "template_dir" => "%app.dir.template%",
                             ],
                         ],
                     ],
