@@ -83,8 +83,6 @@ class InitializeProjectCommand extends Command
         $fs = new Filesystem();
         $fs->mkdir($this->rootDir);
         
-        return;
-        
         $finder = new Finder();
         $finder->in($this->rootDir);
         $finder->depth(0);
@@ -101,7 +99,6 @@ class InitializeProjectCommand extends Command
             'composer.lock',
         ];
         $requiredDirs  = [
-            'bin',
             'vendor',
         ];
         
