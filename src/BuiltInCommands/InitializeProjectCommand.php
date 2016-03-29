@@ -21,6 +21,9 @@ use Symfony\Component\Yaml\Yaml;
 
 class InitializeProjectCommand extends Command
 {
+    /** @var  Filesystem */
+    protected $fs;
+
     /** @var  InputInterface */
     protected $input;
     /** @var  OutputInterface */
@@ -67,7 +70,8 @@ class InitializeProjectCommand extends Command
         $this->prepareServicesYaml();
         
         $this->prepareBootstrapFile();
-        
+        $this->prepareFrontControllerFile();
+
         $this->applyTempFiles();
         $this->dumpComposerAutoload();
     }
@@ -80,8 +84,7 @@ class InitializeProjectCommand extends Command
         
         $this->rootDir = realpath($this->rootDir);
         
-        $fs = new Filesystem();
-        $fs->mkdir($this->rootDir);
+        $this->fs->mkdir($this->rootDir);
         
         $finder = new Finder();
         $finder->in($this->rootDir);
@@ -206,11 +209,12 @@ class InitializeProjectCommand extends Command
     
     protected function prepareDirectoryStructure()
     {
-        $fs = new Filesystem();
-        $fs->mkdir($this->rootDir . "/cache");
-        $fs->mkdir($this->rootDir . "/config");
-        $fs->mkdir($this->rootDir . "/templates");
-        $fs->mkdir(
+        $this->fs->mkdir($this->rootDir . "/cache");
+        $this->fs->mkdir($this->rootDir . "/config");
+        $this->fs->mkdir($this->rootDir . "/templates");
+        $this->fs->mkdir($this->rootDir . "/web");
+        $this->fs->mkdir($this->rootDir . "/assets");
+        $this->fs->mkdir(
             StringUtils::stringStartsWith($this->projectSrcDir, "/") ?
                 $this->projectSrcDir :
                 $this->rootDir . "/" . $this->projectSrcDir
@@ -333,7 +337,35 @@ return \$app;
 SRC;
         $this->writeToTempFile($filename, $bootstrapSource);
     }
-    
+
+    protected function prepareFrontControllerFile()
+    {
+        $filename = $this->rootDir . "/web/front.php";
+        $date     = date('Y-m-d');
+        $time     = date('H:i');
+        $this->output->writeln("front controller file = $filename");
+        $bootstrapSource = <<<SRC
+<?php
+/**
+ * Created by SlimApp.
+ *
+ * Date: $date
+ * Time: $time
+ */
+
+
+use {$this->projectNamespace}{$this->mainClassname};
+
+/** @var {$this->mainClassname} \$app */
+\$app = require_once __DIR__ . "/../bootstrap.php";
+
+\$app->getHttpKernel()->run();
+
+
+SRC;
+        $this->writeToTempFile($filename, $bootstrapSource);
+    }
+
     protected function prepareConfigYaml()
     {
         $helper = $this->getHelper('question');
@@ -413,7 +445,7 @@ SRC;
                                 "namespaces" => [$this->projectNamespace],
                             ],
                             "twig"      => [
-                                "template_dir" => "%app.dir.tempates",
+                                "template_dir" => "%app.dir.tempates%",
                             ],
                         ],
                     ],
@@ -426,6 +458,8 @@ SRC;
     
     protected function writeToTempFile($realFilename, $content)
     {
+        $dir = dirname($realFilename);
+        $this->fs->mkdir($dir);
         file_put_contents($realFilename . ".tmp", $content);
         $this->tempFiles[] = $realFilename;
     }
@@ -436,12 +470,11 @@ SRC;
         $this->output->writeln("All configuration accepted. Will start to generate needed files.");
 
         $overwriteAll = false;
-        $fs           = new Filesystem();
         foreach ($this->tempFiles as $tempFile) {
             $this->output->writeln(
                 "Generating file <comment>$tempFile</comment> ..."
             );
-            if ($fs->exists($tempFile)) {
+            if ($this->fs->exists($tempFile)) {
                 $shouldOverwrite = false;
                 if (!$overwriteAll) {
                     $question  = new Question(
@@ -461,14 +494,14 @@ SRC;
                     $shouldOverwrite = true;
                 }
                 if ($shouldOverwrite) {
-                    $fs->remove($tempFile);
+                    $this->fs->remove($tempFile);
                 }
                 else {
                     continue;
                 }
             }
-            $fs->copy($tempFile . ".tmp", $tempFile);
-            $fs->remove($tempFile . ".tmp");
+            $this->fs->copy($tempFile . ".tmp", $tempFile);
+            $this->fs->remove($tempFile . ".tmp");
             $this->output->writeln("<info>Done.</info>");
         }
     }
