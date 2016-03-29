@@ -23,6 +23,9 @@
             "email": "minhao.zhang@qq.com"
         }
     ],
+    "bin" : [
+        "bin/slimapp"
+    ],
     "autoload"   : {
         "psr-4": {
             "Oasis\\SlimApp\\": "src/"
