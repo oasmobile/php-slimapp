@@ -55,7 +55,7 @@ class InitializeProjectCommand extends Command
     
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->fs = new Filesystem();
+        $this->fs     = new Filesystem();
         $this->input  = $input;
         $this->output = $output;
         
@@ -456,7 +456,23 @@ SRC;
         $serviceYaml = Yaml::dump($services, 7);
         $this->writeToTempFile($filename, $serviceYaml);
     }
-    
+
+    protected function prepareRoutesYaml()
+    {
+        $filename    = $this->rootDir . "/config/routes.yml";
+        $services    = [
+            "home" => [
+                "path"     => "/",
+                "defaults" => [
+                    "controller" => "--- write your controller here ---",
+                ],
+
+            ],
+        ];
+        $serviceYaml = Yaml::dump($services, 7);
+        $this->writeToTempFile($filename, $serviceYaml);
+    }
+
     protected function writeToTempFile($realFilename, $content)
     {
         $dir = dirname($realFilename);
@@ -477,7 +493,7 @@ SRC;
             );
             if ($this->fs->exists($tempFile)) {
                 $shouldOverwrite = false;
-                if (!$overwriteAll) {
+                if (!$overwriteAll && $tempFile != "composer.json") {
                     $question  = new Question(
                         "File <comment>$tempFile</comment> exists, overwrite? <info>[yes/no/all]</info>: ",
                         "y"
