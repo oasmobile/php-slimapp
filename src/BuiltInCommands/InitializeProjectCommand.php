@@ -69,6 +69,7 @@ class InitializeProjectCommand extends Command
         
         $this->prepareConfigYaml();
         $this->prepareServicesYaml();
+        $this->prepareRoutesYaml();
         
         $this->prepareBootstrapFile();
         $this->prepareFrontControllerFile();
@@ -488,16 +489,17 @@ SRC;
 
         $overwriteAll = false;
         foreach ($this->tempFiles as $tempFile) {
-            $this->output->writeln(
-                "Generating file <comment>$tempFile</comment> ..."
+            $this->output->write(
+                "Generating file <comment>$tempFile</comment> ... "
             );
             if ($this->fs->exists($tempFile)) {
                 $shouldOverwrite = false;
-                if (!$overwriteAll && $tempFile != "composer.json") {
+                if (!$overwriteAll && basename($tempFile) != "composer.json") {
                     $question  = new Question(
                         "File <comment>$tempFile</comment> exists, overwrite? <info>[yes/no/all]</info>: ",
                         "y"
                     );
+                    $this->output->writeln('');
                     $overwrite = $helper->ask($this->input, $this->output, $question);
                     if (preg_match('/^a/i', $overwrite)) {
                         $overwriteAll    = true;
@@ -514,6 +516,7 @@ SRC;
                     $this->fs->remove($tempFile);
                 }
                 else {
+                    $this->output->writeln('Skipped.');
                     continue;
                 }
             }
