@@ -73,6 +73,7 @@ class InitializeProjectCommand extends Command
         
         $this->prepareBootstrapFile();
         $this->prepareFrontControllerFile();
+        $this->prepareDemoControllerFile();
 
         $this->applyTempFiles();
         $this->dumpComposerAutoload();
@@ -370,6 +371,37 @@ SRC;
         $this->writeToTempFile($filename, $bootstrapSource);
     }
 
+    protected function prepareDemoControllerFile()
+    {
+        $filename = $this->rootDir . "/" . $this->projectSrcDir . "/Controllers/DemoController.php";
+        $date     = date('Y-m-d');
+        $time     = date('H:i');
+        $this->output->writeln("front controller file = $filename");
+        $bootstrapSource = <<<SRC
+<?php
+/**
+ * Created by SlimApp.
+ *
+ * Date: $date
+ * Time: $time
+ */
+
+
+use Symfony\Component\HttpFoundation\Response;
+
+class DemoController
+{
+    public function testAction()
+    {
+        return new Response('Hello World!');
+    }
+}
+
+
+SRC;
+        $this->writeToTempFile($filename, $bootstrapSource);
+    }
+
     protected function prepareConfigYaml()
     {
         $helper = $this->getHelper('question');
@@ -446,7 +478,7 @@ SRC;
                             "cache_dir" => "%app.dir.cache%",
                             "routing"   => [
                                 "path"       => "%app.dir.config%/routes.yml",
-                                "namespaces" => [$this->projectNamespace],
+                                "namespaces" => [$this->projectNamespace, $this->projectNamespace . "Controllers\\"],
                             ],
                             "twig"      => [
                                 "template_dir" => "%app.dir.template%",
@@ -467,7 +499,7 @@ SRC;
             "home" => [
                 "path"     => "/",
                 "defaults" => [
-                    "controller" => "--- write your controller here ---",
+                    "_controller" => "DemoController::testAction",
                 ],
 
             ],
