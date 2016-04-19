@@ -23,13 +23,15 @@ class InitializeProjectCommand extends Command
 {
     /** @var  Filesystem */
     protected $fs;
-
+    
     /** @var  InputInterface */
     protected $input;
     /** @var  OutputInterface */
     protected $output;
     /** @var  string */
     protected $rootDir;
+    /** @var  string */
+    protected $vendorName;
     /** @var  string */
     protected $projectName;
     /** @var  string */
@@ -40,6 +42,8 @@ class InitializeProjectCommand extends Command
     protected $projectSrcDir;
     /** @var  string */
     protected $cacheDir;
+    /** @var bool */
+    protected $databaseSupportEnabled = false;
     
     protected $tempFiles = [];
     
@@ -66,7 +70,9 @@ class InitializeProjectCommand extends Command
         
         $this->prepareAppClassFile();
         $this->prepareConfigClassFile();
-        
+
+        $this->prepareDatabaseRelatedFiles();
+
         $this->prepareConfigYaml();
         $this->prepareServicesYaml();
         $this->prepareRoutesYaml();
@@ -74,9 +80,9 @@ class InitializeProjectCommand extends Command
         $this->prepareBootstrapFile();
         $this->prepareFrontControllerFile();
         $this->prepareDemoControllerFile();
-
+        
         $this->applyTempFiles();
-        $this->dumpComposerAutoload();
+        $this->updateComposerInfo();
     }
     
     protected function ensureProjectRoot()
@@ -156,7 +162,7 @@ class InitializeProjectCommand extends Command
             exit(1);
         }
         $composerJson['name'] = $name;
-        list(, $this->projectName) = explode("/", $name, 2);
+        list($this->vendorName, $this->projectName) = explode("/", $name, 2);
         
         if (!isset($composerJson['autoload'])) {
             $composerJson['autoload'] = [];
@@ -168,7 +174,8 @@ class InitializeProjectCommand extends Command
         $namespaces = $composerJson['autoload']['psr-4'];
         
         // auto-detect if namespace is already presented
-        $suggestNamespace = '';
+        $suggestNamespace = str_replace('-', '', ucwords($this->vendorName, '-')) . "\\"
+                            . str_replace('-', '', ucwords($this->projectName, '-')) . "\\";
         $suggestSrcDir    = 'src/';
         if ($namespaces) {
             foreach ($namespaces as $namespace => $srcDir) {
@@ -299,6 +306,21 @@ class $classname implements ConfigurationInterface
                 \$dir->children()->scalarNode('cache');
                 \$dir->children()->scalarNode('template');
             }
+            
+            \$db = \$root->children()->arrayNode('db');
+            {
+                \$db->children()->scalarNode('host')->isRequired();
+                \$db->children()->integerNode('port')->defaultValue(3306);
+                \$db->children()->scalarNode('username')->isRequired();
+                \$db->children()->scalarNode('password')->isRequired();
+                \$db->children()->scalarNode('dbname')->isRequired();
+            }
+
+            \$memcached = \$root->children()->arrayNode('memcached');
+            {
+                \$memcached->children()->scalarNode('host')->isRequired();
+                \$memcached->children()->integerNode('port')->isRequired();
+            }
         }
 
         return \$treeBuilder;
@@ -342,7 +364,7 @@ return \$app;
 SRC;
         $this->writeToTempFile($filename, $bootstrapSource);
     }
-
+    
     protected function prepareFrontControllerFile()
     {
         $filename = $this->rootDir . "/web/front.php";
@@ -370,14 +392,15 @@ use {$this->projectNamespace}{$this->mainClassname};
 SRC;
         $this->writeToTempFile($filename, $bootstrapSource);
     }
-
+    
     protected function prepareDemoControllerFile()
     {
         $filename = $this->rootDir . "/" . $this->projectSrcDir . "/Controllers/DemoController.php";
         $date     = date('Y-m-d');
         $time     = date('H:i');
         $this->output->writeln("front controller file = $filename");
-        $bootstrapSource = <<<SRC
+        $namespaceDeclaration = trim($this->projectNamespace, "\\");
+        $bootstrapSource      = <<<SRC
 <?php
 /**
  * Created by SlimApp.
@@ -386,6 +409,7 @@ SRC;
  * Time: $time
  */
 
+namespace {$namespaceDeclaration}\Controllers;
 
 use Symfony\Component\HttpFoundation\Response;
 
@@ -401,7 +425,7 @@ class DemoController
 SRC;
         $this->writeToTempFile($filename, $bootstrapSource);
     }
-
+    
     protected function prepareConfigYaml()
     {
         $helper = $this->getHelper('question');
@@ -491,7 +515,7 @@ SRC;
         $serviceYaml = Yaml::dump($services, 7);
         $this->writeToTempFile($filename, $serviceYaml);
     }
-
+    
     protected function prepareRoutesYaml()
     {
         $filename    = $this->rootDir . "/config/routes.yml";
@@ -501,13 +525,133 @@ SRC;
                 "defaults" => [
                     "_controller" => "DemoController::testAction",
                 ],
-
+            
             ],
         ];
         $serviceYaml = Yaml::dump($services, 7);
         $this->writeToTempFile($filename, $serviceYaml);
     }
+    
+    protected function prepareDatabaseRelatedFiles()
+    {
+        $helper   = $this->getHelper('question');
+        $question = new Question(
+            "Do you want to enable database support (Doctrine/ORM)?"
+            . " <info>[yes]</info>: ",
+            'yes'
+        );
+        $answer   = $helper->ask($this->input, $this->output, $question);
+        if (!preg_match('#^y#i', $answer)) {
+            $this->output->writeln("You chose not to enable database support.");
+            
+            return;
+        }
+        $this->output->writeln("Database support enabled, related files will be populated.");
+        $this->databaseSupportEnabled = true;
+        
+        $this->prepareDatabaseManagerFile();
+        $this->prepareDatabaseCliConfigFile();
+    }
+    
+    protected function prepareDatabaseManagerFile()
+    {
+        $filename = $this->rootDir . "/" . $this->projectSrcDir . "/Database/" . $this->mainClassname . "Database.php";
+        $date     = date('Y-m-d');
+        $time     = date('H:i');
+        $this->output->writeln("database manager file = $filename");
+        $namespaceDeclaration              = trim($this->projectNamespace, "\\");
+        $entityNamespaceDeclarationEscaped = addcslashes($namespaceDeclaration . "\\Entities", "\\");
+        $bootstrapSource                   = <<<SRC
+<?php
+/**
+ * Created by SlimApp.
+ *
+ * Date: $date
+ * Time: $time
+ */
 
+namespace {$namespaceDeclaration}\Database;
+
+use Doctrine\Common\Cache\MemcachedCache;
+use Doctrine\ORM\Cache\DefaultCacheFactory;
+use Doctrine\ORM\Cache\RegionsConfiguration;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Setup;
+use {$this->projectNamespace}{$this->mainClassname};
+
+
+class {$this->mainClassname}Database
+{
+    public static function getEntityManager()
+    {
+        static \$entityManager = null;
+        if (\$entityManager instanceof EntityManager) {
+            return \$entityManager;
+        }
+        
+        \$app = {$this->mainClassname}::app();
+
+        \$memcached = new \Memcached();
+        \$memcached->addServer(\$app->getParameter('app.memcached.host'), \$app->getParameter('app.memcached.port')); 
+        \$memcache = new MemcachedCache();
+        \$memcache->setMemcached(\$memcached);
+        
+        \$isDevMode = \$app->isDebug();
+        \$config    = Setup::createAnnotationMetadataConfiguration(
+            [PROJECT_DIR . "/src/Entities"],
+            \$isDevMode,
+            \$app->getParameter('app.dir.data') . "/proxies",
+            \$memcache,
+            false /* do not use simple annotation reader, so that we can understand annotations like @ORM/Table */
+        );
+        \$config->addEntityNamespace("{$this->mainClassname}", "{$entityNamespaceDeclarationEscaped}");
+        //\$config->setSQLLogger(new EchoSQLLogger());
+
+        \$regconfig = new RegionsConfiguration();
+        \$factory   = new DefaultCacheFactory(\$regconfig, \$memcache);
+        \$config->setSecondLevelCacheEnabled();
+        \$config->getSecondLevelCacheConfiguration()->setCacheFactory(\$factory);
+
+        \$conn           = \$app->getParameter('app.db');
+        \$conn["driver"] = "pdo_mysql";
+        \$entityManager  = EntityManager::create(\$conn, \$config);
+
+        return \$entityManager;
+    }
+}
+
+
+SRC;
+        $this->writeToTempFile($filename, $bootstrapSource);
+    }
+    
+    protected function prepareDatabaseCliConfigFile()
+    {
+        $filename = $this->rootDir . "/config/cli-config.php";
+        $date     = date('Y-m-d');
+        $time     = date('H:i');
+        $this->output->writeln("cli config file = $filename");
+        $bootstrapSource = <<<SRC
+<?php
+/**
+ * Created by SlimApp.
+ *
+ * Date: $date
+ * Time: $time
+ */
+ 
+ 
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+use {$this->projectNamespace}Database\{$this->mainClassname}Database;
+
+require_once __DIR__ . "/../bootstrap.php";
+
+return ConsoleRunner::createHelperSet({$this->mainClassname}Database::getEntityManager());
+
+SRC;
+        $this->writeToTempFile($filename, $bootstrapSource);
+    }
+    
     protected function writeToTempFile($realFilename, $content)
     {
         $dir = dirname($realFilename);
@@ -520,7 +664,7 @@ SRC;
     {
         $helper = $this->getHelper('question');
         $this->output->writeln("All configuration accepted. Will start to generate needed files.");
-
+        
         $overwriteAll = false;
         foreach ($this->tempFiles as $tempFile) {
             $this->output->write(
@@ -529,7 +673,7 @@ SRC;
             if ($this->fs->exists($tempFile)) {
                 $shouldOverwrite = false;
                 if (!$overwriteAll && basename($tempFile) != "composer.json") {
-                    $question  = new Question(
+                    $question = new Question(
                         "File <comment>$tempFile</comment> exists, overwrite? <info>[yes/no/all]</info>: ",
                         "y"
                     );
@@ -559,22 +703,34 @@ SRC;
             $this->output->writeln("<info>Done.</info>");
         }
     }
-
-    protected function dumpComposerAutoload()
+    
+    protected function updateComposerInfo()
     {
-        $this->output->writeln("Will now update autoload file ...");
+        $this->output->writeln("Will now update composer related files ...");
         $oldDir = getcwd();
         chdir($this->rootDir);
+        
+        if ($this->databaseSupportEnabled) {
+            system("composer require doctrine/orm", $retval);
+            if ($retval == 0) {
+                $this->output->writeln("<info>Database support component updated.</info>");
+            }
+            else {
+                $this->output->writeln("<error>Error while updating database support component.</error>");
+                exit(1);
+            }
+        }
+        
         system("composer dumpautoload", $retval);
-        chdir($oldDir);
-
         if ($retval == 0) {
-            $this->output->writeln("<info>Done.</info>");
+            $this->output->writeln("<info>Autoloader updated.</info>");
         }
         else {
             $this->output->writeln("<error>Error while updating autoload file.</error>");
             exit(1);
         }
+        
+        chdir($oldDir);
     }
     
 }
