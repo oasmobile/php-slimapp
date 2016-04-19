@@ -311,7 +311,7 @@ class $classname implements ConfigurationInterface
             {
                 \$db->children()->scalarNode('host')->isRequired();
                 \$db->children()->integerNode('port')->defaultValue(3306);
-                \$db->children()->scalarNode('username')->isRequired();
+                \$db->children()->scalarNode('user')->isRequired();
                 \$db->children()->scalarNode('password')->isRequired();
                 \$db->children()->scalarNode('dbname')->isRequired();
             }
