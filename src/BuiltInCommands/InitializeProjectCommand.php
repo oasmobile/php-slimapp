@@ -467,6 +467,19 @@ SRC;
                 "template" => $templateDir,
             ],
         ];
+        if ($this->databaseSupportEnabled) {
+            $config['db']        = [
+                'host'     => 'localhost',
+                'port'     => 3306,
+                'user'     => str_replace('-', '_', $this->projectName),
+                'password' => $this->projectName,
+                'dbname'   => str_replace('-', '_', $this->projectName),
+            ];
+            $config['memcached'] = [
+                'host' => 'localhost',
+                'port' => 11211,
+            ];
+        }
         
         $configYaml = Yaml::dump($config, 5);
         $this->writeToTempFile($filename, $configYaml);
