@@ -329,6 +329,8 @@ use {$this->projectNamespace}{$this->mainClassname}Configuration;
 
 require_once __DIR__ . "/vendor/autoload.php";
 
+define('PROJECT_DIR', __DIR__);
+
 /** @var {$this->mainClassname} \$app */
 \$app = {$this->mainClassname}::app();
 \$app->init(__DIR__ . "/config", new {$this->mainClassname}Configuration(), __DIR__ . "/cache/config");

@@ -119,10 +119,8 @@ class SlimApp
                                                array $configs,
                                                $prefix = 'app.') {
                 foreach ($configs as $k => &$v) {
-                    if (!is_array($v)) {
-                        $builder->setParameter($prefix . "$k", $v);
-                    }
-                    else {
+                    $builder->setParameter($prefix . "$k", $v);
+                    if (is_array($v)) {
                         call_user_func($recursiveCallback, $recursiveCallback, $builder, $v, $prefix . "$k" . ".");
                     }
                 }
