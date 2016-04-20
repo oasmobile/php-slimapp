@@ -246,7 +246,7 @@ class InitializeProjectCommand extends Command
 <?php
 namespace $namespaceDeclaration;
 
-use Oasis\SlimApp\SlimApp;
+use Oasis\\SlimApp\\SlimApp;
 
 /**
  * Created by SlimApp.
@@ -277,8 +277,8 @@ SRC;
 <?php
 namespace $namespaceDeclaration;
 
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\\Component\\Config\\Definition\\Builder\\TreeBuilder;
+use Symfony\\Component\\Config\\Definition\\ConfigurationInterface;
 
 /**
  * Created by SlimApp.
@@ -439,9 +439,9 @@ SRC;
  * Time: $time
  */
 
-namespace {$namespaceDeclaration}\Controllers;
+namespace {$namespaceDeclaration}\\Controllers;
 
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\\Component\\HttpFoundation\\Response;
 
 class DemoController
 {
@@ -613,13 +613,13 @@ SRC;
  * Time: $time
  */
 
-namespace {$namespaceDeclaration}\Database;
+namespace {$namespaceDeclaration}\\Database;
 
-use Doctrine\Common\Cache\MemcachedCache;
-use Doctrine\ORM\Cache\DefaultCacheFactory;
-use Doctrine\ORM\Cache\RegionsConfiguration;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\Setup;
+use Doctrine\\Common\\Cache\\MemcachedCache;
+use Doctrine\\ORM\\Cache\\DefaultCacheFactory;
+use Doctrine\\ORM\\Cache\\RegionsConfiguration;
+use Doctrine\\ORM\\EntityManager;
+use Doctrine\\ORM\\Tools\\Setup;
 use {$this->projectNamespace}{$this->mainClassname};
 
 
@@ -684,8 +684,8 @@ SRC;
  */
  
  
-use Doctrine\ORM\Tools\Console\ConsoleRunner;
-use {$this->projectNamespace}Database\{$this->mainClassname}Database;
+use Doctrine\\ORM\\Tools\\Console\\ConsoleRunner;
+use {$this->projectNamespace}Database\\{$this->mainClassname}Database;
 
 require_once __DIR__ . "/../bootstrap.php";
 
