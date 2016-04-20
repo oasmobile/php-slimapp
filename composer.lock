@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1af9119826430bd428bbd32b3386a77f",
-    "content-hash": "c5b89e5a71d75af3c63c0dac12a6ce7b",
+    "hash": "c677fd188dc11d4027b77ce48ac99752",
+    "content-hash": "f821867e633c11fe553062c05cc1695b",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -169,16 +169,16 @@
         },
         {
             "name": "oasis/http",
-            "version": "v1.2.4",
+            "version": "v1.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oasmobile/php-http.git",
-                "reference": "eedf78f082a742cacf436213712145751107b03b"
+                "reference": "d4c438457ed1c90ced89ea56d470010f41dde258"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/eedf78f082a742cacf436213712145751107b03b",
-                "reference": "eedf78f082a742cacf436213712145751107b03b",
+                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/d4c438457ed1c90ced89ea56d470010f41dde258",
+                "reference": "d4c438457ed1c90ced89ea56d470010f41dde258",
                 "shasum": ""
             },
             "require": {
@@ -216,7 +216,7 @@
                 }
             ],
             "description": "An extension to Silex, for HTTP related routing, middleware, and so on.",
-            "time": "2016-04-15 07:47:38"
+            "time": "2016-04-20 13:34:01"
         },
         {
             "name": "oasis/logging",
@@ -3370,6 +3370,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.6"
+    },
     "platform-dev": []
 }

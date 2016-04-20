@@ -70,13 +70,13 @@ class InitializeProjectCommand extends Command
         
         $this->prepareAppClassFile();
         $this->prepareConfigClassFile();
-
+        
         $this->prepareDatabaseRelatedFiles();
-
+        
         $this->prepareConfigYaml();
         $this->prepareServicesYaml();
         $this->prepareRoutesYaml();
-
+        
         $this->prepareBootstrapFile();
         $this->prepareFrontControllerFile();
         $this->prepareConsoleEntryFile();
@@ -395,7 +395,7 @@ use {$this->projectNamespace}{$this->mainClassname};
 SRC;
         $this->writeToTempFile($filename, $frontSource);
     }
-
+    
     protected function prepareConsoleEntryFile()
     {
         $filename = $this->rootDir . "/bin/" . strtolower($this->projectName) . ".php";
@@ -424,7 +424,7 @@ use {$this->projectNamespace}{$this->mainClassname};
 SRC;
         $this->writeToTempFile($filename, $consoleEntrySource, 0755);
     }
-
+    
     protected function prepareDemoControllerFile()
     {
         $filename = $this->rootDir . "/" . $this->projectSrcDir . "/Controllers/DemoController.php";
@@ -522,8 +522,8 @@ SRC;
     {
         //$helper = $this->getHelper('question');
         
-        $filename    = $this->rootDir . "/config/services.yml";
-        $services    = [
+        $filename = $this->rootDir . "/config/services.yml";
+        $services = [
             "imports"    => [
             
             ],
@@ -558,6 +558,27 @@ SRC;
                 ],
             ],
         ];
+        if ($this->databaseSupportEnabled) {
+            $services['services']['memcached']                                  = [
+                "class" => "Memcached",
+                "calls" => [
+                    [
+                        "addServer",
+                        ['%app.memcached.host%', '%app.memcached.port%'],
+                    ],
+                ],
+            ];
+            $services['services']['entity_manager']                             = [
+                "class"   => "Doctrine\\ORM\\EntityManager",
+                "factory" => [
+                    $this->projectNamespace . "Database\\" . $this->mainClassname . "Database",
+                    "getEntityManager",
+                ],
+            ];
+            $services['services']['app']['properties']['http']['injected_args'] = [
+                "@entity_manager",
+            ];
+        }
         $serviceYaml = Yaml::dump($services, 7);
         $this->writeToTempFile($filename, $serviceYaml);
     }
@@ -637,10 +658,8 @@ class {$this->mainClassname}Database
         
         \$app = {$this->mainClassname}::app();
 
-        \$memcached = new \Memcached();
-        \$memcached->addServer(\$app->getParameter('app.memcached.host'), \$app->getParameter('app.memcached.port')); 
         \$memcache = new MemcachedCache();
-        \$memcache->setMemcached(\$memcached);
+        \$memcache->setMemcached(\$app->getService('memcached'));
         
         \$isDevMode = \$app->isDebug();
         \$config    = Setup::createAnnotationMetadataConfiguration(
