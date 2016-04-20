@@ -703,7 +703,7 @@ SRC;
         $dir = dirname($realFilename);
         $this->fs->mkdir($dir);
         file_put_contents($realFilename . ".tmp", $content);
-        chmod($realFilename, $mode);
+        chmod($realFilename . ".tmp", $mode);
         $this->tempFiles[] = $realFilename;
     }
     
