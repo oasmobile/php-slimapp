@@ -76,9 +76,10 @@ class InitializeProjectCommand extends Command
         $this->prepareConfigYaml();
         $this->prepareServicesYaml();
         $this->prepareRoutesYaml();
-        
+
         $this->prepareBootstrapFile();
         $this->prepareFrontControllerFile();
+        $this->prepareConsoleEntryFile();
         $this->prepareDemoControllerFile();
         
         $this->applyTempFiles();
@@ -371,7 +372,7 @@ SRC;
         $date     = date('Y-m-d');
         $time     = date('H:i');
         $this->output->writeln("front controller file = $filename");
-        $bootstrapSource = <<<SRC
+        $frontSource = <<<SRC
 <?php
 /**
  * Created by SlimApp.
@@ -390,9 +391,38 @@ use {$this->projectNamespace}{$this->mainClassname};
 
 
 SRC;
-        $this->writeToTempFile($filename, $bootstrapSource);
+        $this->writeToTempFile($filename, $frontSource);
     }
-    
+
+    protected function prepareConsoleEntryFile()
+    {
+        $filename = $this->rootDir . "/bin/" . strtolower($this->projectName) . ".php";
+        $date     = date('Y-m-d');
+        $time     = date('H:i');
+        $this->output->writeln("console entry file = $filename");
+        $consoleEntrySource = <<<SRC
+#! /usr/bin/env php
+<?php
+/**
+ * Created by SlimApp.
+ *
+ * Date: $date
+ * Time: $time
+ */
+
+
+use {$this->projectNamespace}{$this->mainClassname};
+
+/** @var {$this->mainClassname} \$app */
+\$app = require_once __DIR__ . "/../bootstrap.php";
+
+\$app->getConsoleApplication()->run();
+
+
+SRC;
+        $this->writeToTempFile($filename, $consoleEntrySource, 0755);
+    }
+
     protected function prepareDemoControllerFile()
     {
         $filename = $this->rootDir . "/" . $this->projectSrcDir . "/Controllers/DemoController.php";
@@ -400,7 +430,7 @@ SRC;
         $time     = date('H:i');
         $this->output->writeln("front controller file = $filename");
         $namespaceDeclaration = trim($this->projectNamespace, "\\");
-        $bootstrapSource      = <<<SRC
+        $demoControllerSource = <<<SRC
 <?php
 /**
  * Created by SlimApp.
@@ -423,7 +453,7 @@ class DemoController
 
 
 SRC;
-        $this->writeToTempFile($filename, $bootstrapSource);
+        $this->writeToTempFile($filename, $demoControllerSource);
     }
     
     protected function prepareConfigYaml()
@@ -574,7 +604,7 @@ SRC;
         $this->output->writeln("database manager file = $filename");
         $namespaceDeclaration              = trim($this->projectNamespace, "\\");
         $entityNamespaceDeclarationEscaped = addcslashes($namespaceDeclaration . "\\Entities", "\\");
-        $bootstrapSource                   = <<<SRC
+        $dbManagerSource                   = <<<SRC
 <?php
 /**
  * Created by SlimApp.
@@ -635,7 +665,7 @@ class {$this->mainClassname}Database
 
 
 SRC;
-        $this->writeToTempFile($filename, $bootstrapSource);
+        $this->writeToTempFile($filename, $dbManagerSource);
     }
     
     protected function prepareDatabaseCliConfigFile()
@@ -644,7 +674,7 @@ SRC;
         $date     = date('Y-m-d');
         $time     = date('H:i');
         $this->output->writeln("cli config file = $filename");
-        $bootstrapSource = <<<SRC
+        $cliConfigSource = <<<SRC
 <?php
 /**
  * Created by SlimApp.
@@ -662,14 +692,15 @@ require_once __DIR__ . "/../bootstrap.php";
 return ConsoleRunner::createHelperSet({$this->mainClassname}Database::getEntityManager());
 
 SRC;
-        $this->writeToTempFile($filename, $bootstrapSource);
+        $this->writeToTempFile($filename, $cliConfigSource);
     }
     
-    protected function writeToTempFile($realFilename, $content)
+    protected function writeToTempFile($realFilename, $content, $mode = 0644)
     {
         $dir = dirname($realFilename);
         $this->fs->mkdir($dir);
         file_put_contents($realFilename . ".tmp", $content);
+        chmod($realFilename, $mode);
         $this->tempFiles[] = $realFilename;
     }
     
