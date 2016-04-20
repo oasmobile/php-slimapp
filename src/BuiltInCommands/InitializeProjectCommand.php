@@ -301,6 +301,7 @@ class $classname implements ConfigurationInterface
         \$treeBuilder = new TreeBuilder();
         \$root        = \$treeBuilder->root('app');
         {
+            \$root->children()->booleanNode('is_debug')->defaultValue(true);
             \$dir = \$root->children()->arrayNode('dir');
             {
                 \$dir->children()->scalarNode('log');
@@ -491,7 +492,8 @@ SRC;
         
         $filename = $this->rootDir . "/config/config.yml";
         $config   = [
-            "dir" => [
+            "is_debug" => true,
+            "dir"      => [
                 "log"      => $loggingDir,
                 "data"     => $dataDir,
                 "cache"    => $cacheDir,
