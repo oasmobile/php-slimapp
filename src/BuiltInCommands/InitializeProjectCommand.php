@@ -220,6 +220,7 @@ class InitializeProjectCommand extends Command
     
     protected function prepareDirectoryStructure()
     {
+        $this->fs->mkdir($this->rootDir . "/bin");
         $this->fs->mkdir($this->rootDir . "/cache");
         $this->fs->mkdir($this->rootDir . "/config");
         $this->fs->mkdir($this->rootDir . "/templates");
