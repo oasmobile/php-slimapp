@@ -552,6 +552,9 @@ SRC;
                             ],
                             "twig"      => [
                                 "template_dir" => "%app.dir.template%",
+                                "globals"      => [
+                                    "app" => "@app",
+                                ],
                             ],
                         ],
                     ],

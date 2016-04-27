@@ -169,16 +169,16 @@
         },
         {
             "name": "oasis/http",
-            "version": "v1.3.2",
+            "version": "v1.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oasmobile/php-http.git",
-                "reference": "8e1489536ab83a1d4d3df8bdd14136c09cc85e26"
+                "reference": "700800f5c970166b91b273c86013e013fa626204"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/8e1489536ab83a1d4d3df8bdd14136c09cc85e26",
-                "reference": "8e1489536ab83a1d4d3df8bdd14136c09cc85e26",
+                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/700800f5c970166b91b273c86013e013fa626204",
+                "reference": "700800f5c970166b91b273c86013e013fa626204",
                 "shasum": ""
             },
             "require": {
@@ -216,7 +216,7 @@
                 }
             ],
             "description": "An extension to Silex, for HTTP related routing, middleware, and so on.",
-            "time": "2016-04-26 08:39:50"
+            "time": "2016-04-27 11:10:56"
         },
         {
             "name": "oasis/logging",
