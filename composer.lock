@@ -169,16 +169,16 @@
         },
         {
             "name": "oasis/http",
-            "version": "v1.3.0",
+            "version": "v1.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oasmobile/php-http.git",
-                "reference": "330e8162a46dad6f2c78d0bd25fed41bb09e8190"
+                "reference": "8e1489536ab83a1d4d3df8bdd14136c09cc85e26"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/330e8162a46dad6f2c78d0bd25fed41bb09e8190",
-                "reference": "330e8162a46dad6f2c78d0bd25fed41bb09e8190",
+                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/8e1489536ab83a1d4d3df8bdd14136c09cc85e26",
+                "reference": "8e1489536ab83a1d4d3df8bdd14136c09cc85e26",
                 "shasum": ""
             },
             "require": {
@@ -216,7 +216,7 @@
                 }
             ],
             "description": "An extension to Silex, for HTTP related routing, middleware, and so on.",
-            "time": "2016-04-20 14:44:45"
+            "time": "2016-04-26 08:39:50"
         },
         {
             "name": "oasis/logging",
@@ -1843,16 +1843,16 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.18.0",
+            "version": "3.18.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "4dce50189be0acac9d7b877c7439e2890937473c"
+                "reference": "b02e402e4795819a06dc0e4ebf59f2585e8afbcd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/4dce50189be0acac9d7b877c7439e2890937473c",
-                "reference": "4dce50189be0acac9d7b877c7439e2890937473c",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/b02e402e4795819a06dc0e4ebf59f2585e8afbcd",
+                "reference": "b02e402e4795819a06dc0e4ebf59f2585e8afbcd",
                 "shasum": ""
             },
             "require": {
@@ -1919,7 +1919,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2016-04-19 16:36:37"
+            "time": "2016-04-26 20:02:37"
         },
         {
             "name": "doctrine/instantiator",
