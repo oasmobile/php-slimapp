@@ -235,6 +235,7 @@ class SlimApp
         if (!$this->silexKernel) {
             $this->silexKernel = new SilexKernel($this->httpConfig, $this->isDebugMode);
             $this->silexKernel->addControllerInjectedArg($this);
+            $this->silexKernel->addExtraParameters($this->container->getParameterBag()->all());
         }
 
         return $this->silexKernel;
