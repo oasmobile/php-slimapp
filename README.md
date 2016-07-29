@@ -2,6 +2,27 @@
 
 The Slim Application Framework (SlimApp) is an all-in-one framework aiming to make development of PHP project, either web or console, faster and easier.
 
+- [Installation & Setup](#installation-setup)
+- [Directory structure](#directory-structure)
+- [Configuration](#configuration)
+- [Bootstrap](#bootstrap)
+- [Refer to Config Value](#refer-to-config-value)
+    - [get value by _config key_:](#get-value-by-config-key)
+    - [get value by _parameter key_:](#get-value-by-parameter-key)
+- [Service Container](#service-container)
+- [Service Description](#service-description)
+    - [The Construction Phase](#the-construction-phase)
+    - [The Setting Phase](#the-setting-phase)
+    - [The decoration phase:](#the-decoration-phase)
+- [Define the "@app" service](#define-the-app-service)
+- [Logging](#logging)
+- [HTTP Kernel](#http-kernel)
+- [Command Line Interface](#command-line-interface)
+    - [Writing Your Own Command](#writing-your-own-command)
+    - [Using Input Argument](#using-input-argument)
+    - [Using Input Option](#using-input-option)
+- [The Daemon Sentinel](#the-daemon-sentinel)
+
 ### Installation & Setup
 
 The framework includes a list of useful PHP components. This makes it easy when setting up a new project: you would only need to use composer to require the project itself, and then run the project setup command.
@@ -20,7 +41,7 @@ After installation, you may initialize your project by running:
 
 Follow on screen prompts to provide necessary information, and your project directory structure will be automatically created.
 
-Below is a list of explanations about asked info:
+Below is a list of explanations about information asked during project initialization:
 
 Name            | Explanation
 ---             | ---
@@ -44,7 +65,7 @@ An automatically initialized project will have a directory structure like below:
 + PROJECT_DIR/
     + assets/                            # static assets directory
     + bin/                               # executable directory
-        - test-project.php             # auto-generated project CLI entry point (executable)
+        - test-project.php               # auto-generated project CLI entry point (executable)
     + cache/                             # default cache directory
     + config/                            # config file direcotry
         - cli-config.php                 # auto-generated Doctrine CLI config file
@@ -55,9 +76,9 @@ An automatically initialized project will have a directory structure like below:
         + Controllers/                   # namespace for controller classes
             - DemoController.php         # as the name tells, a demo controller
         + Database/                      # namespace for db classes
-            - TestProjectDatabase.php  # class which provides access to EntityManager and DBAL connection
-        - TestProject.php              # base class for the project, extending SlimApp class
-        - TestProjectConfiguration.php # configuration definition class for config/config.yml
+            - TestProjectDatabase.php    # class which provides access to EntityManager and DBAL connection
+        - TestProject.php                # base class for the project, extending SlimApp class
+        - TestProjectConfiguration.php   # configuration definition class for config/config.yml
     + templates/                         # default Twig template base directory
     + vendor/                            # composer components directory
     + web/                               # web entry directory
@@ -125,7 +146,7 @@ There are a few things to be noticed:
 
 With an instance of `TestProject` (hence an instance of `SlimApp`), we can access the config value in two slightly different ways:
 
-##### get value by config key:
+##### get value by _config key_:
 
 ```php
 <?php
@@ -144,7 +165,7 @@ $nonExistingConfig = $app->getOptionalConfig('non_existing_config'); // will ret
 
 **NOTE**: hierarchical config keys can be concatenated by a dot "."
 
-##### get value by common parameter key:
+##### get value by _parameter key_:
 
 ```php
 <?php
@@ -159,7 +180,7 @@ $nonExistingConfig = $app->getParameter('app.non_existing_config'); // will thro
 
 ```
 
-Compared to the first method, the _parameter key_ only prepends a "app." prefix to the _config key_. And furthermore, all parameter keys are required to exist, or an exception will be thrown when accessed.
+Compared to the first method, the _parameter key_ only prepends the "app." prefix to the _config key_. And furthermore, all parameter keys are required to exist, or an exception will be thrown when accessed.
 
 In practice, we suggest using the parameter key because it is consistent with how you access parameter in container definitions and twig templates. On the other side, the auto type checking ability when using _config key_ is an useful advantage some times.
 
@@ -590,7 +611,7 @@ When executed, the command expects a configuration file as its first argument. T
 
 ```yaml
 commands:
-    
+
     dummy: # name of the daemon, informative only, use any name meaningful
 
         # command name
