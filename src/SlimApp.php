@@ -36,7 +36,7 @@ class SlimApp
 {
     /** @var  bool */
     protected $isDebugMode;
-
+    
     /** @var array */
     protected $configs;
     /** @var  ArrayDataProvider */
@@ -53,12 +53,12 @@ class SlimApp
     protected $silexKernel;
     /** @var  array */
     protected $httpConfig;
-
+    
     protected $configPath;
     protected $configFilename  = "config.yml";
     protected $serviceFilename = "services.yml";
     protected $configCachePath = '';
-
+    
     /**
      * @return static
      */
@@ -68,10 +68,10 @@ class SlimApp
         if ($inst == null) {
             $inst = new static;
         }
-
+        
         return $inst;
     }
-
+    
     public function init($configPath, ConfigurationInterface $configurationInterface, $configCachePath = null)
     {
         if (!is_dir($configPath)) {
@@ -80,11 +80,11 @@ class SlimApp
             );
         }
         $this->configPath = $configPath;
-
+        
         $this->configCachePath = $configCachePath ? : $this->configPath . "/cache";
-
+        
         $locator = new FileLocator([$this->configPath]);
-
+        
         // read config.yml first
         $configResources = [];
         $yamlFiles       = $locator->locate($this->configFilename, null, false);
@@ -99,9 +99,9 @@ class SlimApp
         if (!isset($this->configs['dir.config'])) {
             $this->configs['dir.config'] = $this->configPath;
         }
-
+        
         $this->configDataProvider = new ArrayDataProvider($this->configs);
-
+        
         // read container info
         $cacheFilePath        = $this->configCachePath . "/container.php";
         $this->isDebugMode    = $this->configDataProvider->getOptional('is_debug', ArrayDataProvider::BOOL_TYPE, true);
@@ -109,7 +109,7 @@ class SlimApp
             $cacheFilePath,
             $this->isDebugMode
         );
-
+        
         // refresh container if dirty
         if (!$containerConfigCache->isFresh()) {
             $builder = new ContainerBuilder();
@@ -126,15 +126,15 @@ class SlimApp
                 }
             };
             call_user_func($recursiveSetParameter, $recursiveSetParameter, $builder, $this->configs);
-
+            
             $loader = new YamlFileLoader(
                 $builder,
                 $locator
             );
             $loader->load($this->serviceFilename);
-
+            
             $builder->compile();
-
+            
             $dumper      = new PhpDumper($builder);
             $resources   = $builder->getResources();
             $resources[] = new FileResource(__FILE__);
@@ -145,60 +145,60 @@ class SlimApp
             );
             //mdebug("container dumped");
         }
-
+        
         // create container instance
         /** @noinspection PhpIncludeInspection */
         require_once $cacheFilePath;
         /** @noinspection PhpUndefinedClassInspection */
         $this->container = new SlimAppCachedContainer;
-
+        
         $this->container->get('app');
-
+        
         // NOTE: loggers below will be overriden if running in console mode
         $logger = new LocalFileHandler($this->loggingPath, "%date%/%script%.log", $this->loggingLevel);
         $logger->install();
         $logger = new LocalErrorHandler($this->loggingPath, "%date%/%script%.error", $this->loggingLevel);
         $logger->install();
-
+        
         //mdebug("SlimApp [%s] initialized", static::class);
     }
-
+    
     public function getServiceIds()
     {
         return $this->container->getServiceIds();
     }
-
+    
     public function getService($id, $type = null)
     {
         $service = $this->container->get($id);
         if ($type && (!$service instanceof $type)) {
             throw new InvalidArgumentException(sprintf("Service %s is not of type %s", $id, $type));
         }
-
+        
         return $service;
     }
-
+    
     public function getParameter($k)
     {
         return $this->container->getParameter($k);
     }
-
+    
     public function getMandatoryConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE)
     {
         // normalize key
         $key = strtr($key, ['-' => "_"]);
-
+        
         return $this->configDataProvider->getMandatory($key, $expectedType);
     }
-
+    
     public function getOptionalConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE, $defaultValue = null)
     {
         // normalize key
         $key = strtr($key, ['-' => "_"]);
-
+        
         return $this->configDataProvider->getOptional($key, $expectedType, $defaultValue);
     }
-
+    
     /**
      * @return ConsoleApplication
      */
@@ -211,7 +211,7 @@ class SlimApp
             $this->consoleApp->setSlimapp($this);
             $this->consoleApp->setLoggingPath($this->loggingPath);
             $this->consoleApp->setLoggingLevel($this->loggingLevel);
-
+            
             // Add built-in commands
             $this->consoleApp->addCommands(
                 [
@@ -220,16 +220,16 @@ class SlimApp
                     new InitializeProjectCommand(),
                 ]
             );
-
+            
             // Add custom commands
             if (is_array($this->consoleConfig['commands'])) {
                 $this->consoleApp->addCommands($this->consoleConfig['commands']);
             }
         }
-
+        
         return $this->consoleApp;
     }
-
+    
     public function getHttpKernel()
     {
         if (!$this->silexKernel) {
@@ -237,10 +237,10 @@ class SlimApp
             $this->silexKernel->addControllerInjectedArg($this);
             $this->silexKernel->addExtraParameters($this->container->getParameterBag()->all());
         }
-
+        
         return $this->silexKernel;
     }
-
+    
     function __set($name, $value)
     {
         $methodName = sprintf("set%sProperty", strtr(ucwords($name, "._-"), ["." => "", "_" => "", "-" => ""]));
@@ -248,7 +248,7 @@ class SlimApp
             call_user_func([$this, $methodName], $value);
         }
     }
-
+    
     /**
      * @return boolean
      */
@@ -256,7 +256,7 @@ class SlimApp
     {
         return $this->isDebugMode;
     }
-
+    
     /**
      * @return string
      */
@@ -264,7 +264,7 @@ class SlimApp
     {
         return $this->configCachePath;
     }
-
+    
     /**
      * @return mixed
      */
@@ -272,14 +272,14 @@ class SlimApp
     {
         return $this->configPath;
     }
-
+    
     protected function setLoggingProperty($value)
     {
         if (!is_array($value)) {
             throw new InvalidConfigurationException("logging property should be an array of log handlers!");
         }
-
-        if (is_array($value['handlers'])) {
+        
+        if (isset($value['handlers']) && is_array($value['handlers'])) {
             foreach ($value['handlers'] as $handler) {
                 if (!$handler instanceof HandlerInterface) {
                     throw new InvalidConfigurationException("logging property should be an array of log handlers!");
@@ -294,13 +294,13 @@ class SlimApp
             $this->loggingLevel = $value['level'];
         }
     }
-
+    
     protected function setCliProperty($value)
     {
         $this->consoleApp    = null;
         $this->consoleConfig = $value;
     }
-
+    
     protected function setHttpProperty($value)
     {
         $this->silexKernel = null;
