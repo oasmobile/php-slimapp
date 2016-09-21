@@ -222,7 +222,7 @@ class SlimApp
             );
             
             // Add custom commands
-            if (is_array($this->consoleConfig['commands'])) {
+            if (isset($this->consoleConfig['commands']) && is_array($this->consoleConfig['commands'])) {
                 $this->consoleApp->addCommands($this->consoleConfig['commands']);
             }
         }
