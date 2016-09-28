@@ -17,6 +17,9 @@
         "phpunit/phpunit"   : "^5.1",
         "oasis/aws-wrappers": "^1.0"
     },
+    "suggest": {
+        "ext-pcntl": "*"
+    },
     "license"    : "MIT",
     "authors"    : [
         {
