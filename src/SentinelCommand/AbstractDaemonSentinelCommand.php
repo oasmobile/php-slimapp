@@ -15,6 +15,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Class AbstractDaemonSentinelCommand
+ *
+ * @deprecated
+ * @package Oasis\SlimApp\SentinelCommand
+ */
 class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
 {
     protected $runningProcesses = [];
