@@ -79,6 +79,8 @@ class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
             //}
             //$lastMemory = $memory;
 
+            pcntl_signal_dispatch();
+            
             $status = 0;
             $pid    = pcntl_waitpid(-1, $status, WNOHANG);
 
