@@ -29,6 +29,7 @@ class DummyCommand extends AbstractParallelCommand
         $tt = $input->getOption('tt');
         minfo('I got a: %s', $a);
         minfo('I got tt: %s', json_encode($tt));
+        //merror("wow");
 
         return self::EXIT_CODE_OK;
 

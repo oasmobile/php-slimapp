@@ -21,26 +21,44 @@ class ConsoleApplication extends Application
 {
     /** @var SlimApp */
     protected $slimapp = null;
-
-    protected $loggingPath  = null;
-    protected $loggingLevel = Logger::DEBUG;
-
+    
+    protected $loggingEnabled = true;
+    protected $loggingPath    = null;
+    protected $logFilePattern = "%date%/%script%.%command%.%type%";
+    protected $loggingLevel   = Logger::DEBUG;
+    
     /**
-     * @return SlimApp
+     * @return boolean
      */
-    public function getSlimapp()
+    public function isLoggingEnabled()
     {
-        return $this->slimapp;
+        return $this->loggingEnabled;
     }
-
+    
     /**
-     * @param SlimApp $slimapp
+     * @param boolean $loggingEnabled
      */
-    public function setSlimapp($slimapp)
+    public function setLoggingEnabled($loggingEnabled)
     {
-        $this->slimapp = $slimapp;
+        $this->loggingEnabled = $loggingEnabled;
     }
-
+    
+    /**
+     * @return string
+     */
+    public function getLogFilePattern()
+    {
+        return $this->logFilePattern;
+    }
+    
+    /**
+     * @param string $logFilePattern
+     */
+    public function setLogFilePattern($logFilePattern)
+    {
+        $this->logFilePattern = $logFilePattern;
+    }
+    
     /**
      * @return int
      */
@@ -48,7 +66,7 @@ class ConsoleApplication extends Application
     {
         return $this->loggingLevel;
     }
-
+    
     /**
      * @param int $loggingLevel
      */
@@ -56,7 +74,7 @@ class ConsoleApplication extends Application
     {
         $this->loggingLevel = $loggingLevel;
     }
-
+    
     /**
      * @return null
      */
@@ -65,10 +83,10 @@ class ConsoleApplication extends Application
         if ($this->loggingPath === null) {
             $this->loggingPath = sys_get_temp_dir() . "/logs";
         }
-
+        
         return $this->loggingPath;
     }
-
+    
     /**
      * @param null $loggingPath
      */
@@ -76,11 +94,27 @@ class ConsoleApplication extends Application
     {
         $this->loggingPath = $loggingPath;
     }
-
+    
+    /**
+     * @return SlimApp
+     */
+    public function getSlimapp()
+    {
+        return $this->slimapp;
+    }
+    
+    /**
+     * @param SlimApp $slimapp
+     */
+    public function setSlimapp($slimapp)
+    {
+        $this->slimapp = $slimapp;
+    }
+    
     protected function configureIO(InputInterface $input, OutputInterface $output)
     {
         parent::configureIO($input, $output);
-
+        
         $level = Logger::DEBUG;
         switch ($output->getVerbosity()) {
             case OutputInterface::VERBOSITY_VERY_VERBOSE:
@@ -102,21 +136,37 @@ class ConsoleApplication extends Application
         $handler = new ConsoleHandler($level);
         $handler->install();
     }
-
+    
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
     {
-        $name   = $command->getName();
-        $name   = strtr($name, ":", ".");
-        $logger = new LocalFileHandler(
-            $this->getLoggingPath(), "%date%/%script%.$name.log", $this->getLoggingLevel()
-        );
-        $logger->install();
-        $logger = new LocalErrorHandler(
-            $this->getLoggingPath(), "%date%/%script%.$name.error", $this->getLoggingLevel()
-        );
-        $logger->install();
-
+        if ($this->loggingEnabled) {
+            $name             = $command->getName();
+            $name             = strtr($name, ":", ".");
+            $logFilePattern   = strtr(
+                $this->logFilePattern,
+                [
+                    "%command%" => $name,
+                    "%type%"    => "log",
+                ]
+            );
+            $errorFilePattern = strtr(
+                $this->logFilePattern,
+                [
+                    "%command%" => $name,
+                    "%type%"    => "error",
+                ]
+            );
+            $logger           = new LocalFileHandler(
+                $this->getLoggingPath(), $logFilePattern, $this->getLoggingLevel()
+            );
+            $logger->install();
+            $logger = new LocalErrorHandler(
+                $this->getLoggingPath(), $errorFilePattern, $this->getLoggingLevel()
+            );
+            $logger->install();
+        }
+        
         return parent::doRunCommand($command, $input, $output);
     }
-
+    
 }
