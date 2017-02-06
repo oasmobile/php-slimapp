@@ -662,6 +662,7 @@ class {$this->mainClassname}Database
         \$app = {$this->mainClassname}::app();
 
         \$memcache = new MemcachedCache();
+        /** @noinspection PhpParamsInspection */
         \$memcache->setMemcached(\$app->getService('memcached'));
         
         \$isDevMode = \$app->isDebug();
@@ -673,7 +674,7 @@ class {$this->mainClassname}Database
             false /* do not use simple annotation reader, so that we can understand annotations like @ORM/Table */
         );
         \$config->addEntityNamespace("{$this->mainClassname}", "{$entityNamespaceDeclarationEscaped}");
-        //\$config->setSQLLogger(new Doctrine\\DBAL\\Logging\\EchoSQLLogger());
+        //\$config->setSQLLogger(new \\Doctrine\\DBAL\\Logging\\EchoSQLLogger());
 
         \$regconfig = new RegionsConfiguration();
         \$factory   = new DefaultCacheFactory(\$regconfig, \$memcache);
