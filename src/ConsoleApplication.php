@@ -133,8 +133,10 @@ class ConsoleApplication extends Application
                 $level = Logger::CRITICAL;
                 break;
         }
-        $handler = new ConsoleHandler($level);
-        $handler->install();
+        if ($this->loggingEnabled) {
+            $handler = new ConsoleHandler($level);
+            $handler->install();
+        }
     }
     
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
