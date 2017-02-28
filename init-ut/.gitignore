@@ -1,1 +1,9 @@
 /vendor/
+/.idea/
+/assets/
+/bin/
+/cache/
+/config/
+/src/
+/templates/
+/web/
