@@ -1,0 +1,12 @@
+{
+	"name" : "slimapp/test",
+	"repositories" : [
+		{
+			"type" : "vcs",
+			"url" : "../"
+		}
+	],
+	"require": {
+		"oasis/slimapp": "dev-master"
+	}
+}
