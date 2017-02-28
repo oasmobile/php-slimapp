@@ -9,7 +9,7 @@
         "symfony/config"              : "^3.0",
         "oasis/utils"                 : "^1.6",
         "symfony/console"             : "^3.0",
-        "oasis/http"                  : "^1.1",
+        "oasis/http"                  : "^1.8.6",
         "symfony/finder"              : "^3.0",
         "symfony/filesystem"          : "^3.0"
     },
