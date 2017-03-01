@@ -739,9 +739,9 @@ SRC;
         $utDir = $this->rootDir . "/ut";
         $this->fs->mkdir($utDir);
         
-        $date        = date('Y-m-d');
-        $time        = date('H:i');
-        $xmlFile     = <<<XML
+        $date            = date('Y-m-d');
+        $time            = date('H:i');
+        $xmlFile         = <<<XML
 <!--suppress XmlUnboundNsPrefix -->
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -758,40 +758,21 @@ SRC;
 </phpunit>
 
 XML;
-        $utBootstrap = <<<PHP
-<?php
-/**
- * Created by SlimApp.
- *
- * Date: $date
- * Time: $time
- */
-
-use Doctrine\ORM\Tools\Console\ConsoleRunner;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use {$this->projectNamespace}{$this->mainClassname};
-
-/** @var {$this->mainClassname} \$app */
-\$app = require __DIR__ . "/../bootstrap.php";
-if (!\$app->isDebug()) {
-    die ("Never run unit test under production environment!");
-}
-
+        $rdbmsClearCodes = <<<PHP
+        
 \$console = \$app->getConsoleApplication();
 
-/** @var HelperSet \$helperSet */
+/** @var Symfony\\Component\\Console\\Helper\\HelperSet \$helperSet */
 \$helperSet = require_once __DIR__ . "/../config/cli-config.php";
 \$console->setHelperSet(\$helperSet);
-ConsoleRunner::addCommands(\$console);
+\\Doctrine\\ORM\\Tools\\Console\\ConsoleRunner::addCommands(\$console);
 
-\$output = new ConsoleOutput();
+\$output = new \\Symfony\\Component\\Console\\Output\\ConsoleOutput();
 \$console->setAutoExit(false);
 \$console->setCatchExceptions(false);
 \$console->setLoggingEnabled(false);
 \$console->run(
-    new ArrayInput(
+    new \\Symfony\\Component\\Console\\Input\\ArrayInput(
         [
             "command" => "orm:schema-tool:drop",
             "-f"      => true,
@@ -801,13 +782,35 @@ ConsoleRunner::addCommands(\$console);
     \$output
 );
 \$console->run(
-    new ArrayInput(
+    new \\Symfony\\Component\\Console\\Input\\ArrayInput(
         [
             "command" => "orm:schema-tool:create",
         ]
     ),
     \$output
 );
+PHP;
+        if (!$this->ormSupportEnabled) {
+            $rdbmsClearCodes = '';
+        }
+        $utBootstrap = <<<PHP
+<?php
+/**
+ * Created by SlimApp.
+ *
+ * Date: $date
+ * Time: $time
+ */
+
+use {$this->projectNamespace}{$this->mainClassname};
+
+/** @var {$this->mainClassname} \$app */
+\$app = require __DIR__ . "/../bootstrap.php";
+if (!\$app->isDebug()) {
+    die ("Never run unit test under production environment!");
+}
+
+$rdbmsClearCodes
 
 return \$app;
 
