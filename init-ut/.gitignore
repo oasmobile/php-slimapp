@@ -8,3 +8,4 @@
 /templates/
 /web/
 /bootstrap.php
+/phpunit.xml
