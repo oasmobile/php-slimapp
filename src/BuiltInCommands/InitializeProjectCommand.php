@@ -980,7 +980,7 @@ SRC;
         }
         if ($this->odmSupportEnabled) {
             $services['services']['item_manager']                               = [
-                "class"   => "\\Oasis\\Mlib\\ODM\\Dynamodb\\ItemManager",
+                "class"   => "Oasis\\Mlib\\ODM\\Dynamodb\\ItemManager",
                 "factory" => [
                     $this->projectNamespace . "Database\\" . $this->mainClassname . "Database",
                     "getItemManager",
