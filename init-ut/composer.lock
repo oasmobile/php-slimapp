@@ -315,7 +315,7 @@
             "source": {
                 "type": "git",
                 "url": "../",
-                "reference": "59e65cf2d3dc4a35631078709b86d39ebda52b0e"
+                "reference": "b5abc955042a1b513b621525c2b04b1245eade07"
             },
             "require": {
                 "oasis/http": "^1.8.6",
@@ -357,7 +357,7 @@
                 }
             ],
             "description": "slim app framework",
-            "time": "2017-03-01 07:26:56"
+            "time": "2017-03-01 09:41:50"
         },
         {
             "name": "oasis/utils",
