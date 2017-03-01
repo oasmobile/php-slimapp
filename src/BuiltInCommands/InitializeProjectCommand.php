@@ -978,6 +978,18 @@ SRC;
                 "@entity_manager",
             ];
         }
+        if ($this->odmSupportEnabled) {
+            $services['services']['item_manager']                               = [
+                "class"   => "\\Oasis\\Mlib\\ODM\\Dynamodb\\ItemManager",
+                "factory" => [
+                    $this->projectNamespace . "Database\\" . $this->mainClassname . "Database",
+                    "getItemManager",
+                ],
+            ];
+            $services['services']['app']['properties']['http']['injected_args'] = [
+                "@item_manager",
+            ];
+        }
         $serviceYaml = Yaml::dump($services, 7);
         $this->writeToTempFile($filename, $serviceYaml);
     }
