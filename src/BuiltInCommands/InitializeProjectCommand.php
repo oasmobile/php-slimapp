@@ -170,6 +170,7 @@ class InitializeProjectCommand extends Command
         $this->prepareConfigClassFile();
         
         $this->prepareDatabaseRelatedFiles();
+        $this->prepareUnitTestFiles();
         
         $this->prepareConfigYaml();
         $this->prepareServicesYaml();
