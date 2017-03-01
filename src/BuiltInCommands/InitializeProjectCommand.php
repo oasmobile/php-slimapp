@@ -571,6 +571,7 @@ SRC;
         $this->output->writeln("database manager file = $filename");
         $namespaceDeclaration              = trim($this->projectNamespace, "\\");
         $entityNamespaceDeclarationEscaped = addcslashes($namespaceDeclaration . "\\Entities", "\\");
+        $itemNamespaceDeclarationEscaped   = addcslashes($namespaceDeclaration . "\\Items", "\\");
         $ormImports                        = <<<SRC
 use Doctrine\\Common\\Cache\\MemcachedCache;
 use Doctrine\\ORM\\Cache\\DefaultCacheFactory;
@@ -633,7 +634,7 @@ SRC;
             \$prefix    = \$app->getMandatoryConfig('dynamodb.prefix', DataProviderInterface::STRING_TYPE);
             
             \$im = new ItemManager(\$awsConfig, \$prefix, \$cacheDir, \$app->isDebug());
-            \$im->addNamespace("Oasis\\\\Watch\\\\Items", __DIR__ . "/../Items");
+            \$im->addNamespace("{$itemNamespaceDeclarationEscaped}", PROJECT_DIR . "/src/Items");
         }
         
         return \$im;
@@ -689,6 +690,8 @@ SRC;
             
             $this->output->writeln("ORM support enabled, related files will be populated.");
             $this->ormSupportEnabled = true;
+            $entityDir               = $this->rootDir . "/" . $this->projectSrcDir . "/Entities";
+            $this->fs->mkdir($entityDir);
         }
         
         $question = new Question(
@@ -703,6 +706,8 @@ SRC;
         else {
             $this->output->writeln("ODM support enabled, related files will be populated.");
             $this->odmSupportEnabled = true;
+            $itemDir                 = $this->rootDir . "/" . $this->projectSrcDir . "/Items";
+            $this->fs->mkdir($itemDir);
         }
         
         $this->prepareDatabaseManagerFile();
