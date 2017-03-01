@@ -46,6 +46,8 @@ class InitializeProjectCommand extends Command
     protected $ormSupportEnabled = false;
     /** @var bool */
     protected $odmSupportEnabled = false;
+    /** @var bool */
+    protected $phpunitSupportEnabled = false;
     
     protected $tempFiles = [];
     
@@ -179,6 +181,7 @@ class InitializeProjectCommand extends Command
         $this->prepareDemoControllerFile();
         
         $this->applyTempFiles();
+        
         $this->updateComposerInfo();
     }
     
@@ -714,6 +717,106 @@ SRC;
         $this->prepareDatabaseCliConfigFile();
     }
     
+    protected function prepareUnitTestFiles()
+    {
+        $helper   = $this->getHelper('question');
+        $question = new Question(
+            "Do you want to enable phpunit?"
+            . " <info>[yes]</info>: ",
+            'yes'
+        );
+        $answer   = $helper->ask($this->input, $this->output, $question);
+        if (!preg_match('#^y#i', $answer)) {
+            $this->output->writeln("You chose not to enable phpunit.");
+            
+            return;
+        }
+        
+        $this->phpunitSupportEnabled = true;
+        
+        $this->output->writeln("phpunit support enabled, related files will be populated.");
+        $utDir = $this->rootDir . "/ut";
+        $this->fs->mkdir($utDir);
+        
+        $date        = date('Y-m-d');
+        $time        = date('H:i');
+        $xmlFile     = <<<XML
+<!--suppress XmlUnboundNsPrefix -->
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.7/phpunit.xsd"
+        bootstrap="ut/bootstrap.php"
+        backupGlobals="false"
+        backupStaticAttributes="false"
+>
+    <testsuites>
+        <testsuite name="basic">
+            <file><!-- add file here --></file>
+        </testsuite>
+    </testsuites>
+</phpunit>
+
+XML;
+        $utBootstrap = <<<PHP
+<?php
+/**
+ * Created by SlimApp.
+ *
+ * Date: $date
+ * Time: $time
+ */
+
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use {$this->projectNamespace}{$this->mainClassname};
+
+/** @var {$this->mainClassname} \$app */
+\$app = require __DIR__ . "/../bootstrap.php";
+if (!\$app->isDebug()) {
+    die ("Never run unit test under production environment!");
+}
+
+\$console = \$app->getConsoleApplication();
+
+/** @var HelperSet \$helperSet */
+\$helperSet = require_once __DIR__ . "/../config/cli-config.php";
+\$console->setHelperSet(\$helperSet);
+ConsoleRunner::addCommands(\$console);
+
+\$output = new ConsoleOutput();
+\$console->setAutoExit(false);
+\$console->setCatchExceptions(false);
+\$console->setLoggingEnabled(false);
+\$console->run(
+    new ArrayInput(
+        [
+            "command" => "orm:schema-tool:drop",
+            "-f"      => true,
+            "-vvv"    => true,
+        ]
+    ),
+    \$output
+);
+\$console->run(
+    new ArrayInput(
+        [
+            "command" => "orm:schema-tool:create",
+        ]
+    ),
+    \$output
+);
+
+return \$app;
+
+PHP;
+        
+        $this->writeToTempFile($this->rootDir . "/phpunit.xml", $xmlFile);
+        $this->writeToTempFile($this->rootDir . "/ut/bootstrap.php", $utBootstrap);
+        
+    }
+    
     protected function prepareDemoControllerFile()
     {
         $filename = $this->rootDir . "/" . $this->projectSrcDir . "/Controllers/DemoController.php";
@@ -899,6 +1002,17 @@ SRC;
             }
             else {
                 $this->output->writeln("<error>Error while updating ODM support component.</error>");
+                exit(1);
+            }
+        }
+        
+        if ($this->phpunitSupportEnabled) {
+            system("composer require --dev phpunit/phpunit:^5.7", $retval);
+            if ($retval == 0) {
+                $this->output->writeln("<info>phpunit component updated.</info>");
+            }
+            else {
+                $this->output->writeln("<error>Error while updating phpunit component.</error>");
                 exit(1);
             }
         }
