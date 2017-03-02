@@ -803,6 +803,9 @@ PHP;
  */
 
 use {$this->projectNamespace}{$this->mainClassname};
+use Monolog\\Logger;
+use Oasis\\Mlib\\Logging\\ConsoleHandler;
+use Oasis\\Mlib\\Logging\\MLogging;
 
 /** @var {$this->mainClassname} \$app */
 \$app = require __DIR__ . "/../bootstrap.php";
@@ -810,7 +813,16 @@ if (!\$app->isDebug()) {
     die ("Never run unit test under production environment!");
 }
 
+(new ConsoleHandler())->install();
+if (!in_array('-v', \$_SERVER['argv'])
+    && !in_array('--verbose', \$_SERVER['argv'])
+) {
+    MLogging::setMinLogLevel(Logger::CRITICAL);
+}
+
+
 $rdbmsClearCodes
+
 
 return \$app;
 
