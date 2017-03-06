@@ -33,7 +33,7 @@ class CommandConfiguration implements ConfigurationInterface
                 {
                     $command->children()->scalarNode('name')->isRequired();
                     $command->children()->variableNode('args')->defaultValue([]);
-                    $command->children()->integerNode('parallel')->defaultValue(1);
+                    $command->children()->scalarNode('parallel')->defaultValue(1);
                     $command->children()->booleanNode('once')->defaultValue(false);
                     $command->children()->booleanNode('alert')->defaultValue(true);
                     $command->children()->integerNode('interval')->defaultValue(0);

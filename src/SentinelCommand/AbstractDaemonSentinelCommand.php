@@ -9,6 +9,7 @@
 namespace Oasis\SlimApp\SentinelCommand;
 
 use Oasis\SlimApp\AbstractAlertableCommand;
+use Oasis\SlimApp\ConsoleApplication;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -52,7 +53,23 @@ abstract class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
         
         $this->runningProcesses = [];
         foreach ($processed['commands'] as $command) {
-            $parallel = $command['parallel'];
+            $parallel    = $command['parallel'];
+            $application = $this->getApplication();
+            if ($application instanceof ConsoleApplication
+                && is_string($parallel)
+                && preg_match('#(%([^%].*?)%)#', $parallel, $matches, 0)
+            ) {
+                $key         = $matches[2];
+                $replacement = $application->getSlimapp()->getParameter($key);
+                if ($replacement === null) {
+                    throw new \InvalidArgumentException("Cannot get config value $key");
+                }
+                $parallel = $replacement;
+            }
+            if ($parallel != intval($parallel)) {
+                throw new \InvalidArgumentException("parallel value is not an integer! <$parallel>");
+            }
+            
             for ($i = 0; $i < $parallel; ++$i) {
                 $runner = new CommandRunner($this->getApplication(), $i, $command, $output);
                 $pid    = $runner->run();

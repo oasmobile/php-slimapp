@@ -31,6 +31,7 @@ class TestAppConfig implements ConfigurationInterface
             }
             
             $root->children()->scalarNode('name');
+            $root->children()->integerNode('count');
         }
 
         return $treeBuilder;

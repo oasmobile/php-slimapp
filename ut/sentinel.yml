@@ -6,7 +6,7 @@ commands:
             --tt: true
             --idx: $PARALLEL_INDEX
 #            -vvv:
-        parallel: 3
+        parallel: "%app.count%"
         once: false
         # alert on abnormal exit (exit != 0)
         alert: false
