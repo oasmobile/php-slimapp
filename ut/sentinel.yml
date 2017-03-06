@@ -2,7 +2,7 @@ commands:
     dummy:
         name: dummy:job
         args:
-            a: moking
+            a: %app.name%
             --tt: true
             --idx: $PARALLEL_INDEX
 #            -vvv:

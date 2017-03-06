@@ -1,3 +1,5 @@
 dir:
     log:    /data/logs/slimapp
     data:   /data/slimapp
+
+name: Jason

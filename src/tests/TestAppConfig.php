@@ -29,6 +29,8 @@ class TestAppConfig implements ConfigurationInterface
                 $dir->children()->scalarNode('log');
                 $dir->children()->scalarNode('data');
             }
+            
+            $root->children()->scalarNode('name');
         }
 
         return $treeBuilder;

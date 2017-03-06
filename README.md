@@ -619,8 +619,9 @@ commands:
 
         # command line arguments to pass to the command
         args:
-            a: moking
+            a: %app.name%
             --tt: true
+            --idx: $PARALLEL_INDEX
             -vvv:
 
         # whether to run in parallel, and if yes, how many
@@ -638,6 +639,10 @@ commands:
         # frequency: min seconds between two start
         frequency: 5
 ```
+
+> **NOTE**: all config values can be used in the format of "%key-to-config-value%" in args setting of command
+
+> **NOTE**: $PARALLEL_INDEX is a special variable in args, denoting the index of the command if executed in parallel. The index starts from 0.
 
 [symfony/config]: http://symfony.com/doc/master//components/config/index.html
 [symfony/dependency-injection]: http://symfony.com/doc/master/components/dependency_injection/index.html

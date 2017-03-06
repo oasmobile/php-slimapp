@@ -8,6 +8,7 @@
 
 namespace Oasis\SlimApp\SentinelCommand;
 
+use Oasis\SlimApp\ConsoleApplication;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -46,16 +47,32 @@ class CommandRunner
         $this->parallelIndex = $parallelIndex;
         
         $this->output = $output;
-        $this->name   = $command['name'];
-        $args         = ['command' => $this->name];
-        $args         = array_merge($args, $command['args']);
+        
+        $this->name = $command['name'];
+        $args       = ['command' => $this->name];
+        $args       = array_merge($args, $command['args']);
         //mdebug("args = %s", json_encode($args));
         $args = array_map(
             function ($argValue) {
                 if ($argValue === "\$PARALLEL_INDEX") {
                     return $this->parallelIndex;
                 }
-                else {
+                elseif (!is_string($argValue)) {
+                    return $argValue;
+                }
+                elseif ($this->application instanceof ConsoleApplication) {
+                    $offset = 0;
+                    while (preg_match('#(%([^%].*?)%)#', $argValue, $matches, 0, $offset)) {
+                        $key         = $matches[2];
+                        $replacement = $this->application->getSlimapp()->getParameter($key);
+                        if ($replacement === null) {
+                            $offset += strlen($key + 2);
+                            continue;
+                        }
+                        $argValue = preg_replace("/" . preg_quote($matches[1], '/') . "/", $replacement, $argValue, 1);
+                    }
+                    $argValue = preg_replace('#%%#', '%', $argValue);
+                    
                     return $argValue;
                 }
             },
