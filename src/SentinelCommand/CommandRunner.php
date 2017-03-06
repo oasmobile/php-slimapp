@@ -17,6 +17,8 @@ class CommandRunner
 {
     /** @var  Application */
     protected $application;
+    /** @var  int */
+    protected $parallelIndex;
     
     protected $name;
     /** @var  InputInterface */
@@ -35,16 +37,32 @@ class CommandRunner
     protected $traceEnabled = false;
     
     public function __construct(Application $application,
+                                $parallelIndex,
                                 array $command,
                                 OutputInterface $output,
                                 $traceEnabled = false)
     {
-        $this->application = $application;
-        $this->output      = $output;
-        $this->name        = $command['name'];
-        $args              = ['command' => $this->name];
-        $args              = array_merge($args, $command['args']);
-        $this->input       = new ArrayInput($args);
+        $this->application   = $application;
+        $this->parallelIndex = $parallelIndex;
+        
+        $this->output = $output;
+        $this->name   = $command['name'];
+        $args         = ['command' => $this->name];
+        $args         = array_merge($args, $command['args']);
+        //mdebug("args = %s", json_encode($args));
+        $args = array_map(
+            function ($argValue) {
+                if ($argValue === "\$PARALLEL_INDEX") {
+                    return $this->parallelIndex;
+                }
+                else {
+                    return $argValue;
+                }
+            },
+            $args
+        );
+        //mdebug("args = %s", json_encode($args));
+        $this->input = new ArrayInput($args);
         
         $this->once      = $command['once'];
         $this->interval  = $command['interval'];

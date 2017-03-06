@@ -21,18 +21,22 @@ class DummyCommand extends AbstractParallelCommand
         $this->setName('dummy:job')->setDescription('dummy command');
         $this->addArgument('a');
         $this->addOption('tt', null, InputOption::VALUE_REQUIRED);
+        $this->addOption('idx', null, InputOption::VALUE_REQUIRED);
     }
-
+    
     protected function doExecute(InputInterface $input, OutputInterface $output)
     {
-        $a  = $input->getArgument('a');
-        $tt = $input->getOption('tt');
+        $a   = $input->getArgument('a');
+        $tt  = $input->getOption('tt');
+        $idx = $input->getOption('idx');
         minfo('I got a: %s', $a);
         minfo('I got tt: %s', json_encode($tt));
+        minfo('I got idx: %d', $idx);
+        
         //merror("wow");
-
+        
         return self::EXIT_CODE_OK;
-
+        
         //mdebug("message");
         //minfo("message");
         //mnotice("message");
@@ -41,7 +45,7 @@ class DummyCommand extends AbstractParallelCommand
         //mcritical("message");
         ////malert("message");
         ////memergency("message");
-
+        
         //$s = '';
         //for ($i = 0; $i < 100000; ++$i) {
         //    $s .= str_repeat(' ', pow(2, $i));

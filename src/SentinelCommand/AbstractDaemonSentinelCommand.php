@@ -21,17 +21,17 @@ use Symfony\Component\Yaml\Yaml;
  * @deprecated
  * @package Oasis\SlimApp\SentinelCommand
  */
-class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
+abstract class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
 {
     protected $runningProcesses = [];
-
+    
     protected function configure()
     {
         parent::configure();
         $this->setDescription("Runs as sentinel for a list of daemon commands");
         $this->addArgument('file', InputArgument::REQUIRED, "a config file holding daemon commands info");
     }
-
+    
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $filename = $input->getArgument('file');
@@ -46,26 +46,26 @@ class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
         $config    = Yaml::parse(file_get_contents($filename));
         $configs   = [$config];
         $configDef = new CommandConfiguration();
-
+        
         $processor = new Processor();
         $processed = $processor->processConfiguration($configDef, $configs);
-
+        
         $this->runningProcesses = [];
         foreach ($processed['commands'] as $command) {
             $parallel = $command['parallel'];
             for ($i = 0; $i < $parallel; ++$i) {
-                $runner = new CommandRunner($this->getApplication(), $command, $output);
+                $runner = new CommandRunner($this->getApplication(), $i, $command, $output);
                 $pid    = $runner->run();
-
+                
                 $this->runningProcesses[$pid] = $runner;
             }
         }
-
+        
         $this->waitForBackgroundProcesses();
-
+        
         return 0;
     }
-
+    
     protected function waitForBackgroundProcesses()
     {
         //$lastMemory = memory_get_usage(true);
@@ -78,12 +78,12 @@ class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
             //    );
             //}
             //$lastMemory = $memory;
-
+            
             pcntl_signal_dispatch();
             
             $status = 0;
             $pid    = pcntl_waitpid(-1, $status, WNOHANG);
-
+            
             if ($pid == 0) { // no child process has quit
                 usleep(200 * 1000);
             }

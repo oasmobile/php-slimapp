@@ -4,8 +4,9 @@ commands:
         args:
             a: moking
             --tt: true
+            --idx: $PARALLEL_INDEX
 #            -vvv:
-#        parallel: 3
+        parallel: 3
         once: false
         # alert on abnormal exit (exit != 0)
         alert: false
