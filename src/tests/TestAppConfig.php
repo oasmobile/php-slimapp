@@ -13,7 +13,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class TestAppConfig implements ConfigurationInterface
 {
-
+    
     /**
      * Generates the configuration tree builder.
      *
@@ -32,8 +32,9 @@ class TestAppConfig implements ConfigurationInterface
             
             $root->children()->scalarNode('name');
             $root->children()->integerNode('count');
+            $root->children()->booleanNode('once');
         }
-
+        
         return $treeBuilder;
     }
 }

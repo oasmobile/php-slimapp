@@ -7,11 +7,11 @@ commands:
             --idx: $PARALLEL_INDEX
 #            -vvv:
         parallel: "%app.count%"
-        once: false
+        once: %app.once%
         # alert on abnormal exit (exit != 0)
         alert: false
         # interval: num of seconds between last end and next start
-        interval: 2
+        interval: %app.count%
         # frequency: min seconds between two start
 #        frequency: 5
 
