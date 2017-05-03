@@ -72,6 +72,14 @@ class SlimApp
         return $inst;
     }
     
+    function __set($name, $value)
+    {
+        $methodName = sprintf("set%sProperty", strtr(ucwords($name, "._-"), ["." => "", "_" => "", "-" => ""]));
+        if (method_exists($this, $methodName)) {
+            call_user_func([$this, $methodName], $value);
+        }
+    }
+    
     public function init($configPath, ConfigurationInterface $configurationInterface, $configCachePath = null)
     {
         if (!is_dir($configPath)) {
@@ -163,40 +171,33 @@ class SlimApp
         //mdebug("SlimApp [%s] initialized", static::class);
     }
     
-    public function getServiceIds()
+    /**
+     * @return boolean
+     */
+    public function isDebug()
     {
-        return $this->container->getServiceIds();
+        return $this->isDebugMode;
     }
     
-    public function getService($id, $type = null)
+    public function resetService($id)
     {
-        $service = $this->container->get($id);
-        if ($type && (!$service instanceof $type)) {
-            throw new InvalidArgumentException(sprintf("Service %s is not of type %s", $id, $type));
-        }
-        
-        return $service;
+        $this->container->set($id, null);
     }
     
-    public function getParameter($k)
+    /**
+     * @return string
+     */
+    public function getConfigCachePath()
     {
-        return $this->container->getParameter($k);
+        return $this->configCachePath;
     }
     
-    public function getMandatoryConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE)
+    /**
+     * @return mixed
+     */
+    public function getConfigPath()
     {
-        // normalize key
-        $key = strtr($key, ['-' => "_"]);
-        
-        return $this->configDataProvider->getMandatory($key, $expectedType);
-    }
-    
-    public function getOptionalConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE, $defaultValue = null)
-    {
-        // normalize key
-        $key = strtr($key, ['-' => "_"]);
-        
-        return $this->configDataProvider->getOptional($key, $expectedType, $defaultValue);
+        return $this->configPath;
     }
     
     /**
@@ -241,36 +242,57 @@ class SlimApp
         return $this->silexKernel;
     }
     
-    function __set($name, $value)
+    public function getMandatoryConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE)
     {
-        $methodName = sprintf("set%sProperty", strtr(ucwords($name, "._-"), ["." => "", "_" => "", "-" => ""]));
-        if (method_exists($this, $methodName)) {
-            call_user_func([$this, $methodName], $value);
+        // normalize key
+        $key = strtr($key, ['-' => "_"]);
+        
+        return $this->configDataProvider->getMandatory($key, $expectedType);
+    }
+    
+    public function getOptionalConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE, $defaultValue = null)
+    {
+        // normalize key
+        $key = strtr($key, ['-' => "_"]);
+        
+        return $this->configDataProvider->getOptional($key, $expectedType, $defaultValue);
+    }
+    
+    public function getParameter($k)
+    {
+        return $this->container->getParameter($k);
+    }
+    
+    public function getService($id, $type = null)
+    {
+        $service = $this->container->get($id);
+        if ($type && (!$service instanceof $type)) {
+            throw new InvalidArgumentException(sprintf("Service %s is not of type %s", $id, $type));
         }
+        
+        return $service;
     }
     
-    /**
-     * @return boolean
-     */
-    public function isDebug()
+    public function getServiceIds()
     {
-        return $this->isDebugMode;
+        return $this->container->getServiceIds();
     }
     
-    /**
-     * @return string
-     */
-    public function getConfigCachePath()
+    public function setService($id, $service)
     {
-        return $this->configCachePath;
+        $this->container->set($id, $service);
     }
     
-    /**
-     * @return mixed
-     */
-    public function getConfigPath()
+    protected function setCliProperty($value)
     {
-        return $this->configPath;
+        $this->consoleApp    = null;
+        $this->consoleConfig = $value;
+    }
+    
+    protected function setHttpProperty($value)
+    {
+        $this->silexKernel = null;
+        $this->httpConfig  = $value;
     }
     
     protected function setLoggingProperty($value)
@@ -293,17 +315,5 @@ class SlimApp
         if (isset($value['level'])) {
             $this->loggingLevel = $value['level'];
         }
-    }
-    
-    protected function setCliProperty($value)
-    {
-        $this->consoleApp    = null;
-        $this->consoleConfig = $value;
-    }
-    
-    protected function setHttpProperty($value)
-    {
-        $this->silexKernel = null;
-        $this->httpConfig  = $value;
     }
 }
