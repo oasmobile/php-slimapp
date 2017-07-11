@@ -55,9 +55,10 @@ class SlimApp
     protected $httpConfig;
     
     protected $configPath;
-    protected $configFilename  = "config.yml";
-    protected $serviceFilename = "services.yml";
-    protected $configCachePath = '';
+    protected $configFilename         = "config.yml";
+    protected $serviceFilename        = "services.yml";
+    protected $configCachePath        = '';
+    protected $configRelatedResources = [];
     
     /**
      * @return static
@@ -91,12 +92,12 @@ class SlimApp
         $this->configCachePath = $configCachePath ? : $this->configPath . "/cache";
         $locator               = new FileLocator([$this->configPath]);
         
-        $configCacheFile = \sprintf($this->configCachePath . "/config.cache");
-        $configYamlCache = new ConfigCache(
+        $configCacheFile              = \sprintf($this->configCachePath . "/config.cache");
+        $configYamlCache              = new ConfigCache(
             $configCacheFile,
             true
         );
-        $configResources = [];
+        $this->configRelatedResources = [];
         if ($upToDate = $configYamlCache->isFresh()) {
             $content       = \file_get_contents($configCacheFile);
             $this->configs = @\unserialize($content);
@@ -106,9 +107,9 @@ class SlimApp
             $yamlFiles = $locator->locate($this->configFilename, null, false);
             $rawData   = [];
             foreach ($yamlFiles as $file) {
-                $configResources[] = new FileResource(realpath($file));
-                $config            = Yaml::parse(file_get_contents($file));
-                $rawData[]         = $config;
+                $this->configRelatedResources[] = new FileResource(realpath($file));
+                $config                         = Yaml::parse(file_get_contents($file));
+                $rawData[]                      = $config;
             }
             $processor     = new Processor();
             $this->configs = $processor->processConfiguration($configurationInterface, $rawData);
@@ -117,7 +118,7 @@ class SlimApp
             }
             $configYamlCache->write(
                 \serialize($this->configs),
-                $configResources
+                $this->configRelatedResources
             );
         }
         
@@ -160,13 +161,13 @@ class SlimApp
             
             $builder->compile();
             
-            $dumper      = new PhpDumper($builder);
-            $resources   = $builder->getResources();
-            $resources[] = new FileResource(__FILE__);
-            $resources   = array_merge($resources, $configResources);
+            $dumper                       = new PhpDumper($builder);
+            $resources                    = $builder->getResources();
+            $resources[]                  = new FileResource(__FILE__);
+            $this->configRelatedResources = array_merge($resources, $this->configRelatedResources);
             $containerConfigCache->write(
                 $dumper->dump(['class' => 'SlimAppCachedContainer', 'namespace' => __NAMESPACE__]),
-                $resources
+                $this->configRelatedResources
             );
             //mdebug("container dumped");
         }
@@ -251,9 +252,18 @@ class SlimApp
     public function getHttpKernel()
     {
         if (!$this->silexKernel) {
-            $this->silexKernel = new SilexKernel($this->httpConfig, $this->isDebugMode);
-            $this->silexKernel->addControllerInjectedArg($this);
-            $this->silexKernel->addExtraParameters($this->container->getParameterBag()->all());
+            $kernelCacheFile = $this->configCachePath . "/silex.kernel.cache";
+            if (!$this->isDebug() && \file_exists($kernelCacheFile)) {
+                $this->silexKernel = @\unserialize(\file_get_contents($kernelCacheFile));
+            }
+            if (!$this->silexKernel instanceof SilexKernel) {
+                $this->silexKernel = new SilexKernel($this->httpConfig, $this->isDebugMode);
+                $this->silexKernel->addControllerInjectedArg($this);
+                $this->silexKernel->addExtraParameters($this->container->getParameterBag()->all());
+                if (!$this->isDebug()) {
+                    \file_put_contents($kernelCacheFile, \serialize($this->silexKernel));
+                }
+            }
         }
         
         return $this->silexKernel;
