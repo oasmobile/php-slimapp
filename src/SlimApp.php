@@ -92,15 +92,16 @@ class SlimApp
         $locator               = new FileLocator([$this->configPath]);
         
         $configCacheFile = \sprintf($this->configCachePath . "/config.cache");
-        
+        $configYamlCache = new ConfigCache(
+            $configCacheFile,
+            true
+        );
         $configResources = [];
-        if (\file_exists($configCacheFile) && $content = \file_get_contents($configCacheFile)) {
+        if ($upToDate = $configYamlCache->isFresh()) {
+            $content       = \file_get_contents($configCacheFile);
             $this->configs = @\unserialize($content);
         }
-        if (!$this->configs
-            || !isset($this->configs['is_debug'])
-            || $this->configs['is_debug'] == true
-        ) {
+        if (!$this->configs || !$upToDate) {
             // read config.yml first
             $yamlFiles = $locator->locate($this->configFilename, null, false);
             $rawData   = [];
@@ -114,8 +115,12 @@ class SlimApp
             if (!isset($this->configs['dir.config'])) {
                 $this->configs['dir.config'] = $this->configPath;
             }
-            \file_put_contents($configCacheFile, \serialize($this->configs));
+            $configYamlCache->write(
+                \serialize($this->configs),
+                $configResources
+            );
         }
+        
         $this->configDataProvider = new ArrayDataProvider($this->configs);
         $this->isDebugMode        = $this->configDataProvider->getOptional(
             'is_debug',

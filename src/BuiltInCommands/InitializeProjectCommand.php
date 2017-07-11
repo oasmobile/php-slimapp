@@ -638,7 +638,10 @@ SRC;
             \$prefix    = \$app->getMandatoryConfig('dynamodb.prefix', DataProviderInterface::STRING_TYPE);
             
             \$im = new ItemManager(\$awsConfig, \$prefix, \$cacheDir, \$app->isDebug());
-            \$im->addNamespace("{$itemNamespaceDeclarationEscaped}", PROJECT_DIR . "/src/Items");
+            \$dir = PROJECT_DIR . "/src/Items";
+            if (\is_dir(\$dir)) {
+                \$im->addNamespace("{$itemNamespaceDeclarationEscaped}", \$dir);
+            }
         }
         
         return \$im;
