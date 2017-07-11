@@ -249,21 +249,15 @@ class SlimApp
         return $this->consoleApp;
     }
     
+    /**
+     * @return SilexKernel
+     */
     public function getHttpKernel()
     {
-        if (!$this->silexKernel) {
-            $kernelCacheFile = $this->configCachePath . "/silex.kernel.cache";
-            if (!$this->isDebug() && \file_exists($kernelCacheFile)) {
-                $this->silexKernel = @\unserialize(\file_get_contents($kernelCacheFile));
-            }
-            if (!$this->silexKernel instanceof SilexKernel) {
-                $this->silexKernel = new SilexKernel($this->httpConfig, $this->isDebugMode);
-                $this->silexKernel->addControllerInjectedArg($this);
-                $this->silexKernel->addExtraParameters($this->container->getParameterBag()->all());
-                if (!$this->isDebug()) {
-                    \file_put_contents($kernelCacheFile, \serialize($this->silexKernel));
-                }
-            }
+        if (!$this->silexKernel instanceof SilexKernel) {
+            $this->silexKernel = new SilexKernel($this->httpConfig, $this->isDebugMode);
+            $this->silexKernel->addControllerInjectedArg($this);
+            $this->silexKernel->addExtraParameters($this->container->getParameterBag()->all());
         }
         
         return $this->silexKernel;
