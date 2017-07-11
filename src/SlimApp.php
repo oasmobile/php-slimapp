@@ -38,7 +38,7 @@ class SlimApp
     protected $isDebugMode;
     
     /** @var array */
-    protected $configs;
+    protected $configs = [];
     /** @var  ArrayDataProvider */
     protected $configDataProvider;
     /** @var  Container */
@@ -87,32 +87,44 @@ class SlimApp
                 "Config path must be a directory containing config file. Path given = " . $configPath
             );
         }
-        $this->configPath = $configPath;
-        
+        $this->configPath      = $configPath;
         $this->configCachePath = $configCachePath ? : $this->configPath . "/cache";
+        $locator               = new FileLocator([$this->configPath]);
         
-        $locator = new FileLocator([$this->configPath]);
+        $configCacheFile = \sprintf($this->configCachePath . "/config.cache");
         
-        // read config.yml first
         $configResources = [];
-        $yamlFiles       = $locator->locate($this->configFilename, null, false);
-        $rawData         = [];
-        foreach ($yamlFiles as $file) {
-            $configResources[] = new FileResource(realpath($file));
-            $config            = Yaml::parse(file_get_contents($file));
-            $rawData[]         = $config;
+        if (\file_exists($configCacheFile) && $content = \file_get_contents($configCacheFile)) {
+            $this->configs = @\unserialize($content);
         }
-        $processor     = new Processor();
-        $this->configs = $processor->processConfiguration($configurationInterface, $rawData);
-        if (!isset($this->configs['dir.config'])) {
-            $this->configs['dir.config'] = $this->configPath;
+        if (!$this->configs
+            || !isset($this->configs['is_debug'])
+            || $this->configs['is_debug'] == true
+        ) {
+            // read config.yml first
+            $yamlFiles = $locator->locate($this->configFilename, null, false);
+            $rawData   = [];
+            foreach ($yamlFiles as $file) {
+                $configResources[] = new FileResource(realpath($file));
+                $config            = Yaml::parse(file_get_contents($file));
+                $rawData[]         = $config;
+            }
+            $processor     = new Processor();
+            $this->configs = $processor->processConfiguration($configurationInterface, $rawData);
+            if (!isset($this->configs['dir.config'])) {
+                $this->configs['dir.config'] = $this->configPath;
+            }
+            \file_put_contents($configCacheFile, \serialize($this->configs));
         }
-        
         $this->configDataProvider = new ArrayDataProvider($this->configs);
+        $this->isDebugMode        = $this->configDataProvider->getOptional(
+            'is_debug',
+            ArrayDataProvider::BOOL_TYPE,
+            true
+        );
         
         // read container info
         $cacheFilePath        = $this->configCachePath . "/container.php";
-        $this->isDebugMode    = $this->configDataProvider->getOptional('is_debug', ArrayDataProvider::BOOL_TYPE, true);
         $containerConfigCache = new ConfigCache(
             $cacheFilePath,
             $this->isDebugMode
