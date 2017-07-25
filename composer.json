@@ -11,7 +11,7 @@
         "symfony/filesystem"          : "^3.0",
         "oasis/logging"               : "^1.2.0",
         "oasis/utils"                 : "^1.6.1",
-        "oasis/http"                  : "^1.8.6"
+        "oasis/http"                  : "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit"     : "^5.7",
