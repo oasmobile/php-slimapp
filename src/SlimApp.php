@@ -43,8 +43,9 @@ class SlimApp
     protected $configDataProvider;
     /** @var  Container */
     protected $container;
-    protected $loggingPath  = null;
-    protected $loggingLevel = Logger::DEBUG;
+    protected $loggingPath    = null;
+    protected $loggingLevel   = Logger::DEBUG;
+    protected $loggingPattern = "%date%/%script%.%type%";
     /** @var  ConsoleApplication */
     protected $consoleApp;
     /** @var  array */
@@ -181,9 +182,17 @@ class SlimApp
         $this->container->get('app');
         
         // NOTE: loggers below will be overriden if running in console mode
-        $logger = new LocalFileHandler($this->loggingPath, "%date%/%script%.log", $this->loggingLevel);
+        $logger = new LocalFileHandler(
+            $this->loggingPath,
+            \strtr($this->loggingPattern, '%type%', 'log'),
+            $this->loggingLevel
+        );
         $logger->install();
-        $logger = new LocalErrorHandler($this->loggingPath, "%date%/%script%.error", $this->loggingLevel);
+        $logger = new LocalErrorHandler(
+            $this->loggingPath,
+            \strtr($this->loggingPattern, '%type%', 'error'),
+            $this->loggingLevel
+        );
         $logger->install();
         
         //mdebug("SlimApp [%s] initialized", static::class);
@@ -230,6 +239,7 @@ class SlimApp
             $this->consoleApp->setSlimapp($this);
             $this->consoleApp->setLoggingPath($this->loggingPath);
             $this->consoleApp->setLoggingLevel($this->loggingLevel);
+            $this->consoleApp->setLogFilePattern($this->loggingPattern);
             
             // Add built-in commands
             $this->consoleApp->addCommands(
@@ -335,6 +345,9 @@ class SlimApp
         }
         if (isset($value['level'])) {
             $this->loggingLevel = $value['level'];
+        }
+        if (isset($value['pattern'])) {
+            $this->loggingPattern = $value['pattern'];
         }
     }
 }

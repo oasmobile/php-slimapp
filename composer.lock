@@ -210,16 +210,16 @@
         },
         {
             "name": "oasis/http",
-            "version": "v2.0.0",
+            "version": "v2.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oasmobile/php-http.git",
-                "reference": "391c6443a049fda71bfb61c6f6d53aef93748f07"
+                "reference": "18294082d3c18ce5cf4067a5a3053c2b177bf53a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/391c6443a049fda71bfb61c6f6d53aef93748f07",
-                "reference": "391c6443a049fda71bfb61c6f6d53aef93748f07",
+                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/18294082d3c18ce5cf4067a5a3053c2b177bf53a",
+                "reference": "18294082d3c18ce5cf4067a5a3053c2b177bf53a",
                 "shasum": ""
             },
             "require": {
@@ -259,7 +259,7 @@
                 }
             ],
             "description": "An extension to Silex, for HTTP related routing, middleware, and so on.",
-            "time": "2017-07-25T13:37:54+00:00"
+            "time": "2017-07-28T09:15:35+00:00"
         },
         {
             "name": "oasis/logging",
@@ -2192,16 +2192,16 @@
     "packages-dev": [
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.31.8",
+            "version": "3.32.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "9829a8183016df800110148b467179d67c434f90"
+                "reference": "ca8791495696a1620fe2275df4983d063627aba7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/9829a8183016df800110148b467179d67c434f90",
-                "reference": "9829a8183016df800110148b467179d67c434f90",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/ca8791495696a1620fe2275df4983d063627aba7",
+                "reference": "ca8791495696a1620fe2275df4983d063627aba7",
                 "shasum": ""
             },
             "require": {
@@ -2268,7 +2268,7 @@
                 "s3",
                 "sdk"
             ],
-            "time": "2017-07-20T22:22:05+00:00"
+            "time": "2017-07-27T19:46:08+00:00"
         },
         {
             "name": "doctrine/annotations",

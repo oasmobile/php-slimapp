@@ -17,8 +17,9 @@ services:
 #        factory: [SlimApp, app]
         properties:
             logging:
-                path: %app.dir.log%
+                path: "%app.dir.log%"
                 level: debug
+                pattern: "%%script%%.%%date%%.%%type%%"
                 handlers:
 #                    - '@log.handler.sns'
 #                    - '@log.handler.console'
@@ -31,7 +32,7 @@ services:
                     - '@cli.command.sentinel'
             http:
                 routing:
-                    path: %app.dir.config%/routes.yml
+                    path: "%app.dir.config%/routes.yml"
                     namespaces:
                         - Oasis\SlimApp\Ut\
                 error_handlers: '@http.error_handler'
@@ -47,8 +48,6 @@ services:
         arguments:
             - '@sns.publisher'
             - message from slimapp
-        calls:
-            - [enableAutoPublishingOnFatalError, []]
 
     cli.command.dummy:
         class: tests\DummyCommand
@@ -69,10 +68,10 @@ services:
         class: Dummy
         factory: ['@app', app]
         properties:
-            name: %db.username%
+            name: "%db.username%"
 
     sns.publisher:
         class: Oasis\Mlib\AwsWrappers\SnsPublisher
         arguments:
-            - %sns.config%
+            - "%sns.config%"
             - "arn:aws:sns:us-east-1:315771499375:dynamodb"
