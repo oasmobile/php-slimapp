@@ -266,7 +266,7 @@ class SlimApp
     public function getMandatoryConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE)
     {
         // normalize key
-        $key = strtr($key, ['-' => "_"]);
+        //$key = strtr($key, ['-' => "_"]);
         
         return $this->configDataProvider->getMandatory($key, $expectedType);
     }
@@ -274,7 +274,7 @@ class SlimApp
     public function getOptionalConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE, $defaultValue = null)
     {
         // normalize key
-        $key = strtr($key, ['-' => "_"]);
+        //$key = strtr($key, ['-' => "_"]);
         
         return $this->configDataProvider->getOptional($key, $expectedType, $defaultValue);
     }
