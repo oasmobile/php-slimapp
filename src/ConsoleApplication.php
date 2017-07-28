@@ -147,15 +147,15 @@ class ConsoleApplication extends Application
             $logFilePattern   = strtr(
                 $this->logFilePattern,
                 [
-                    "%command%" => $name,
-                    "%type%"    => "log",
+                    "%script%" => $name,
+                    "%type%"   => "log",
                 ]
             );
             $errorFilePattern = strtr(
                 $this->logFilePattern,
                 [
-                    "%command%" => $name,
-                    "%type%"    => "error",
+                    "%script%" => $name,
+                    "%type%"   => "error",
                 ]
             );
             $logger           = new LocalFileHandler(
