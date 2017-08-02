@@ -184,13 +184,13 @@ class SlimApp
         // NOTE: loggers below will be overriden if running in console mode
         $logger = new LocalFileHandler(
             $this->loggingPath,
-            \strtr($this->loggingPattern, '%type%', 'log'),
+            \strtr($this->loggingPattern, ['%type%' => 'log']),
             $this->loggingLevel
         );
         $logger->install();
         $logger = new LocalErrorHandler(
             $this->loggingPath,
-            \strtr($this->loggingPattern, '%type%', 'error'),
+            \strtr($this->loggingPattern, ['%type%' => 'error']),
             $this->loggingLevel
         );
         $logger->install();
