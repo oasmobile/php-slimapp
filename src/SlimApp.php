@@ -124,21 +124,21 @@ class SlimApp
             );
             $parameterizedResult   = [];
             $recursiveSetParameter = function (callable $recursiveCallback,
-                                               array &$parameterizedResult,
-                                               $prefix = 'app.') {
-                foreach ($this->configs as $k => &$v) {
+                                               array $value,
+                                               $prefix = 'app.') use (&$parameterizedResult) {
+                foreach ($value as $k => &$v) {
                     $parameterizedResult[$prefix . "$k"] = $v;
                     if (is_array($v)) {
                         call_user_func(
                             $recursiveCallback,
                             $recursiveCallback,
-                            $parameterizedResult,
+                            $v,
                             $prefix . "$k" . "."
                         );
                     }
                 }
             };
-            call_user_func($recursiveSetParameter, $recursiveSetParameter, $parameterizedResult);
+            call_user_func($recursiveSetParameter, $recursiveSetParameter, $this->configs);
             \file_put_contents(
                 $this->configCachePath . '/parameterized_helper.yml',
                 Yaml::dump(['parameters' => $parameterizedResult])
