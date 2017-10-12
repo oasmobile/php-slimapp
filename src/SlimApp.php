@@ -103,6 +103,7 @@ class SlimApp
             $content       = \file_get_contents($configCacheFile);
             $this->configs = @\unserialize($content);
         }
+        
         if (!$this->configs || !$upToDate) {
             // read config.yml first
             $yamlFiles = $locator->locate($this->configFilename, null, false);
@@ -120,6 +121,27 @@ class SlimApp
             $configYamlCache->write(
                 \serialize($this->configs),
                 $this->configRelatedResources
+            );
+            $parameterizedResult   = [];
+            $recursiveSetParameter = function (callable $recursiveCallback,
+                                               array &$parameterizedResult,
+                                               $prefix = 'app.') {
+                foreach ($this->configs as $k => &$v) {
+                    $parameterizedResult[$prefix . "$k"] = $v;
+                    if (is_array($v)) {
+                        call_user_func(
+                            $recursiveCallback,
+                            $recursiveCallback,
+                            $parameterizedResult,
+                            $prefix . "$k" . "."
+                        );
+                    }
+                }
+            };
+            call_user_func($recursiveSetParameter, $recursiveSetParameter, $parameterizedResult);
+            \file_put_contents(
+                $this->configCachePath . '/parameterized_helper.yml',
+                Yaml::dump(['parameters' => $parameterizedResult])
             );
         }
         
