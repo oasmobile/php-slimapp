@@ -345,6 +345,7 @@ SRC;
 <?php
 namespace $namespaceDeclaration;
 
+use Oasis\\Mlib\\Utils\\StringUtils;
 use Symfony\\Component\\Config\\Definition\\Builder\\TreeBuilder;
 use Symfony\\Component\\Config\\Definition\\ConfigurationInterface;
 
@@ -371,10 +372,16 @@ class $classname implements ConfigurationInterface
             \$root->children()->booleanNode('is_debug')->defaultValue(true);
             \$dir = \$root->children()->arrayNode('dir');
             {
-                \$dir->children()->scalarNode('log');
-                \$dir->children()->scalarNode('data');
-                \$dir->children()->scalarNode('cache');
-                \$dir->children()->scalarNode('template');
+                \$makeAbsolute = function (\$path) {
+                    return StringUtils::stringStartsWith(\$path, \DIRECTORY_SEPARATOR)
+                        ? \$path
+                        : \PROJECT_DIR . \DIRECTORY_SEPARATOR . \$path;
+                };
+
+                \$dir->children()->scalarNode('log')->beforeNormalization()->always(\$makeAbsolute);
+                \$dir->children()->scalarNode('data')->beforeNormalization()->always(\$makeAbsolute);
+                \$dir->children()->scalarNode('cache')->beforeNormalization()->always(\$makeAbsolute);
+                \$dir->children()->scalarNode('template')->beforeNormalization()->always(\$makeAbsolute);
             }
             
             \$db = \$root->children()->arrayNode('db');
@@ -431,14 +438,14 @@ SRC;
         );
         $dataDir        = $helper->ask($this->input, $this->output, $question);
         
-        $suggestCacheDir = "{$this->rootDir}/cache";
+        $suggestCacheDir = "./cache";
         $question        = new Question(
             "Please provide the cache directory <info>[$suggestCacheDir]</info>: ",
             $suggestCacheDir
         );
         $cacheDir        = $helper->ask($this->input, $this->output, $question);
         
-        $suggestTemplateDir = "{$this->rootDir}/templates";
+        $suggestTemplateDir = "./templates";
         $question           = new Question(
             "Please provide the template directory <info>[$suggestTemplateDir]</info>: ",
             $suggestTemplateDir
