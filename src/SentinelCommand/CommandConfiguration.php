@@ -75,6 +75,11 @@ class CommandConfiguration implements ConfigurationInterface
                     $command->children()->integerNode('frequency')->defaultValue(0)->beforeNormalization()->always(
                         $normalizer
                     );
+                    $command->children()
+                            ->booleanNode('frequency_fixed')
+                            ->defaultValue(false)
+                            ->beforeNormalization()
+                            ->always($normalizer);
                 }
             }
         }

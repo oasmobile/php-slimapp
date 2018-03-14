@@ -633,11 +633,14 @@ commands:
         # alert on abnormal exit (exit != 0)
         alert: false
 
-        # interval: num of seconds between last end and next start
+        # interval: minimum number of seconds between last end and next start
         interval: 2
 
-        # frequency: min seconds between two start
+        # frequency: minimum seconds between two start
         frequency: 5
+        
+        # frequency_fixed: default to false, if enabled, commands will start at fixed frequency, no matter if the previous run has finished or not
+        frequency_fixed: false
 ```
 
 > **NOTE**: all config values can be used in the format of "%key-to-config-value%" in args setting of command

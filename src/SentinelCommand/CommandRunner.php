@@ -26,9 +26,10 @@ class CommandRunner
     /** @var  OutputInterface */
     protected $output;
     
-    protected $once      = false;
-    protected $interval  = 0;
-    protected $frequency = 0;
+    protected $once           = false;
+    protected $interval       = 0;
+    protected $frequency      = 0;
+    protected $frequencyFixed = false;
     
     protected $lastRun      = 0;
     protected $nextRun      = 0;
@@ -66,10 +67,11 @@ class CommandRunner
         //mdebug("args = %s", json_encode($args));
         $this->input = new ArrayInput($args);
         
-        $this->once      = $command['once'];
-        $this->interval  = $command['interval'];
-        $this->frequency = $command['frequency'];
-        $this->alert     = $command['alert'];
+        $this->once           = $command['once'];
+        $this->interval       = $command['interval'];
+        $this->frequency      = $command['frequency'];
+        $this->frequencyFixed = $command['frequency_fixed'];
+        $this->alert          = $command['alert'];
         
         $this->nextRun      = time();
         $this->traceEnabled = $traceEnabled;
@@ -77,7 +79,7 @@ class CommandRunner
     
     public function shouldStartNextRunWhenNotFinished()
     {
-        if (!$this->frequency || $this->once) {
+        if (!$this->frequencyFixed || !$this->frequency || $this->once) {
             return false;
         }
         
@@ -99,6 +101,7 @@ class CommandRunner
         $ret          = clone $this;
         $ret->nextRun = time();
         $this->once   = true;
+        
         //\mdebug('Cloned early runner for process [%d]', $this->currentPid);
         
         return $ret;
@@ -127,13 +130,15 @@ class CommandRunner
         }
         else {
             $this->nextRun = time();
-            if ($this->interval) {
-                $this->nextRun = $this->nextRun + $this->interval;
-            }
+            
             if ($this->frequency) {
                 if ($this->nextRun - $this->lastRun < $this->frequency) {
                     $this->nextRun = $this->lastRun + $this->frequency;
                 }
+            }
+            
+            if ($this->interval && $this->nextRun - time() < $this->interval) {
+                $this->nextRun = time() + $this->interval;
             }
         }
         
@@ -196,6 +201,7 @@ class CommandRunner
         else {
             $this->lastRun    = $this->nextRun;
             $this->currentPid = $pid;
+            
             //\mdebug("Started process %d", $pid);
             
             return $pid;
