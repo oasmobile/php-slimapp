@@ -18,11 +18,14 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Class AbstractDaemonSentinelCommand
  *
- * @deprecated
- * @package Oasis\SlimApp\SentinelCommand
+ * @deprecated use DaemonSentinelCommand instead
+ * @package    Oasis\SlimApp\SentinelCommand
  */
 abstract class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
 {
+    /**
+     * @var CommandRunner[]
+     */
     protected $runningProcesses = [];
     
     protected function configure()
@@ -89,13 +92,27 @@ abstract class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
             $pid    = pcntl_waitpid(-1, $status, WNOHANG);
             
             if ($pid == 0) { // no child process has quit
+                $jumpStarted = [];
+                foreach ($this->runningProcesses as $runner) {
+                    if ($runner->shouldStartNextRunWhenNotFinished()) {
+                        $earlyRunner                  = $runner->cloneEarlyRunner();
+                        $earlyRunnerPid               = $earlyRunner->run();
+                        $jumpStarted[$earlyRunnerPid] = $earlyRunner;
+                    }
+                }
+                //\mdebug("Before: " . \GuzzleHttp\json_encode(\array_keys($this->runningProcesses)));
+                //\mdebug(\GuzzleHttp\json_encode($jumpStarted));
+                $this->runningProcesses = $this->runningProcesses + $jumpStarted;
+                //\mdebug("After: " . \GuzzleHttp\json_encode(\array_keys($this->runningProcesses)));
                 usleep(200 * 1000);
             }
             else if ($pid > 0) { // child process with pid = $pid exits
                 $exitStatus = pcntl_wexitstatus($status);
-                $runner     = $this->runningProcesses[$pid];
-                if (!$runner instanceof CommandRunner) {
-                    throw new \LogicException("Cannot find command runner for process pid = %d", $pid);
+                if (!isset($this->runningProcesses[$pid])
+                    || !(($runner = $this->runningProcesses[$pid]) instanceof CommandRunner)
+                ) {
+                    //\mdebug(\GuzzleHttp\json_encode(\array_keys($this->runningProcesses)));
+                    throw new \LogicException(\sprintf("Cannot find command runner for process pid = %d", $pid));
                 }
                 unset($this->runningProcesses[$pid]);
                 $runner->onProcessExit($exitStatus, $pid);

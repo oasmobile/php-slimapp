@@ -8,9 +8,9 @@
 
 namespace Oasis\SlimApp\tests;
 
-use Oasis\SlimApp\SentinelCommand\AbstractDaemonSentinelCommand;
+use Oasis\SlimApp\SentinelCommand\DaemonSentinelCommand;
 
-class TestSentinelCommand extends AbstractDaemonSentinelCommand
+class TestSentinelCommand extends DaemonSentinelCommand
 {
     protected function configure()
     {

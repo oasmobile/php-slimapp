@@ -32,6 +32,7 @@ class DummyCommand extends AbstractParallelCommand
         minfo('I got a: %s', $a);
         minfo('I got tt: %s', json_encode($tt));
         minfo('I got idx: %d', $idx);
+        sleep(5);
         merror("woww");
         
         //merror("wow");
