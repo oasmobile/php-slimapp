@@ -130,11 +130,11 @@ class CommandRunner
             if ($this->interval) {
                 $this->nextRun = $this->nextRun + $this->interval;
             }
-            //if ($this->frequency) {
-            //    if ($this->nextRun - $this->lastRun < $this->frequency) {
-            //        $this->nextRun = $this->lastRun + $this->frequency;
-            //    }
-            //}
+            if ($this->frequency) {
+                if ($this->nextRun - $this->lastRun < $this->frequency) {
+                    $this->nextRun = $this->lastRun + $this->frequency;
+                }
+            }
         }
         
         if ($this->traceEnabled) {
