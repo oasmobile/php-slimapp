@@ -397,6 +397,7 @@ class $classname implements ConfigurationInterface
             {
                 \$memcached->children()->scalarNode('host')->isRequired();
                 \$memcached->children()->integerNode('port')->isRequired();
+                \$memcached->children()->scalarNode('namespace')->isRequired();
             }
             
             \$aws = \$root->children()->arrayNode('aws');
@@ -471,8 +472,9 @@ SRC;
                 'dbname'   => str_replace('-', '_', $this->projectName),
             ];
             $config['memcached'] = [
-                'host' => 'localhost',
-                'port' => 11211,
+                'host'      => 'localhost',
+                'port'      => 11211,
+                'namespace' => $this->projectName,
             ];
         }
         if ($this->odmSupportEnabled) {
@@ -603,17 +605,13 @@ SRC;
         }
         
         \$app = {$this->mainClassname}::app();
-
-        \$memcache = new MemcachedCache();
-        /** @noinspection PhpParamsInspection */
-        \$memcache->setMemcached(\$app->getService('memcached'));
-        
+    
         \$isDevMode = \$app->isDebug();
         \$config    = Setup::createAnnotationMetadataConfiguration(
             [PROJECT_DIR . "/src/Entities"],
             \$isDevMode,
             \$app->getParameter('app.dir.data') . "/proxies",
-            \$memcache,
+            \$app->getService('memcached_cache'),
             false /* do not use simple annotation reader, so that we can understand annotations like @ORM/Table */
         );
         \$config->addEntityNamespace("{$this->mainClassname}", "{$entityNamespaceDeclarationEscaped}");
@@ -986,6 +984,19 @@ SRC;
                     [
                         "addServer",
                         ['%app.memcached.host%', '%app.memcached.port%'],
+                    ],
+                ],
+            ];
+            $services['services']['memcached_cache']                                  = [
+                "class" => "Doctrine\\Common\\Cache\\MemcachedCache",
+                "calls" => [
+                    [
+                        "setMemcached",
+                        ['@memcached'],
+                    ],
+                    [
+                        "setNamespace",
+                        ['%app.memcached.namespace%'],
                     ],
                 ],
             ];
