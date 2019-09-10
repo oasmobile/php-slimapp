@@ -607,6 +607,7 @@ SRC;
         \$app = {$this->mainClassname}::app();
     
         \$isDevMode = \$app->isDebug();
+        /** @noinspection PhpParamsInspection */
         \$config    = Setup::createAnnotationMetadataConfiguration(
             [PROJECT_DIR . "/src/Entities"],
             \$isDevMode,
@@ -618,12 +619,14 @@ SRC;
         //\$config->setSQLLogger(new \\Doctrine\\DBAL\\Logging\\EchoSQLLogger());
 
         \$regconfig = new RegionsConfiguration();
-        \$factory   = new DefaultCacheFactory(\$regconfig, \$memcache);
+        /** @noinspection PhpParamsInspection */
+        \$factory   = new DefaultCacheFactory(\$regconfig, \$app->getService('memcached_cache'));
         \$config->setSecondLevelCacheEnabled();
         \$config->getSecondLevelCacheConfiguration()->setCacheFactory(\$factory);
 
         \$conn           = \$app->getParameter('app.db');
         \$conn["driver"] = "pdo_mysql";
+        /** @noinspection PhpUnhandledExceptionInspection */
         \$entityManager  = EntityManager::create(\$conn, \$config);
 
         return \$entityManager;
