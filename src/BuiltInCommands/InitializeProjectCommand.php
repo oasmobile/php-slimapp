@@ -586,7 +586,6 @@ SRC;
         $entityNamespaceDeclarationEscaped = addcslashes($namespaceDeclaration . "\\Entities", "\\");
         $itemNamespaceDeclarationEscaped   = addcslashes($namespaceDeclaration . "\\Items", "\\");
         $ormImports                        = <<<SRC
-use Doctrine\\Common\\Cache\\MemcachedCache;
 use Doctrine\\ORM\\Cache\\DefaultCacheFactory;
 use Doctrine\\ORM\\Cache\\RegionsConfiguration;
 use Doctrine\\ORM\\EntityManager;
