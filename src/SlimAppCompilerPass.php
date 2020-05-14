@@ -35,6 +35,9 @@ class SlimAppCompilerPass implements CompilerPassInterface
 
             foreach ($container->getDefinitions() as $id => $definition) {
 
+                // set service to public
+                $definition->setPublic(true);
+
                 // We need to prepare 'app' service
                 if ($id == 'app') {
                     $definition->setClass($this->classname);
