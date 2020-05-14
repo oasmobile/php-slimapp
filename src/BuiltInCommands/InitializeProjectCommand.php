@@ -952,6 +952,9 @@ SRC;
                 ],
             ],
             "services"   => [
+                "_defaults" => [
+                    "public" => true
+                ],
                 "app" => [
                     "properties" => [
                         "logging" => [
