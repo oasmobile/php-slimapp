@@ -255,8 +255,8 @@ class SlimApp
     public function getConsoleApplication()
     {
         if (!$this->consoleApp) {
-            $name             = $this->consoleConfig['name'] ?: 'UNKNOWN';
-            $version          = $this->consoleConfig['version'] ?: 'UNKNOWN';
+            $name             = $this->consoleConfig['name'] ?? 'UNKNOWN';
+            $version          = $this->consoleConfig['version'] ?? 'UNKNOWN';
             $this->consoleApp = new ConsoleApplication($name, $version);
             $this->consoleApp->setSlimapp($this);
             $this->consoleApp->setLoggingPath($this->loggingPath);
