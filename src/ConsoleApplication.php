@@ -26,7 +26,12 @@ class ConsoleApplication extends Application
     protected $loggingPath    = null;
     protected $logFilePattern = "%date%/%script%.%command%.%type%";
     protected $loggingLevel   = Logger::DEBUG;
-    
+
+    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
+    {
+        parent::__construct($name, $version);
+    }
+
     /**
      * @return boolean
      */
@@ -170,5 +175,4 @@ class ConsoleApplication extends Application
         
         return parent::doRunCommand($command, $input, $output);
     }
-    
 }
