@@ -14,6 +14,7 @@ parameters:
 
 services:
     app:
+        public: true
         properties:
             logging:
                 path: "%app.dir.log%"
@@ -21,7 +22,7 @@ services:
                 pattern: "%%script%%.%%date%%.%%type%%"
             cli:
                 name: Slim App Console
-                version: 1.1
+                version: "1.1"
                 commands:
                     - '@cli.command.dummy'
                     - '@cli.command.sentinel'
@@ -46,8 +47,10 @@ services:
 
     cli.command.dummy:
         class: DummyCommand
+        public: true
     cli.command.sentinel:
         class: TestSentinelCommand
+        public: true
 
     http.error_handler:
         class: Http\ErrorHandlers\JsonErrorHandler

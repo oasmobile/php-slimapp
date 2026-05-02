@@ -3,7 +3,7 @@
  * 独立进程测试脚本：AbstractParallelCommand 多进程分支
  *
  * 在独立进程中运行，避免 fork 干扰 PHPUnit。
- * 手动收集代码覆盖率并写入 .cov 文件供 PHPUnit 合并。
+ * 手动收集代码覆盖率并写入 .cov 文件供合并。
  */
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -11,6 +11,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Driver\Selector;
 use SebastianBergmann\CodeCoverage\Filter;
+use SebastianBergmann\CodeCoverage\Serialization\Serializer;
 
 // ── 覆盖率收集 ──
 $covFile = getenv('COVERAGE_FILE');
@@ -112,7 +113,7 @@ try {
 // ── 写覆盖率 ──
 if ($coverage && $covFile) {
     $coverage->stop();
-    file_put_contents($covFile, serialize($coverage));
+    (new Serializer())->serialize($covFile, $coverage);
 }
 
 exit($exitCode);

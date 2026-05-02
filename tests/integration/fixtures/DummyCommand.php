@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\Tests\Integration\Fixtures;
 
@@ -28,7 +29,7 @@ class DummyCommand extends AbstractParallelCommand
         minfo('I got idx: %d', $idx);
         sleep(5);
         merror("woww");
-        
+
         return self::EXIT_CODE_OK;
     }
 }

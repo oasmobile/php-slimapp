@@ -10,6 +10,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Driver\Selector;
 use SebastianBergmann\CodeCoverage\Filter;
+use SebastianBergmann\CodeCoverage\Serialization\Serializer;
 
 // ── 覆盖率收集 ──
 $covFile = getenv('COVERAGE_FILE');
@@ -133,7 +134,7 @@ YAML
 // ── 写覆盖率 ──
 if ($coverage && $covFile) {
     $coverage->stop();
-    file_put_contents($covFile, serialize($coverage));
+    (new Serializer())->serialize($covFile, $coverage);
 }
 
 exit($exitCode);
