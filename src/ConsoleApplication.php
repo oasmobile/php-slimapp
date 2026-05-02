@@ -116,7 +116,7 @@ class ConsoleApplication extends Application
         $this->slimapp = $slimapp;
     }
     
-    protected function configureIO(InputInterface $input, OutputInterface $output)
+    protected function configureIO(InputInterface $input, OutputInterface $output): void
     {
         parent::configureIO($input, $output);
         
@@ -144,7 +144,7 @@ class ConsoleApplication extends Application
         }
     }
     
-    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output)
+    protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
         if ($this->loggingEnabled) {
             $name             = $command->getName();

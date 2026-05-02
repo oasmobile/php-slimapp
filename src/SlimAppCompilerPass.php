@@ -25,7 +25,7 @@ class SlimAppCompilerPass implements CompilerPassInterface
      *
      * @param ContainerBuilder $container
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if ($container->hasParameter('default.namespace')) {
             $defaultNamespaces = $container->getParameter('default.namespace');

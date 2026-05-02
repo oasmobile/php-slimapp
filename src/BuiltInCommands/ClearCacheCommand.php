@@ -18,7 +18,7 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ClearCacheCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -26,7 +26,7 @@ class ClearCacheCommand extends Command
         $this->setDescription("Clears cache directories used by slimapp.");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var ConsoleApplication $console */
         $console = $this->getApplication();
@@ -50,5 +50,7 @@ class ClearCacheCommand extends Command
             }
             $output->writeln(sprintf('<info>done.</info>', $dir));
         }
+
+        return 0;
     }
 }

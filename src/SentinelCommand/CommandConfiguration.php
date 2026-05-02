@@ -32,11 +32,11 @@ class CommandConfiguration implements ConfigurationInterface
      *
      * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('daemon-monitor');
         
-        $root = $builder->root('daemon-monitor');
+        $root = $builder->getRootNode();
         {
             $commands = $root->children()->arrayNode('commands');
             {

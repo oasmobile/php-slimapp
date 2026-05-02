@@ -27,7 +27,7 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
         return $this->parallelCount;
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -46,7 +46,7 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->parallelCount = intval($input->getOption('parallel'));
         if ($this->parallelCount < 1) {

@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ValidateServicesCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -23,7 +23,7 @@ class ValidateServicesCommand extends Command
         $this->setDescription("Validate all services configured for slimapp.");
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var ConsoleApplication $console */
         $console = $this->getApplication();
@@ -42,5 +42,6 @@ class ValidateServicesCommand extends Command
             }
         }
 
+        return 0;
     }
 }

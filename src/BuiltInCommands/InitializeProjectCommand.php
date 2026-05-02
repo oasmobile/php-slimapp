@@ -95,7 +95,7 @@ class InitializeProjectCommand extends Command
         }
     }
     
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         
@@ -155,7 +155,7 @@ class InitializeProjectCommand extends Command
         }
     }
     
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->fs     = new Filesystem();
         $this->input  = $input;
@@ -184,6 +184,8 @@ class InitializeProjectCommand extends Command
         $this->applyTempFiles();
         
         $this->updateComposerInfo();
+
+        return 0;
     }
     
     protected function prepareAppClassFile()

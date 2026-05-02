@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class DummyCommand extends AbstractParallelCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setName('dummy:job')->setDescription('dummy command');
@@ -17,8 +17,8 @@ class DummyCommand extends AbstractParallelCommand
         $this->addOption('tt', null, InputOption::VALUE_REQUIRED);
         $this->addOption('idx', null, InputOption::VALUE_REQUIRED);
     }
-    
-    protected function doExecute(InputInterface $input, OutputInterface $output)
+
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
         $a   = $input->getArgument('a');
         $tt  = $input->getOption('tt');

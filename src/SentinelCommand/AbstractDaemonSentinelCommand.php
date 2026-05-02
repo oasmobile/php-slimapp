@@ -28,14 +28,14 @@ abstract class AbstractDaemonSentinelCommand extends AbstractAlertableCommand
      */
     protected $runningProcesses = [];
     
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setDescription("Runs as sentinel for a list of daemon commands");
         $this->addArgument('file', InputArgument::REQUIRED, "a config file holding daemon commands info");
     }
     
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $filename = $input->getArgument('file');
         if (!is_readable($filename)) {
