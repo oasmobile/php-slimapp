@@ -44,6 +44,7 @@ class SlimAppCompilerPass implements CompilerPassInterface
                 // Resolve factory class name using default namespaces
                 if (($factory = $definition->getFactory())
                     && is_array($factory)
+                    && is_string($factory[0])
                     && (strpos($factory[0], '@') !== 0)
                     && !class_exists($class = $factory[0])
                     && !class_exists('\\' . $class)

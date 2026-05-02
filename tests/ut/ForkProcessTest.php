@@ -8,11 +8,11 @@
 
 namespace Oasis\SlimApp\Tests;
 
-class ForkProcessTest extends \PHPUnit_Framework_TestCase
+class ForkProcessTest extends \PHPUnit\Framework\TestCase
 {
-    private static $covDir;
+    private static string $covDir;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$covDir = sys_get_temp_dir() . '/slimapp_fork_cov';
         if (!is_dir(self::$covDir)) {

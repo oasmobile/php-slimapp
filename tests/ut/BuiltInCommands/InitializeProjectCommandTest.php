@@ -4,7 +4,7 @@ namespace Oasis\SlimApp\Tests\BuiltInCommands;
 
 use Oasis\SlimApp\BuiltInCommands\InitializeProjectCommand;
 
-class InitializeProjectCommandTest extends \PHPUnit_Framework_TestCase
+class InitializeProjectCommandTest extends \PHPUnit\Framework\TestCase
 {
     public function testCommandNameAndDescription()
     {
