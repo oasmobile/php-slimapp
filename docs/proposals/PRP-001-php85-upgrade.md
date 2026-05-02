@@ -103,7 +103,7 @@
 
 ### Phase 2 — PBT 与覆盖率
 
-- 引入 `giorgiosironi/eris` ^1.0 作为 dev 依赖
+- 引入 `giorgiosironi/eris` ^1.1 作为 dev 依赖
 - 为核心组件编写 PBT 用例
 - ut + pbt + integration 综合覆盖率达到 90%+
 - 配置覆盖率报告（合并 ut、pbt、integration 三套 suite）
