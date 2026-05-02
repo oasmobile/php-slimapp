@@ -292,32 +292,32 @@
     - Ref: Req 8, AC 1–3, 5
   - [x] 14.3 Checkpoint: 运行全量测试套件（ut + pbt + integration），确保全部通过。确认覆盖率达标。Commit。
 
-- [-] 15. 文档更新
-  - [ ] 15.1 更新 `docs/state/architecture.md`
+- [x] 15. 文档更新
+  - [x] 15.1 更新 `docs/state/architecture.md`
     - HTTP Kernel 段落：SilexKernel → MicroKernel
     - DI 容器段落：移除"所有服务设为 public"，改为"默认 private，`app` 服务保持 public"
     - Daemon Sentinel 段落：移除 AbstractDaemonSentinelCommand 引用，DaemonSentinelCommand 直接继承 AbstractAlertableCommand
     - Ref: Req 10, AC 1
-  - [ ] 15.2 更新 `docs/state/cli-commands.md`
+  - [x] 15.2 更新 `docs/state/cli-commands.md`
     - Command 基类体系图：移除 AbstractDaemonSentinelCommand 层级
     - ValidateServicesCommand 说明更新为"验证所有 public 服务"
     - Ref: Req 10, AC 2
-  - [ ] 15.3 更新 `docs/state/configuration.md`
+  - [x] 15.3 更新 `docs/state/configuration.md`
     - DI 可见性变更说明：服务默认 private，需要通过 `getService()` 获取的服务须在 `services.yml` 中声明 `public: true`
     - Ref: Req 10, AC 3
-  - [ ] 15.4 更新 `PROJECT.md`
+  - [x] 15.4 更新 `PROJECT.md`
     - 技术栈更新：PHP >=8.5、Symfony ^8.0、PHPUnit ^13、oasis 上游库版本
     - 开发依赖更新：Doctrine ORM ^3.6、Eris ^1.1
     - 目录结构：移除 AbstractDaemonSentinelCommand，添加 ConfigParser、NamespaceResolver、tests/pbt/
     - Ref: Req 10, AC 4
-  - [ ] 15.5 更新 `README.md`
+  - [x] 15.5 更新 `README.md`
     - PHP 版本要求更新
     - 主要依赖版本更新
     - Ref: Req 10, AC 5
-  - [ ] 15.6 Checkpoint: Review 所有文档变更，确认内容准确。Commit。
+  - [x] 15.6 Checkpoint: Review 所有文档变更，确认内容准确。Commit。
 
-- [~] 16. 迁移指南
-  - [ ] 16.1 创建 `docs/manual/migration-v2-to-v3.md`
+- [-] 16. 迁移指南
+  - [x] 16.1 创建 `docs/manual/migration-v2-to-v3.md`
     - 依赖变更清单（表格：依赖名 | 2.x 版本 | 3.0 版本）
     - Breaking Change 1: PHP 版本要求（>=7.0 → >=8.5）
     - Breaking Change 2: HTTP Kernel 变更（`getHttpKernel()` 返回类型从 `SilexKernel` 改为 `MicroKernel`，使用方代码中的类型提示需更新）
@@ -331,7 +331,7 @@
     - 升级后验证步骤：`composer update` → `slimapp:cache:clear` → `slimapp:services:validate` → 运行业务测试套件
     - 升级步骤清单（有序列表）
     - Ref: Req 11, AC 1–8
-  - [ ] 16.2 Checkpoint: Review 迁移指南内容完整性和准确性。Commit。
+  - [-] 16.2 Checkpoint: Review 迁移指南内容完整性和准确性。Commit。
 
 - [~] 17. 手工测试
   - [ ] 17.1 Increment alpha tag
