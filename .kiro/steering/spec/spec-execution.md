@@ -1,6 +1,6 @@
 ---
 inclusion: auto
-description: 当执行 spec task（编码、测试、code review）时读取，包含执行模型、并行策略、commit 规则、测试分层、bug fix 规则、手工测试、code review 规范
+description: 当执行 spec task（编码、测试、code review）时读取，包含执行模型、质量标准、特殊任务、异常处理
 ---
 
 # Spec Execution
@@ -9,7 +9,9 @@ description: 当执行 spec task（编码、测试、code review）时读取，�
 
 ---
 
-## Task 执行模型
+## 执行模型
+
+### 基本规则
 
 - 当前 spec 目录下的 `tasks.md` 为唯一执行清单
 - top-level task 必须按序号逐项完成，不允许跨步跳跃
@@ -38,7 +40,7 @@ description: 当执行 spec task（编码、测试、code review）时读取，�
 
 如果 tasks.md 中已标注了并行计划（如 `[并行: 1.1, 1.2, 1.3]`），优先遵循标注；否则按上述策略自行判断。
 
-### Checkpoint 执行
+### Checkpoint
 
 - checkpoint task 必须执行其描述中指定的验证命令
 - 通过标准：不仅要求测试全部通过，还要求**输出干净**——无 compiler warning、无 deprecation warning、无异常堆栈、无非预期的 stderr 输出
@@ -47,7 +49,17 @@ description: 当执行 spec task（编码、测试、code review）时读取，�
 
 ---
 
-## 自动化测试分层
+## 质量标准
+
+### 不推诿原则
+
+测试失败时，不得将原因归咎于"已有代码的问题"或"不是本次变更引起的"而跳过修复。只要你最终要 commit，就必须保证 commit 时所有测试通过、所有行为正确。具体要求：
+
+- 发现测试 fail，无论是否由本次变更引起，都必须修复或向用户确认可以不修
+- 不得以"这是 pre-existing issue"为由自行决定跳过
+- 除非用户明确说"这个不用修"，否则 fail 就是你的责任
+
+### 自动化测试分层
 
 | 层 | 测试类型 | 覆盖范围 |
 |----|---------|---------|
@@ -78,37 +90,35 @@ description: 当执行 spec task（编码、测试、code review）时读取，�
 
 ---
 
-## 手工测试任务
+## 特殊任务
+
+### 手工测试
 
 - 执行时机：feature 分支上完成（finish 之前），或推迟到 release stabilize 阶段
 - 生成或执行手工测试时，按 manual-testing 规范编排和执行
 
----
-
-## Finish 前 Code Review Task
+### Code Review
 
 任何 spec（feature / release / hotfix），在 finish 之前，`tasks.md` 必须包含一个 code-review task。
 
 执行时委托给 `code-reviewer` sub-agent，不在主 agent 上下文中内联执行。
 
----
-
-## Release Stabilize 特殊规则
+### Release Stabilize
 
 在 release 分支上执行 stabilize 阶段的测试 task 时，遵循以下额外规则：
 
-### Alpha Tag
+**Alpha Tag**
 
 - 每个测试 task 开始前打 alpha tag（如 `v0.2-alpha3`）
 - alpha tag 序号：查询已有 alpha tag，取最大序号 +1；无 alpha tag 则为 alpha1
 - alpha tag 打出后到 commit 前，禁止任何 git commit
 
-### 问题处理
+**问题处理**
 
 - 发现问题时：3 轮对话内能修复则直接修复，不提 issue
 - 超过 3 轮修不好的：创建 issue 文件，标注发现时的 alpha tag
 
-### Issue Severity 处理
+**Issue Severity 处理**
 
 | Severity | 处理方式 |
 |----------|----------|
@@ -117,18 +127,20 @@ description: 当执行 spec task（编码、测试、code review）时读取，�
 | `[P2] minor` | 需用户确认是否可接受带 issue 发布 |
 | `[P3] trivial` | 可忽略，不阻塞发布 |
 
-### Issue 修复规则
+**Issue 修复规则**
 
 - 修复前必须先编写 reproduction test
 - 修复后重新执行对应测试项，确认通过后更新 issue 状态为 closed
 
-### Beta Tag
+**Beta Tag**
 
 - beta tag 由用户手动控制，agent 不可自主打
 
 ---
 
-## Blocker Escalation
+## 异常处理
+
+### Blocker Escalation
 
 遇到以下任一情况时，**必须立即停止执行并向用户报告**，不得自行绕过或硬冲：
 
@@ -142,11 +154,9 @@ description: 当执行 spec task（编码、测试、code review）时读取，�
 
 报告时应包含：问题描述、已尝试的方案（如有）、建议的下一步选项。
 
----
+### 常规错误处理
 
-## Error Handling
-
-以下为常规技术错误的处理方式（未触发 Blocker Escalation 时）：
+以下为未触发 Blocker Escalation 时的处理方式：
 
 - 编译失败：分析错误信息，修复后重新编译
 - 测试失败：分析失败原因，修复代码或测试后重新运行

@@ -5,8 +5,7 @@
     bootstrap="tests/bootstrap.php"
     backupGlobals="false"
     colors="true"
-    failOnWarning="true"
-    failOnRisky="true"
+    failOnAllIssues="true"
 >
     <testsuites>
         <testsuite name="ut">
