@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-03-28
- * Time: 21:03
- */
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\BuiltInCommands;
 
@@ -25,8 +20,8 @@ class ValidateServicesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var ConsoleApplication $console */
         $console = $this->getApplication();
+        assert($console instanceof ConsoleApplication);
         $slimapp = $console->getSlimapp();
 
         $ids = $slimapp->getServiceIds();
@@ -37,7 +32,7 @@ class ValidateServicesCommand extends Command
                 $output->writeln("<info>Done.</info>");
             } catch (\Exception $e) {
                 $output->writeln(
-                    "<error>Service $id is misconfigured, execption = \n" . $e->getTraceAsString() . "</error>"
+                    "<error>Service $id is misconfigured, exception = \n" . $e->getTraceAsString() . "</error>"
                 );
             }
         }

@@ -157,7 +157,7 @@
     - Ref: Req 3, AC 7; Req 6, AC 3, 6
   - [x] 7.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ClearCacheCommandTest'`，确认测试通过。Commit。
 
-- [-] 8. CommandConfiguration 语法升级 + TreeBuilder API 升级
+- [x] 8. CommandConfiguration 语法升级 + TreeBuilder API 升级
   - [x] 8.1 升级 `src/SentinelCommand/CommandConfiguration.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - `$application` 属性改为 constructor promotion：`private readonly Application $application`
@@ -170,35 +170,35 @@
     - `setExpectedException()` 改为 `expectException()`
     - `getMockBuilder(...)->getMock()` 改为 `createMock(...)`
     - Ref: Req 6, AC 3–4, 6
-  - [-] 8.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'CommandConfigurationTest'`，确认测试通过。Commit。
+  - [x] 8.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'CommandConfigurationTest'`，确认测试通过。Commit。
 
-- [~] 9. CommandRunner 语法升级
-  - [ ] 9.1 升级 `src/SentinelCommand/CommandRunner.php` 为 PHP 8.5 语法
+- [x] 9. CommandRunner 语法升级
+  - [x] 9.1 升级 `src/SentinelCommand/CommandRunner.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 所有属性添加类型声明
     - 所有方法添加参数类型和返回类型
     - 构造函数参数添加类型声明
     - 匿名函数中的 `$PARALLEL_INDEX` 替换逻辑保持不变
     - Ref: Req 2, AC 1–3
-  - [ ] 9.2 更新 `CommandRunnerTest.php` 适配 PHPUnit 13
+  - [x] 9.2 更新 `CommandRunnerTest.php` 适配 PHPUnit 13
     - 基类改为 `\PHPUnit\Framework\TestCase`
     - Ref: Req 6, AC 3
-  - [ ] 9.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'CommandRunnerTest'`，确认测试通过。Commit。
+  - [x] 9.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'CommandRunnerTest'`，确认测试通过。Commit。
 
-- [~] 10. ValidateServicesCommand 语法升级
-  - [ ] 10.1 升级 `src/BuiltInCommands/ValidateServicesCommand.php` 为 PHP 8.5 语法
+- [-] 10. ValidateServicesCommand 语法升级
+  - [x] 10.1 升级 `src/BuiltInCommands/ValidateServicesCommand.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 方法添加参数类型和返回类型（`configure(): void`、`execute(...): int`）
     - `execute()` 中使用 `assert($console instanceof ConsoleApplication)` 替代 `@var` 注释
     - `execute()` 返回 `int`（添加 `return 0`）
     - 修正 `execption` 拼写为 `exception`
     - Ref: Req 2, AC 1, 3; Req 4, AC 6
-  - [ ] 10.2 更新 `ValidateServicesCommandTest.php` 适配 PHPUnit 13
+  - [x] 10.2 更新 `ValidateServicesCommandTest.php` 适配 PHPUnit 13
     - 基类改为 `\PHPUnit\Framework\TestCase`
     - `getMockBuilder(...)->getMock()` 改为 `createMock(...)`
     - `assertContains` 改为 `assertStringContainsString`
     - Ref: Req 6, AC 3, 6
-  - [ ] 10.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ValidateServicesCommandTest'`，确认测试通过。Commit。
+  - [-] 10.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ValidateServicesCommandTest'`，确认测试通过。Commit。
 
 - [~] 11. PHPUnit 配置 + 测试 bootstrap 升级
   - [ ] 11.1 升级 `phpunit.xml` 为 PHPUnit 13 格式
