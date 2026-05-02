@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-03-28
- * Time: 16:47
- */
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\BuiltInCommands;
 
@@ -28,13 +23,21 @@ class ClearCacheCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var ConsoleApplication $console */
         $console = $this->getApplication();
+        assert($console instanceof ConsoleApplication);
         $slimapp = $console->getSlimapp();
 
-        $cacheDirs     = [$slimapp->getConfigCachePath()];
-        $httpCacheDirs = $slimapp->getHttpKernel()->getCacheDirectories();
-        $cacheDirs     = array_merge($cacheDirs, $httpCacheDirs);
+        $cacheDirs = [$slimapp->getConfigCachePath()];
+
+        $httpKernel    = $slimapp->getHttpKernel();
+        if (method_exists($httpKernel, 'getCacheDirectories')) {
+            $httpCacheDirs = $httpKernel->getCacheDirectories();
+        } elseif (method_exists($httpKernel, 'getCacheDir')) {
+            $httpCacheDirs = [$httpKernel->getCacheDir()];
+        } else {
+            $httpCacheDirs = [];
+        }
+        $cacheDirs = array_merge($cacheDirs, $httpCacheDirs);
 
         foreach ($cacheDirs as $dir) {
             $output->writeln(sprintf('<comment>removing cache in %s ...</comment>', $dir));

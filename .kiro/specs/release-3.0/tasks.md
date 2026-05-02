@@ -105,7 +105,7 @@
     - Ref: Req 6, AC 3–4
   - [x] 4.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'AbstractAlertableCommandTest|AbstractParallelCommandTest'`，确认测试通过。Commit。
 
-- [-] 5. DaemonSentinelCommand 重构 — 移除 AbstractDaemonSentinelCommand
+- [x] 5. DaemonSentinelCommand 重构 — 移除 AbstractDaemonSentinelCommand
   - [x] 5.1 重构 `src/SentinelCommand/DaemonSentinelCommand.php`
     - 将继承关系从 `extends AbstractDaemonSentinelCommand` 改为 `extends AbstractAlertableCommand`
     - 从 `AbstractDaemonSentinelCommand` 内联所有逻辑到 `DaemonSentinelCommand`：
@@ -125,37 +125,37 @@
       - 验证 command 定义（name、description、file argument）
       - 验证空配置文件执行返回 0
     - Ref: Req 5, AC 7; Req 6, AC 3
-  - [-] 5.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'DaemonSentinelCommandTest'`，确认测试通过。Commit。
+  - [x] 5.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'DaemonSentinelCommandTest'`，确认测试通过。Commit。
 
-- [~] 6. ConsoleApplication 语法升级
-  - [ ] 6.1 升级 `src/ConsoleApplication.php` 为 PHP 8.5 语法
+- [x] 6. ConsoleApplication 语法升级
+  - [x] 6.1 升级 `src/ConsoleApplication.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 所有属性添加类型声明
     - 所有方法添加参数类型和返回类型
     - `configureIO()` 中的 `switch` 改为 `match` 表达式
     - Ref: Req 2, AC 1–4
-  - [ ] 6.2 更新 `ConsoleApplicationTest.php` 适配 PHPUnit 13
+  - [x] 6.2 更新 `ConsoleApplicationTest.php` 适配 PHPUnit 13
     - 基类改为 `\PHPUnit\Framework\TestCase`
     - `setUp()` 添加 `: void` 返回类型
     - `getMockBuilder(...)->getMock()` 改为 `createMock(...)`
     - Ref: Req 6, AC 3, 6
-  - [ ] 6.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ConsoleApplicationTest'`，确认测试通过。Commit。
+  - [x] 6.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ConsoleApplicationTest'`，确认测试通过。Commit。
 
-- [~] 7. ClearCacheCommand 语法升级 + MicroKernel 适配
-  - [ ] 7.1 升级 `src/BuiltInCommands/ClearCacheCommand.php` 为 PHP 8.5 语法并适配 MicroKernel
+- [-] 7. ClearCacheCommand 语法升级 + MicroKernel 适配
+  - [x] 7.1 升级 `src/BuiltInCommands/ClearCacheCommand.php` 为 PHP 8.5 语法并适配 MicroKernel
     - 添加 `declare(strict_types=1)`
     - 方法添加参数类型和返回类型（`configure(): void`、`execute(...): int`）
     - `execute()` 中使用 `assert($console instanceof ConsoleApplication)` 替代 `@var` 注释
     - HTTP 缓存目录获取改为防御性策略：优先 `getCacheDirectories()`，回退 `getCacheDir()`，都不存在则跳过
     - `execute()` 返回 `int`（添加 `return 0`）
     - Ref: Req 2, AC 1, 3; Req 3, AC 7
-  - [ ] 7.2 更新 `ClearCacheCommandTest.php` 适配 PHPUnit 13 和 MicroKernel
+  - [x] 7.2 更新 `ClearCacheCommandTest.php` 适配 PHPUnit 13 和 MicroKernel
     - 基类改为 `\PHPUnit\Framework\TestCase`
     - Mock 对象从 `SilexKernel` 改为 `MicroKernel`
     - `assertContains` 改为 `assertStringContainsString`（PHPUnit 13 对字符串断言的要求）
     - `assertFileNotExists` 改为 `assertFileDoesNotExist`
     - Ref: Req 3, AC 7; Req 6, AC 3, 6
-  - [ ] 7.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ClearCacheCommandTest'`，确认测试通过。Commit。
+  - [-] 7.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ClearCacheCommandTest'`，确认测试通过。Commit。
 
 - [~] 8. CommandConfiguration 语法升级 + TreeBuilder API 升级
   - [ ] 8.1 升级 `src/SentinelCommand/CommandConfiguration.php` 为 PHP 8.5 语法

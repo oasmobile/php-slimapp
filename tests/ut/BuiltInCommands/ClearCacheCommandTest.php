@@ -1,24 +1,27 @@
 <?php
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\Tests\BuiltInCommands;
 
+use Oasis\Mlib\Http\MicroKernel;
 use Oasis\SlimApp\BuiltInCommands\ClearCacheCommand;
 use Oasis\SlimApp\ConsoleApplication;
 use Oasis\SlimApp\SlimApp;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Filesystem\Filesystem;
 
-class ClearCacheCommandTest extends \PHPUnit_Framework_TestCase
+class ClearCacheCommandTest extends TestCase
 {
-    public function testCommandNameAndDescription()
+    public function testCommandNameAndDescription(): void
     {
         $command = new ClearCacheCommand();
         $this->assertEquals('slimapp:cache:clear', $command->getName());
         $this->assertNotEmpty($command->getDescription());
     }
 
-    public function testExecuteClearsCacheDirectory()
+    public function testExecuteClearsCacheDirectory(): void
     {
         $cacheDir = sys_get_temp_dir() . '/slimapp_clear_cache_test_' . uniqid();
         $fs       = new Filesystem();
@@ -28,14 +31,10 @@ class ClearCacheCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFileExists($cacheDir . '/test_cache_file.php');
 
-        $slimapp = $this->getMockBuilder(SlimApp::class)
-                        ->disableOriginalConstructor()
-                        ->getMock();
+        $slimapp = $this->createStub(SlimApp::class);
         $slimapp->method('getConfigCachePath')->willReturn($cacheDir);
 
-        $httpKernel = $this->getMockBuilder(\Oasis\Mlib\Http\SilexKernel::class)
-                           ->disableOriginalConstructor()
-                           ->getMock();
+        $httpKernel = $this->createStub(MicroKernel::class);
         $httpKernel->method('getCacheDirectories')->willReturn([]);
         $slimapp->method('getHttpKernel')->willReturn($httpKernel);
 
@@ -44,7 +43,7 @@ class ClearCacheCommandTest extends \PHPUnit_Framework_TestCase
         $console->setAutoExit(false);
         $console->setCatchExceptions(false);
         $console->setLoggingEnabled(false);
-        $console->add(new ClearCacheCommand());
+        $console->addCommand(new ClearCacheCommand());
 
         $input  = new ArrayInput(['command' => 'slimapp:cache:clear']);
         $output = new BufferedOutput();
@@ -52,9 +51,9 @@ class ClearCacheCommandTest extends \PHPUnit_Framework_TestCase
         $console->run($input, $output);
 
         $text = $output->fetch();
-        $this->assertContains('removing cache', $text);
-        $this->assertContains('done', $text);
-        $this->assertFileNotExists($cacheDir . '/test_cache_file.php');
+        $this->assertStringContainsString('removing cache', $text);
+        $this->assertStringContainsString('done', $text);
+        $this->assertFileDoesNotExist($cacheDir . '/test_cache_file.php');
 
         $fs->remove($cacheDir);
     }
