@@ -141,7 +141,7 @@
     - Ref: Req 6, AC 3, 6
   - [x] 6.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ConsoleApplicationTest'`，确认测试通过。Commit。
 
-- [-] 7. ClearCacheCommand 语法升级 + MicroKernel 适配
+- [x] 7. ClearCacheCommand 语法升级 + MicroKernel 适配
   - [x] 7.1 升级 `src/BuiltInCommands/ClearCacheCommand.php` 为 PHP 8.5 语法并适配 MicroKernel
     - 添加 `declare(strict_types=1)`
     - 方法添加参数类型和返回类型（`configure(): void`、`execute(...): int`）
@@ -155,22 +155,22 @@
     - `assertContains` 改为 `assertStringContainsString`（PHPUnit 13 对字符串断言的要求）
     - `assertFileNotExists` 改为 `assertFileDoesNotExist`
     - Ref: Req 3, AC 7; Req 6, AC 3, 6
-  - [-] 7.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ClearCacheCommandTest'`，确认测试通过。Commit。
+  - [x] 7.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ClearCacheCommandTest'`，确认测试通过。Commit。
 
-- [~] 8. CommandConfiguration 语法升级 + TreeBuilder API 升级
-  - [ ] 8.1 升级 `src/SentinelCommand/CommandConfiguration.php` 为 PHP 8.5 语法
+- [-] 8. CommandConfiguration 语法升级 + TreeBuilder API 升级
+  - [x] 8.1 升级 `src/SentinelCommand/CommandConfiguration.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - `$application` 属性改为 constructor promotion：`private readonly Application $application`
     - `getConfigTreeBuilder()` 返回类型声明为 `TreeBuilder`
     - TreeBuilder API 升级：`new TreeBuilder()` + `$builder->root('daemon-monitor')` 改为 `new TreeBuilder('daemon-monitor')` + `$builder->getRootNode()`
     - `replaceParameterInValue()` 添加参数类型和返回类型
     - Ref: Req 2, AC 1–3, 5
-  - [ ] 8.2 更新 `CommandConfigurationTest.php` 适配 PHPUnit 13
+  - [x] 8.2 更新 `CommandConfigurationTest.php` 适配 PHPUnit 13
     - 基类改为 `\PHPUnit\Framework\TestCase`
     - `setExpectedException()` 改为 `expectException()`
     - `getMockBuilder(...)->getMock()` 改为 `createMock(...)`
     - Ref: Req 6, AC 3–4, 6
-  - [ ] 8.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'CommandConfigurationTest'`，确认测试通过。Commit。
+  - [-] 8.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'CommandConfigurationTest'`，确认测试通过。Commit。
 
 - [~] 9. CommandRunner 语法升级
   - [ ] 9.1 升级 `src/SentinelCommand/CommandRunner.php` 为 PHP 8.5 语法

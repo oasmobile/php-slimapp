@@ -1,17 +1,19 @@
 <?php
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\Tests;
 
 use Oasis\SlimApp\ConsoleApplication;
 use Oasis\SlimApp\SentinelCommand\CommandConfiguration;
 use Oasis\SlimApp\SlimApp;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Application;
 
-class CommandConfigurationTest extends \PHPUnit_Framework_TestCase
+class CommandConfigurationTest extends TestCase
 {
-    public function testGetConfigTreeBuilderReturnsTreeBuilder()
+    public function testGetConfigTreeBuilderReturnsTreeBuilder(): void
     {
         $app    = new Application('test', '1.0');
         $config = new CommandConfiguration($app);
@@ -23,7 +25,7 @@ class CommandConfigurationTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessMinimalConfig()
+    public function testProcessMinimalConfig(): void
     {
         $app       = new Application('test', '1.0');
         $config    = new CommandConfiguration($app);
@@ -45,7 +47,7 @@ class CommandConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($result['commands'][0]['frequency_fixed']);
     }
 
-    public function testProcessFullConfig()
+    public function testProcessFullConfig(): void
     {
         $app       = new Application('test', '1.0');
         $config    = new CommandConfiguration($app);
@@ -79,7 +81,7 @@ class CommandConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($cmd['frequency_fixed']);
     }
 
-    public function testProcessMultipleCommands()
+    public function testProcessMultipleCommands(): void
     {
         $app       = new Application('test', '1.0');
         $config    = new CommandConfiguration($app);
@@ -92,7 +94,7 @@ class CommandConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(3, $result['commands']);
     }
 
-    public function testProcessEmptyCommands()
+    public function testProcessEmptyCommands(): void
     {
         $app       = new Application('test', '1.0');
         $config    = new CommandConfiguration($app);
@@ -103,23 +105,21 @@ class CommandConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(0, $result['commands']);
     }
 
-    public function testArgsNonArrayThrowsException()
+    public function testArgsNonArrayThrowsException(): void
     {
         $app       = new Application('test', '1.0');
         $config    = new CommandConfiguration($app);
         $processor = new Processor();
 
-        $this->setExpectedException(InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $processor->processConfiguration($config, [
             ['commands' => [['name' => 'test:command', 'args' => 'not-an-array']]],
         ]);
     }
 
-    public function testParameterReplacementWithConsoleApplication()
+    public function testParameterReplacementWithConsoleApplication(): void
     {
-        $slimapp = $this->getMockBuilder(SlimApp::class)
-                        ->disableOriginalConstructor()
-                        ->getMock();
+        $slimapp = $this->createStub(SlimApp::class);
         $slimapp->method('getParameter')
                 ->willReturnMap([['app.name', 'TestApp'], ['app.count', 3]]);
 
@@ -136,11 +136,9 @@ class CommandConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, $result['commands'][0]['parallel']);
     }
 
-    public function testParameterReplacementInArgs()
+    public function testParameterReplacementInArgs(): void
     {
-        $slimapp = $this->getMockBuilder(SlimApp::class)
-                        ->disableOriginalConstructor()
-                        ->getMock();
+        $slimapp = $this->createStub(SlimApp::class);
         $slimapp->method('getParameter')
                 ->willReturnMap([['app.name', 'TestApp']]);
 
@@ -157,7 +155,7 @@ class CommandConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('TestApp', $result['commands'][0]['args']['a']);
     }
 
-    public function testNoParameterReplacementWithPlainApplication()
+    public function testNoParameterReplacementWithPlainApplication(): void
     {
         $app       = new Application('test', '1.0');
         $config    = new CommandConfiguration($app);
@@ -170,23 +168,21 @@ class CommandConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $result['commands'][0]['parallel']);
     }
 
-    public function testMissingNameThrowsException()
+    public function testMissingNameThrowsException(): void
     {
         $app       = new Application('test', '1.0');
         $config    = new CommandConfiguration($app);
         $processor = new Processor();
 
-        $this->setExpectedException(\Exception::class);
+        $this->expectException(\Exception::class);
         $processor->processConfiguration($config, [
             ['commands' => [['parallel' => 1]]],
         ]);
     }
 
-    public function testParameterReplacementWithNullValueThrowsException()
+    public function testParameterReplacementWithNullValueThrowsException(): void
     {
-        $slimapp = $this->getMockBuilder(SlimApp::class)
-                        ->disableOriginalConstructor()
-                        ->getMock();
+        $slimapp = $this->createStub(SlimApp::class);
         $slimapp->method('getParameter')->willReturn(null);
 
         $consoleApp = new ConsoleApplication('test', '1.0');
@@ -195,7 +191,8 @@ class CommandConfigurationTest extends \PHPUnit_Framework_TestCase
         $config    = new CommandConfiguration($consoleApp);
         $processor = new Processor();
 
-        $this->setExpectedException(\InvalidArgumentException::class, 'Cannot get config value');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot get config value');
         $processor->processConfiguration($config, [
             ['commands' => [['name' => 'test:command', 'parallel' => '%nonexistent.param%']]],
         ]);
