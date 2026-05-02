@@ -1,14 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\Tests;
 
 use Oasis\SlimApp\SentinelCommand\CommandRunner;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class CommandRunnerTest extends \PHPUnit_Framework_TestCase
+class CommandRunnerTest extends TestCase
 {
-    private function createRunner(array $commandOverrides = [], $traceEnabled = false)
+    private function createRunner(array $commandOverrides = [], bool $traceEnabled = false): CommandRunner
     {
         $app = new Application('test', '1.0');
         $app->setAutoExit(false);
@@ -28,85 +30,77 @@ class CommandRunnerTest extends \PHPUnit_Framework_TestCase
         return new CommandRunner($app, 0, $command, $output, $traceEnabled);
     }
 
-    public function testShouldStartNextRunWhenNotFinishedReturnsFalseByDefault()
+    public function testShouldStartNextRunWhenNotFinishedReturnsFalseByDefault(): void
     {
         $runner = $this->createRunner();
         $this->assertFalse($runner->shouldStartNextRunWhenNotFinished());
     }
 
-    public function testShouldStartNextRunReturnsFalseWhenOnce()
+    public function testShouldStartNextRunReturnsFalseWhenOnce(): void
     {
         $runner = $this->createRunner(['once' => true, 'frequency' => 1, 'frequency_fixed' => true]);
         $this->assertFalse($runner->shouldStartNextRunWhenNotFinished());
     }
 
-    public function testShouldStartNextRunReturnsFalseWhenNoFrequency()
+    public function testShouldStartNextRunReturnsFalseWhenNoFrequency(): void
     {
         $runner = $this->createRunner(['frequency' => 0, 'frequency_fixed' => true]);
         $this->assertFalse($runner->shouldStartNextRunWhenNotFinished());
     }
 
-    public function testShouldStartNextRunReturnsFalseWhenNotFrequencyFixed()
+    public function testShouldStartNextRunReturnsFalseWhenNotFrequencyFixed(): void
     {
         $runner = $this->createRunner(['frequency' => 1, 'frequency_fixed' => false]);
         $this->assertFalse($runner->shouldStartNextRunWhenNotFinished());
     }
 
-    public function testShouldStartNextRunReturnsTrueWhenFrequencyReached()
+    public function testShouldStartNextRunReturnsTrueWhenFrequencyReached(): void
     {
         $runner = $this->createRunner(['frequency' => 1, 'frequency_fixed' => true]);
 
         $ref = new \ReflectionProperty($runner, 'lastRun');
-        $ref->setAccessible(true);
         $ref->setValue($runner, time() - 10);
 
         $this->assertTrue($runner->shouldStartNextRunWhenNotFinished());
     }
 
-    public function testShouldStartNextRunReturnsFalseWhenFrequencyNotReached()
+    public function testShouldStartNextRunReturnsFalseWhenFrequencyNotReached(): void
     {
         $runner = $this->createRunner(['frequency' => 9999, 'frequency_fixed' => true]);
 
         $ref = new \ReflectionProperty($runner, 'lastRun');
-        $ref->setAccessible(true);
         $ref->setValue($runner, time());
 
         $this->assertFalse($runner->shouldStartNextRunWhenNotFinished());
     }
 
-    public function testCloneEarlyRunnerResetsState()
+    public function testCloneEarlyRunnerResetsState(): void
     {
         $runner = $this->createRunner(['frequency' => 1, 'frequency_fixed' => true]);
 
         $ref = new \ReflectionProperty($runner, 'lastRun');
-        $ref->setAccessible(true);
         $ref->setValue($runner, time() - 10);
 
         $earlyRunner = $runner->cloneEarlyRunner();
 
         $onceRef = new \ReflectionProperty($runner, 'once');
-        $onceRef->setAccessible(true);
         $this->assertTrue($onceRef->getValue($runner));
 
         $lastRunRef = new \ReflectionProperty($earlyRunner, 'lastRun');
-        $lastRunRef->setAccessible(true);
         $this->assertEquals(0, $lastRunRef->getValue($earlyRunner));
 
         $currentPidRef = new \ReflectionProperty($earlyRunner, 'currentPid');
-        $currentPidRef->setAccessible(true);
         $this->assertEquals(0, $currentPidRef->getValue($earlyRunner));
     }
 
-    public function testCloneResetsFields()
+    public function testCloneResetsFields(): void
     {
         $runner = $this->createRunner();
 
         $ref = new \ReflectionProperty($runner, 'lastRun');
-        $ref->setAccessible(true);
         $ref->setValue($runner, 12345);
 
         $pidRef = new \ReflectionProperty($runner, 'currentPid');
-        $pidRef->setAccessible(true);
         $pidRef->setValue($runner, 999);
 
         $cloned = clone $runner;
@@ -115,69 +109,63 @@ class CommandRunnerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $pidRef->getValue($cloned));
     }
 
-    public function testOnProcessExitSetsStoppedWhenOnce()
+    public function testOnProcessExitSetsStoppedWhenOnce(): void
     {
         $runner = $this->createRunner(['once' => true]);
         $runner->onProcessExit(0, 123);
 
         $stoppedRef = new \ReflectionProperty($runner, 'stopped');
-        $stoppedRef->setAccessible(true);
         $this->assertTrue($stoppedRef->getValue($runner));
     }
 
-    public function testOnProcessExitDoesNotStopWhenNotOnce()
+    public function testOnProcessExitDoesNotStopWhenNotOnce(): void
     {
         $runner = $this->createRunner(['once' => false]);
         $runner->onProcessExit(0, 123);
 
         $stoppedRef = new \ReflectionProperty($runner, 'stopped');
-        $stoppedRef->setAccessible(true);
         $this->assertFalse($stoppedRef->getValue($runner));
     }
 
-    public function testOnProcessExitWithFrequencyAdjustsNextRun()
+    public function testOnProcessExitWithFrequencyAdjustsNextRun(): void
     {
         $runner = $this->createRunner(['once' => false, 'frequency' => 60]);
 
         $lastRunRef = new \ReflectionProperty($runner, 'lastRun');
-        $lastRunRef->setAccessible(true);
         $lastRunRef->setValue($runner, time());
 
         $runner->onProcessExit(0, 123);
 
         $nextRunRef = new \ReflectionProperty($runner, 'nextRun');
-        $nextRunRef->setAccessible(true);
         $this->assertGreaterThanOrEqual(time() + 59, $nextRunRef->getValue($runner));
     }
 
-    public function testOnProcessExitWithIntervalAdjustsNextRun()
+    public function testOnProcessExitWithIntervalAdjustsNextRun(): void
     {
         $runner = $this->createRunner(['once' => false, 'interval' => 30]);
         $runner->onProcessExit(0, 123);
 
         $nextRunRef = new \ReflectionProperty($runner, 'nextRun');
-        $nextRunRef->setAccessible(true);
         $this->assertGreaterThanOrEqual(time() + 29, $nextRunRef->getValue($runner));
     }
 
-    public function testRunReturnsZeroWhenStopped()
+    public function testRunReturnsZeroWhenStopped(): void
     {
         $runner = $this->createRunner(['once' => true]);
 
         $stoppedRef = new \ReflectionProperty($runner, 'stopped');
-        $stoppedRef->setAccessible(true);
         $stoppedRef->setValue($runner, true);
 
         $this->assertEquals(0, $runner->run());
     }
 
-    public function testParallelIndexSubstitution()
+    public function testParallelIndexSubstitution(): void
     {
         $runner = $this->createRunner();
         $this->assertPropertyEquals($runner, 'parallelIndex', 0);
     }
 
-    public function testConstructorSetsProperties()
+    public function testConstructorSetsProperties(): void
     {
         $app = new Application('test', '1.0');
         $app->setAutoExit(false);
@@ -200,91 +188,82 @@ class CommandRunnerTest extends \PHPUnit_Framework_TestCase
         $this->assertPropertyEquals($runner, 'traceEnabled', true);
     }
 
-    public function testOnProcessExitWithNonZeroExitAndAlertTrue()
+    public function testOnProcessExitWithNonZeroExitAndAlertTrue(): void
     {
         $runner = $this->createRunner(['once' => false, 'alert' => true]);
         $runner->onProcessExit(1, 123);
 
         $stoppedRef = new \ReflectionProperty($runner, 'stopped');
-        $stoppedRef->setAccessible(true);
         $this->assertFalse($stoppedRef->getValue($runner));
     }
 
-    public function testOnProcessExitWithNonZeroExitAndAlertFalse()
+    public function testOnProcessExitWithNonZeroExitAndAlertFalse(): void
     {
         $runner = $this->createRunner(['once' => false, 'alert' => false]);
         $runner->onProcessExit(1, 123);
 
         $stoppedRef = new \ReflectionProperty($runner, 'stopped');
-        $stoppedRef->setAccessible(true);
         $this->assertFalse($stoppedRef->getValue($runner));
     }
 
-    public function testOnProcessExitWithBothFrequencyAndInterval()
+    public function testOnProcessExitWithBothFrequencyAndInterval(): void
     {
         $runner = $this->createRunner(['once' => false, 'frequency' => 5, 'interval' => 30]);
 
         $lastRunRef = new \ReflectionProperty($runner, 'lastRun');
-        $lastRunRef->setAccessible(true);
         $lastRunRef->setValue($runner, time());
 
         $runner->onProcessExit(0, 123);
 
         $nextRunRef = new \ReflectionProperty($runner, 'nextRun');
-        $nextRunRef->setAccessible(true);
         $this->assertGreaterThanOrEqual(time() + 29, $nextRunRef->getValue($runner));
     }
 
-    public function testOnProcessExitWithZeroExitNoFrequencyNoInterval()
+    public function testOnProcessExitWithZeroExitNoFrequencyNoInterval(): void
     {
         $runner = $this->createRunner(['once' => false, 'frequency' => 0, 'interval' => 0]);
         $runner->onProcessExit(0, 123);
 
         $nextRunRef = new \ReflectionProperty($runner, 'nextRun');
-        $nextRunRef->setAccessible(true);
         $this->assertLessThanOrEqual(time() + 1, $nextRunRef->getValue($runner));
     }
 
-    public function testOnProcessExitFrequencyNotYetReached()
+    public function testOnProcessExitFrequencyNotYetReached(): void
     {
         $runner = $this->createRunner(['once' => false, 'frequency' => 60]);
 
         $lastRunRef = new \ReflectionProperty($runner, 'lastRun');
-        $lastRunRef->setAccessible(true);
         $lastRunRef->setValue($runner, time() - 1);
 
         $runner->onProcessExit(0, 123);
 
         $nextRunRef = new \ReflectionProperty($runner, 'nextRun');
-        $nextRunRef->setAccessible(true);
         $this->assertGreaterThanOrEqual(time() + 58, $nextRunRef->getValue($runner));
     }
 
-    public function testOnProcessExitWithTraceEnabled()
+    public function testOnProcessExitWithTraceEnabled(): void
     {
         $runner = $this->createRunner(['once' => false], true);
         $runner->onProcessExit(0, 123);
 
         $stoppedRef = new \ReflectionProperty($runner, 'stopped');
-        $stoppedRef->setAccessible(true);
         $this->assertFalse($stoppedRef->getValue($runner));
     }
 
-    public function testNamePropertyIsSet()
+    public function testNamePropertyIsSet(): void
     {
         $runner = $this->createRunner(['name' => 'custom:command']);
         $this->assertPropertyEquals($runner, 'name', 'custom:command');
     }
 
-    public function testInputIsBuiltWithCommandName()
+    public function testInputIsBuiltWithCommandName(): void
     {
         $runner   = $this->createRunner(['name' => 'list']);
         $inputRef = new \ReflectionProperty($runner, 'input');
-        $inputRef->setAccessible(true);
         $this->assertInstanceOf(\Symfony\Component\Console\Input\ArrayInput::class, $inputRef->getValue($runner));
     }
 
-    public function testInputIncludesArgs()
+    public function testInputIncludesArgs(): void
     {
         $app = new Application('test', '1.0');
         $app->setAutoExit(false);
@@ -299,16 +278,14 @@ class CommandRunnerTest extends \PHPUnit_Framework_TestCase
         $runner = new CommandRunner($app, 0, $command, $output);
 
         $inputRef = new \ReflectionProperty($runner, 'input');
-        $inputRef->setAccessible(true);
         $input = $inputRef->getValue($runner);
 
         $this->assertEquals('json', $input->getParameterOption('--format'));
     }
 
-    private function assertPropertyEquals($object, $property, $expected)
+    private function assertPropertyEquals(object $object, string $property, mixed $expected): void
     {
         $ref = new \ReflectionProperty($object, $property);
-        $ref->setAccessible(true);
         $this->assertEquals($expected, $ref->getValue($object));
     }
 }

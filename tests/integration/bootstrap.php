@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * 集成测试环境 bootstrap
  *

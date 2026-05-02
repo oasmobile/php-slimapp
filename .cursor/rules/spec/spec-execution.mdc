@@ -16,7 +16,7 @@ Plan 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ]
 
 ---
 
-## 执行方法
+## 执行模型
 
 使用 **Cursor Plan Mode** 执行：
 
@@ -46,10 +46,6 @@ Plan 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ]
    - 发现 drift 但不影响当前 task 的实现路径 → 记录 drift，正常执行
    - 发现 drift 且影响当前 task 的实现路径 → **停下来**，向用户报告 drift 内容，等待确认后再继续
 
----
-
-## 执行约束
-
 ### TDD 循环
 
 每个 sub-step 遵循：写失败测试 → 验证失败 → 实现 → 验证通过。不要先写实现再补测试。
@@ -71,7 +67,17 @@ Plan 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ]
 
 ---
 
-## 测试分层
+## 质量标准
+
+### 不推诿原则
+
+测试失败时，不得将原因归咎于"已有代码的问题"或"不是本次变更引起的"而跳过修复。只要你最终要 commit，就必须保证 commit 时所有测试通过、所有行为正确。具体要求：
+
+- 发现测试 fail，无论是否由本次变更引起，都必须修复或向用户确认可以不修
+- 不得以"这是 pre-existing issue"为由自行决定跳过
+- 除非用户明确说"这个不用修"，否则 fail 就是你的责任
+
+### 测试分层
 
 | 层 | 测试类型 | 覆盖范围 |
 |----|---------|---------|
@@ -81,9 +87,7 @@ Plan 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ]
 
 每次完成测试编写后自检：happy path、边界条件、错误场景、中文 / Unicode round-trip。
 
----
-
-## Bug Fix 测试规则
+### Bug Fix 测试规则
 
 | 场景 | 测试要求 |
 |------|---------|
@@ -93,34 +97,32 @@ Plan 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ]
 
 ---
 
-## 手工测试
+## 特殊任务
+
+### 手工测试
 
 遇到手工测试 task 时，按 `manual-testing` 规范执行。agent 不得仅编写测试文档就标记完成——必须实际执行测试步骤。
 
----
-
-## Code Review
+### Code Review
 
 Plan 的最后一个 top-level task 通常为 code review。执行时派发 `code-reviewer` sub-agent 处理。
 
----
-
-## Release Stabilize 特殊规则
+### Release Stabilize
 
 在 release 分支上执行 stabilize 阶段的测试 task 时，遵循以下额外规则：
 
-### Alpha Tag
+**Alpha Tag**
 
 - 每个测试 task 开始前打 alpha tag（如 `v0.2-alpha3`）
 - alpha tag 序号：查询已有 alpha tag，取最大序号 +1；无 alpha tag 则为 alpha1
 - alpha tag 打出后到 commit 前，禁止任何 git commit
 
-### 问题处理
+**问题处理**
 
 - 发现问题时：3 轮对话内能修复则直接修复，不提 issue
 - 超过 3 轮修不好的：创建 issue 文件，标注发现时的 alpha tag
 
-### Issue Severity 处理
+**Issue Severity 处理**
 
 | Severity | 处理方式 |
 |----------|----------|
@@ -129,18 +131,20 @@ Plan 的最后一个 top-level task 通常为 code review。执行时派发 `cod
 | `[P2] minor` | 需用户确认是否可接受带 issue 发布 |
 | `[P3] trivial` | 可忽略，不阻塞发布 |
 
-### Issue 修复规则
+**Issue 修复规则**
 
 - 修复前必须先编写 reproduction test
 - 修复后重新执行对应测试项，确认通过后更新 issue 状态为 closed
 
-### Beta Tag
+**Beta Tag**
 
 - beta tag 由用户手动控制，agent 不可自主打
 
 ---
 
-## Blocker Escalation
+## 异常处理
+
+### Blocker Escalation
 
 遇到以下任一情况时，**必须立即停止执行并向用户报告**，不得自行绕过或硬冲：
 
@@ -154,9 +158,9 @@ Plan 的最后一个 top-level task 通常为 code review。执行时派发 `cod
 
 报告时应包含：问题描述、已尝试的方案（如有）、建议的下一步选项。
 
----
+### 常规错误处理
 
-## Error Handling
+以下为未触发 Blocker Escalation 时的处理方式：
 
 - 编译 / 测试失败：分析错误，修复后重新验证
 - 3 轮内无法修复：向用户报告，请求协助（参见 Blocker Escalation）

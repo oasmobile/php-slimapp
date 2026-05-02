@@ -23,19 +23,18 @@
 
 ### `slimapp:services:validate`
 
-验证所有已配置的服务。
+验证所有 public 服务。
 
 - 类: `Oasis\SlimApp\BuiltInCommands\ValidateServicesCommand`
-- 行为: 遍历容器中所有 service ID，逐个实例化，报告配置错误
+- 行为: 遍历容器中所有 public service ID，逐个实例化，报告配置错误
 
 ## Command 基类体系
 
 ```
 Symfony\Component\Console\Command\Command
   └── AbstractAlertableCommand          # --alert 选项
-        └── AbstractParallelCommand     # --parallel + pcntl_fork
-        └── AbstractDaemonSentinelCommand (deprecated)
-              └── DaemonSentinelCommand # 推荐使用
+        ├── AbstractParallelCommand     # --parallel + pcntl_fork
+        └── DaemonSentinelCommand       # 哨兵命令（读取 YAML 配置，fork 子进程调度）
 ```
 
 ### AbstractAlertableCommand
@@ -56,6 +55,7 @@ Symfony\Component\Console\Command\Command
 
 ### DaemonSentinelCommand
 
+- 直接继承 `AbstractAlertableCommand`
 - 接受一个 YAML 配置文件作为参数
 - 按配置 fork 多个子进程，每个子进程运行一个 Console Command
 - 支持调度策略: interval、frequency、frequency_fixed、once、parallel、alert

@@ -40,6 +40,7 @@ DI 容器定义文件，位于 `config/` 目录。
 - 参数引用: `%app.dir.log%`（配置值）、`%custom.param%`（自定义参数）
 - 服务引用: `@service_id`
 - `default.namespace` 参数: 数组，用于自动补全不含完整命名空间的类名
+- 服务可见性: 默认 private（Symfony 标准约定），需要通过 `getService()` 获取的服务须显式声明 `public: true`；`app` 服务由框架自动设为 public
 
 ### `app` 服务
 

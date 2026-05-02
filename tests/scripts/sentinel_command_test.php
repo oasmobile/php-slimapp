@@ -8,15 +8,45 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Driver\Selector;
 use SebastianBergmann\CodeCoverage\Filter;
+use SebastianBergmann\CodeCoverage\Serialization\Serializer;
 
 // ── 覆盖率收集 ──
 $covFile = getenv('COVERAGE_FILE');
 $coverage = null;
 if ($covFile) {
     $filter = new Filter();
-    $filter->addDirectoryToWhitelist(__DIR__ . '/../../src');
-    $coverage = new CodeCoverage(null, $filter);
+    $srcDir = __DIR__ . '/../../src';
+    $excludes = [
+        realpath($srcDir . '/BuiltInCommands/InitializeProjectCommand.php'),
+    ];
+    $excludeDirs = [
+        realpath($srcDir . '/tests') ?: $srcDir . '/tests',
+    ];
+    $iterator = new \RecursiveIteratorIterator(
+        new \RecursiveDirectoryIterator($srcDir, \FilesystemIterator::SKIP_DOTS),
+    );
+    foreach ($iterator as $file) {
+        if ($file->isFile() && $file->getExtension() === 'php') {
+            $realPath = $file->getRealPath();
+            if (in_array($realPath, $excludes, true)) {
+                continue;
+            }
+            $skip = false;
+            foreach ($excludeDirs as $dir) {
+                if (str_starts_with($realPath, $dir . '/')) {
+                    $skip = true;
+                    break;
+                }
+            }
+            if ($skip) {
+                continue;
+            }
+            $filter->includeFile($realPath);
+        }
+    }
+    $coverage = new CodeCoverage((new Selector())->forLineCoverage($filter), $filter);
     $coverage->start('sentinel_command_test');
 }
 
@@ -32,12 +62,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 // 一个立即返回的 dummy command
 class SentinelDummyCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('sentinel:dummy');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         return 0;
     }
@@ -45,7 +75,7 @@ class SentinelDummyCommand extends Command
 
 class TestableSentinelCommand extends DaemonSentinelCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setName('test:sentinel');
@@ -71,8 +101,8 @@ YAML
             $app = new Application('test', '1.0');
             $app->setAutoExit(false);
             $app->setCatchExceptions(false);
-            $app->add(new TestableSentinelCommand());
-            $app->add(new SentinelDummyCommand());
+            $app->addCommand(new TestableSentinelCommand());
+            $app->addCommand(new SentinelDummyCommand());
 
             $input = new ArrayInput([
                 'command' => 'test:sentinel',
@@ -99,8 +129,8 @@ YAML
             $app = new Application('test', '1.0');
             $app->setAutoExit(false);
             $app->setCatchExceptions(false);
-            $app->add(new TestableSentinelCommand());
-            $app->add(new SentinelDummyCommand());
+            $app->addCommand(new TestableSentinelCommand());
+            $app->addCommand(new SentinelDummyCommand());
 
             $input = new ArrayInput([
                 'command' => 'test:sentinel',
@@ -124,7 +154,7 @@ YAML
 // ── 写覆盖率 ──
 if ($coverage && $covFile) {
     $coverage->stop();
-    file_put_contents($covFile, serialize($coverage));
+    (new Serializer())->serialize($covFile, $coverage);
 }
 
 exit($exitCode);

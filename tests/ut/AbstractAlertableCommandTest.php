@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\Tests;
 
 use Oasis\SlimApp\AbstractAlertableCommand;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,17 +13,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ConcreteAlertableCommand extends AbstractAlertableCommand
 {
-    private $shouldThrow = false;
-    private $returnCode  = 0;
+    private bool $shouldThrow;
+    private int $returnCode;
 
-    public function __construct($shouldThrow = false, $returnCode = 0)
+    public function __construct(bool $shouldThrow = false, int $returnCode = 0)
     {
         $this->shouldThrow = $shouldThrow;
         $this->returnCode  = $returnCode;
         parent::__construct('test:alertable');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->shouldThrow) {
             throw new \RuntimeException('Test exception');
@@ -31,39 +33,38 @@ class ConcreteAlertableCommand extends AbstractAlertableCommand
     }
 }
 
-class AbstractAlertableCommandTest extends \PHPUnit_Framework_TestCase
+class AbstractAlertableCommandTest extends TestCase
 {
-    /** @var Application */
-    private $application;
+    private Application $application;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->application = new Application('test', '1.0');
         $this->application->setAutoExit(false);
         $this->application->setCatchExceptions(false);
     }
 
-    public function testExitCodeConstants()
+    public function testExitCodeConstants(): void
     {
         $this->assertEquals(0, AbstractAlertableCommand::EXIT_CODE_OK);
         $this->assertEquals(0xe1, AbstractAlertableCommand::EXIT_CODE_RESTART);
         $this->assertEquals(0xff, AbstractAlertableCommand::EXIT_CODE_COMMON_ERROR);
     }
 
-    public function testCommandHasAlertOption()
+    public function testCommandHasAlertOption(): void
     {
         $command = new ConcreteAlertableCommand();
-        $this->application->add($command);
+        $this->application->addCommand($command);
 
         $def = $command->getDefinition();
         $this->assertTrue($def->hasOption('alert'));
         $this->assertFalse($def->getOption('alert')->acceptValue());
     }
 
-    public function testRunWithoutExceptionReturnsNormally()
+    public function testRunWithoutExceptionReturnsNormally(): void
     {
         $command = new ConcreteAlertableCommand(false, 0);
-        $this->application->add($command);
+        $this->application->addCommand($command);
 
         $input  = new ArrayInput(['command' => 'test:alertable']);
         $output = new BufferedOutput();
@@ -72,34 +73,36 @@ class AbstractAlertableCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $exitCode);
     }
 
-    public function testRunWithExceptionWithoutAlertRethrows()
+    public function testRunWithExceptionWithoutAlertRethrows(): void
     {
         $command = new ConcreteAlertableCommand(true);
-        $this->application->add($command);
+        $this->application->addCommand($command);
 
         $input  = new ArrayInput(['command' => 'test:alertable']);
         $output = new BufferedOutput();
 
-        $this->setExpectedException(\RuntimeException::class, 'Test exception');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Test exception');
         $this->application->run($input, $output);
     }
 
-    public function testRunWithExceptionAndAlertOptionRethrows()
+    public function testRunWithExceptionAndAlertOptionRethrows(): void
     {
         $command = new ConcreteAlertableCommand(true);
-        $this->application->add($command);
+        $this->application->addCommand($command);
 
         $input  = new ArrayInput(['command' => 'test:alertable', '--alert' => true]);
         $output = new BufferedOutput();
 
-        $this->setExpectedException(\RuntimeException::class, 'Test exception');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Test exception');
         $this->application->run($input, $output);
     }
 
-    public function testRunWithCustomReturnCode()
+    public function testRunWithCustomReturnCode(): void
     {
         $command = new ConcreteAlertableCommand(false, 42);
-        $this->application->add($command);
+        $this->application->addCommand($command);
 
         $input  = new ArrayInput(['command' => 'test:alertable']);
         $output = new BufferedOutput();

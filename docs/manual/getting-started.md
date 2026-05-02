@@ -65,6 +65,42 @@ PROJECT_DIR/
 
 将 Web Server 的 document root 指向 `web/` 目录，入口文件为 `front.php`。
 
+---
+
+## 测试 init 命令
+
+仓库内置了 `init-ut/` 目录作为 `slimapp:project:init` 的隔离测试环境。
+
+### 环境说明
+
+`init-ut/` 是一个独立的 Composer 项目，通过 `path` 仓库 symlink 引用本地的 `oasis/slimapp`，因此本地未提交的代码改动也能直接测试。
+
+`.gitignore` 已排除所有 init 命令生成的文件（`src/`、`config/`、`web/`、`bin/`、`bootstrap.php` 等），可以放心运行。
+
+### 测试步骤
+
+```bash
+cd init-ut/
+
+# 1. 安装依赖（首次或 composer.json 变更后）
+composer install
+
+# 2. 运行 init 命令
+php vendor/bin/slimapp slimapp:project:init --project-root=.
+
+# 3. 按提示输入项目信息，检查生成的文件
+
+# 4. 清理生成的文件
+rm -rf src/ config/ web/ bin/ bootstrap.php templates/ assets/ cache/
+```
+
+### 验证要点
+
+- 生成的 `*Configuration.php` 应使用 `new TreeBuilder('app')` + `getRootNode()`（非 deprecated API）
+- 生成的 `phpunit.xml` 应使用 PHPUnit 13 schema
+- 启用 phpunit 时，`composer require --dev phpunit/phpunit:^13` 应正确执行
+- 所有生成的文件应能通过 `php -l` 语法检查
+
 ## bootstrap.php 说明
 
 ```php

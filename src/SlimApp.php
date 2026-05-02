@@ -1,28 +1,22 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-01-09
- * Time: 14:42
- */
+declare(strict_types=1);
 
 namespace Oasis\SlimApp;
 
 use Monolog\Handler\HandlerInterface;
-use Monolog\Logger;
-use Oasis\Mlib\Http\SilexKernel;
+use Monolog\Level;
+use Oasis\Mlib\Http\MicroKernel;
 use Oasis\Mlib\Logging\LocalErrorHandler;
 use Oasis\Mlib\Logging\LocalFileHandler;
 use Oasis\Mlib\Logging\MLogging;
-use Oasis\Mlib\Utils\AbstractDataProvider;
 use Oasis\Mlib\Utils\ArrayDataProvider;
+use Oasis\Mlib\Utils\DataType;
 use Oasis\SlimApp\BuiltInCommands\ClearCacheCommand;
 use Oasis\SlimApp\BuiltInCommands\InitializeProjectCommand;
 use Oasis\SlimApp\BuiltInCommands\ValidateServicesCommand;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Container;
@@ -34,47 +28,34 @@ use Symfony\Component\Yaml\Yaml;
 
 class SlimApp
 {
-    /** @var  bool */
-    protected $isDebugMode;
+    protected bool $isDebugMode = false;
+    protected array $configs = [];
+    protected ?ArrayDataProvider $configDataProvider = null;
+    protected ?Container $container = null;
+    protected ?string $loggingPath = null;
+    protected Level $loggingLevel = Level::Debug;
+    protected string $loggingPattern = '%date%/%script%.%type%';
+    protected ?ConsoleApplication $consoleApp = null;
+    protected array $consoleConfig = [];
+    protected ?MicroKernel $microKernel = null;
+    protected ?array $httpConfig = null;
+    protected ?string $configPath = null;
+    protected string $configFilename = 'config.yml';
+    protected string $serviceFilename = 'services.yml';
+    protected string $configCachePath = '';
+    protected array $configRelatedResources = [];
 
-    /** @var array */
-    protected $configs = [];
-    /** @var  ArrayDataProvider */
-    protected $configDataProvider;
-    /** @var  Container */
-    protected $container;
-    protected $loggingPath    = null;
-    protected $loggingLevel   = Logger::DEBUG;
-    protected $loggingPattern = "%date%/%script%.%type%";
-    /** @var  ConsoleApplication */
-    protected $consoleApp;
-    /** @var  array */
-    protected $consoleConfig = [];
-    /** @var  SilexKernel */
-    protected $silexKernel;
-    /** @var  array */
-    protected $httpConfig;
-
-    protected $configPath;
-    protected $configFilename         = "config.yml";
-    protected $serviceFilename        = "services.yml";
-    protected $configCachePath        = '';
-    protected $configRelatedResources = [];
-
-    /**
-     * @return static
-     */
-    public static function app()
+    public static function app(): static
     {
         static $inst = null;
-        if ($inst == null) {
-            $inst = new static;
+        if ($inst === null) {
+            $inst = new static();
         }
 
         return $inst;
     }
 
-    function __set($name, $value)
+    public function __set(string $name, mixed $value): void
     {
         $methodName = sprintf("set%sProperty", strtr(ucwords($name, "._-"), ["." => "", "_" => "", "-" => ""]));
         if (method_exists($this, $methodName)) {
@@ -82,7 +63,7 @@ class SlimApp
         }
     }
 
-    public function init($configPath, ConfigurationInterface $configurationInterface, $configCachePath = null)
+    public function init(string $configPath, ConfigurationInterface $configurationInterface, ?string $configCachePath = null): void
     {
         if (!is_dir($configPath)) {
             throw new \InvalidArgumentException(
@@ -113,8 +94,7 @@ class SlimApp
                 $config                         = Yaml::parse(file_get_contents($file));
                 $rawData[]                      = $config;
             }
-            $processor     = new Processor();
-            $this->configs = $processor->processConfiguration($configurationInterface, $rawData);
+            $this->configs = ConfigParser::parse($rawData, $configurationInterface);
             if (!isset($this->configs['dir.config'])) {
                 $this->configs['dir.config'] = $this->configPath;
             }
@@ -122,23 +102,7 @@ class SlimApp
                 \serialize($this->configs),
                 $this->configRelatedResources
             );
-            $parameterizedResult   = [];
-            $recursiveSetParameter = function (callable $recursiveCallback,
-                                               array    $value,
-                                                        $prefix = 'app.') use (&$parameterizedResult) {
-                foreach ($value as $k => &$v) {
-                    $parameterizedResult[$prefix . "$k"] = $v;
-                    if (is_array($v)) {
-                        call_user_func(
-                            $recursiveCallback,
-                            $recursiveCallback,
-                            $v,
-                            $prefix . "$k" . "."
-                        );
-                    }
-                }
-            };
-            call_user_func($recursiveSetParameter, $recursiveSetParameter, $this->configs);
+            $parameterizedResult = ConfigParser::flatten($this->configs);
             \file_put_contents(
                 $this->configCachePath . '/parameterized_helper.yml',
                 Yaml::dump(['parameters' => $parameterizedResult])
@@ -148,7 +112,7 @@ class SlimApp
         $this->configDataProvider = new ArrayDataProvider($this->configs);
         $this->isDebugMode        = $this->configDataProvider->getOptional(
             'is_debug',
-            ArrayDataProvider::BOOL_TYPE,
+            DataType::Bool,
             true
         );
 
@@ -163,18 +127,10 @@ class SlimApp
         if (!$containerConfigCache->isFresh()) {
             $builder = new ContainerBuilder();
             $builder->addCompilerPass(new SlimAppCompilerPass(static::class));
-            $recursiveSetParameter = function (callable         $recursiveCallback,
-                                               ContainerBuilder $builder,
-                                               array            $configs,
-                                                                $prefix = 'app.') {
-                foreach ($configs as $k => &$v) {
-                    $builder->setParameter($prefix . "$k", $v);
-                    if (is_array($v)) {
-                        call_user_func($recursiveCallback, $recursiveCallback, $builder, $v, $prefix . "$k" . ".");
-                    }
-                }
-            };
-            call_user_func($recursiveSetParameter, $recursiveSetParameter, $builder, $this->configs);
+            $flatParams = ConfigParser::flatten($this->configs);
+            foreach ($flatParams as $key => $value) {
+                $builder->setParameter($key, $value);
+            }
 
             $loader = new YamlFileLoader(
                 $builder,
@@ -192,14 +148,13 @@ class SlimApp
                 $dumper->dump(['class' => 'SlimAppCachedContainer', 'namespace' => __NAMESPACE__]),
                 $this->configRelatedResources
             );
-            //mdebug("container dumped");
         }
 
         // create container instance
         /** @noinspection PhpIncludeInspection */
         require_once $cacheFilePath;
         /** @noinspection PhpUndefinedClassInspection */
-        $this->container = new SlimAppCachedContainer;
+        $this->container = new SlimAppCachedContainer();
 
         $this->container->get('app');
 
@@ -216,43 +171,29 @@ class SlimApp
             $this->loggingLevel
         );
         $logger->install();
-
-        //mdebug("SlimApp [%s] initialized", static::class);
     }
 
-    /**
-     * @return boolean
-     */
-    public function isDebug()
+    public function isDebug(): bool
     {
         return $this->isDebugMode;
     }
 
-    public function resetService($id)
+    public function resetService(string $id): void
     {
         $this->container->set($id, null);
     }
 
-    /**
-     * @return string
-     */
-    public function getConfigCachePath()
+    public function getConfigCachePath(): string
     {
         return $this->configCachePath;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getConfigPath()
+    public function getConfigPath(): ?string
     {
         return $this->configPath;
     }
 
-    /**
-     * @return ConsoleApplication
-     */
-    public function getConsoleApplication()
+    public function getConsoleApplication(): ConsoleApplication
     {
         if (!$this->consoleApp) {
             $name             = $this->consoleConfig['name'] ?? 'UNKNOWN';
@@ -281,42 +222,33 @@ class SlimApp
         return $this->consoleApp;
     }
 
-    /**
-     * @return SilexKernel
-     */
-    public function getHttpKernel()
+    public function getHttpKernel(): MicroKernel
     {
-        if (!$this->silexKernel instanceof SilexKernel) {
-            $this->silexKernel = new SilexKernel($this->httpConfig, $this->isDebugMode);
-            $this->silexKernel->addControllerInjectedArg($this);
-            $this->silexKernel->addExtraParameters($this->container->getParameterBag()->all());
+        if (!$this->microKernel instanceof MicroKernel) {
+            $this->microKernel = new MicroKernel($this->httpConfig, $this->isDebugMode);
+            $this->microKernel->addControllerInjectedArg($this);
+            $this->microKernel->addExtraParameters($this->container->getParameterBag()->all());
         }
 
-        return $this->silexKernel;
+        return $this->microKernel;
     }
 
-    public function getMandatoryConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE)
+    public function getMandatoryConfig(string $key, DataType $expectedType = DataType::String): mixed
     {
-        // normalize key
-        //$key = strtr($key, ['-' => "_"]);
-
         return $this->configDataProvider->getMandatory($key, $expectedType);
     }
 
-    public function getOptionalConfig($key, $expectedType = AbstractDataProvider::STRING_TYPE, $defaultValue = null)
+    public function getOptionalConfig(string $key, DataType $expectedType = DataType::String, mixed $defaultValue = null): mixed
     {
-        // normalize key
-        //$key = strtr($key, ['-' => "_"]);
-
         return $this->configDataProvider->getOptional($key, $expectedType, $defaultValue);
     }
 
-    public function getParameter($k)
+    public function getParameter(string $k): mixed
     {
         return $this->container->getParameter($k);
     }
 
-    public function getService($id, $type = null)
+    public function getService(string $id, ?string $type = null): mixed
     {
         $service = $this->container->get($id);
         if ($type && (!$service instanceof $type)) {
@@ -326,29 +258,29 @@ class SlimApp
         return $service;
     }
 
-    public function getServiceIds()
+    public function getServiceIds(): array
     {
         return $this->container->getServiceIds();
     }
 
-    public function setService($id, $service)
+    public function setService(string $id, ?object $service): void
     {
         $this->container->set($id, $service);
     }
 
-    protected function setCliProperty($value)
+    protected function setCliProperty(mixed $value): void
     {
         $this->consoleApp    = null;
         $this->consoleConfig = $value;
     }
 
-    protected function setHttpProperty($value)
+    protected function setHttpProperty(mixed $value): void
     {
-        $this->silexKernel = null;
+        $this->microKernel = null;
         $this->httpConfig  = $value;
     }
 
-    protected function setLoggingProperty($value)
+    protected function setLoggingProperty(mixed $value): void
     {
         if (!is_array($value)) {
             throw new InvalidConfigurationException("logging property should be an array of log handlers!");
@@ -366,7 +298,14 @@ class SlimApp
             $this->loggingPath = $value['path'];
         }
         if (isset($value['level'])) {
-            $this->loggingLevel = $value['level'];
+            $level = $value['level'];
+            if ($level instanceof Level) {
+                $this->loggingLevel = $level;
+            } elseif (is_int($level)) {
+                $this->loggingLevel = Level::from($level);
+            } elseif (is_string($level)) {
+                $this->loggingLevel = Level::fromName(ucfirst(strtolower($level)));
+            }
         }
         if (isset($value['pattern'])) {
             $this->loggingPattern = $value['pattern'];

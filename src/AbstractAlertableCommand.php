@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-01-20
- * Time: 00:59
- */
+declare(strict_types=1);
 
 namespace Oasis\SlimApp;
 
@@ -19,12 +14,12 @@ class AbstractAlertableCommand extends Command
     const EXIT_CODE_RESTART      = 0xe1;
     const EXIT_CODE_COMMON_ERROR = 0xff;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption('alert', null, InputOption::VALUE_NONE, 'trigger alert when exception is thrown');
     }
 
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run(InputInterface $input, OutputInterface $output): int
     {
         try {
             return parent::run($input, $output);
@@ -36,5 +31,4 @@ class AbstractAlertableCommand extends Command
             throw $e;
         }
     }
-
 }

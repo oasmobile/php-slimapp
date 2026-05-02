@@ -1,14 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-03-29
- * Time: 11:23
- */
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\BuiltInCommands;
 
 use Oasis\Mlib\Utils\StringUtils;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,37 +17,23 @@ use Symfony\Component\Yaml\Yaml;
 
 class InitializeProjectCommand extends Command
 {
-    /** @var  Filesystem */
-    protected $fs;
+    protected Filesystem $fs;
+    protected InputInterface $input;
+    protected OutputInterface $output;
+    protected string $rootDir = '';
+    protected string $vendorName = '';
+    protected string $projectName = '';
+    protected string $mainClassname = '';
+    protected string $projectNamespace = '';
+    protected string $projectSrcDir = '';
+    protected string $cacheDir = '';
+    protected bool $ormSupportEnabled = false;
+    protected bool $odmSupportEnabled = false;
+    protected bool $phpunitSupportEnabled = false;
+    /** @var string[] */
+    protected array $tempFiles = [];
     
-    /** @var  InputInterface */
-    protected $input;
-    /** @var  OutputInterface */
-    protected $output;
-    /** @var  string */
-    protected $rootDir;
-    /** @var  string */
-    protected $vendorName;
-    /** @var  string */
-    protected $projectName;
-    /** @var  string */
-    protected $mainClassname;
-    /** @var  string */
-    protected $projectNamespace;
-    /** @var  string */
-    protected $projectSrcDir;
-    /** @var  string */
-    protected $cacheDir;
-    /** @var bool */
-    protected $ormSupportEnabled = false;
-    /** @var bool */
-    protected $odmSupportEnabled = false;
-    /** @var bool */
-    protected $phpunitSupportEnabled = false;
-    
-    protected $tempFiles = [];
-    
-    protected function applyTempFiles()
+    protected function applyTempFiles(): void
     {
         $helper = $this->getHelper('question');
         $this->output->writeln("All configuration accepted. Will start to generate needed files.");
@@ -95,7 +77,7 @@ class InitializeProjectCommand extends Command
         }
     }
     
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         
@@ -105,7 +87,7 @@ class InitializeProjectCommand extends Command
         $this->addOption('project-root', 'p', InputOption::VALUE_REQUIRED, "Project root directory.");
     }
     
-    protected function ensureProjectRoot()
+    protected function ensureProjectRoot(): void
     {
         if (!($this->rootDir = $this->input->getOption('project-root'))) {
             $this->rootDir = getcwd();
@@ -150,12 +132,12 @@ class InitializeProjectCommand extends Command
                 foreach ($requiredDirs as $requiredDir) {
                     $this->output->writeln("\t- <comment>$requiredDir/</comment>");
                 }
-                exit(1);
+                throw new RuntimeException('Project root directory is missing required files.');
             }
         }
     }
     
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->fs     = new Filesystem();
         $this->input  = $input;
@@ -184,9 +166,11 @@ class InitializeProjectCommand extends Command
         $this->applyTempFiles();
         
         $this->updateComposerInfo();
+
+        return 0;
     }
     
-    protected function prepareAppClassFile()
+    protected function prepareAppClassFile(): void
     {
         $this->mainClassname = str_replace("-", "", ucwords($this->projectName, "-"));
         $classFilename       = $this->rootDir . "/" . $this->projectSrcDir . "/" . $this->mainClassname . ".php";
@@ -217,7 +201,7 @@ SRC;
         $this->writeToTempFile($classFilename, $classSource);
     }
     
-    protected function prepareBootstrapFile()
+    protected function prepareBootstrapFile(): void
     {
         $filename = $this->rootDir . "/bootstrap.php";
         $date     = date('Y-m-d');
@@ -250,7 +234,7 @@ SRC;
         $this->writeToTempFile($filename, $bootstrapSource);
     }
     
-    protected function prepareComposerInfo()
+    protected function prepareComposerInfo(): void
     {
         $helper           = $this->getHelper('question');
         $composerFilename = $this->rootDir . "/composer.json";
@@ -259,7 +243,7 @@ SRC;
         $composerJson    = json_decode($composerContent, true);
         if (!$composerJson) {
             $this->output->writeln("<error>The composer.json file is not valid!</error>");
-            exit(1);
+            throw new RuntimeException('The composer.json file is not valid!');
         }
         
         $suggestName = '';
@@ -274,7 +258,7 @@ SRC;
         $name     = $helper->ask($this->input, $this->output, $question);
         if (!preg_match('#^[a-z0-9_-]+/[a-z0-9_-]+$#', $name)) {
             $this->output->writeln("<error>The name entered is not valid!</error>");
-            exit(1);
+            throw new RuntimeException('The name entered is not valid!');
         }
         $composerJson['name'] = $name;
         list($this->vendorName, $this->projectName) = explode("/", $name, 2);
@@ -309,7 +293,7 @@ SRC;
         $namespace = $helper->ask($this->input, $this->output, $question);
         if (!preg_match('#^[a-zA-Z0-9_\\\]+$#', $namespace)) {
             $this->output->writeln("<error>The namespace $namespace is not valid!</error>");
-            exit(1);
+            throw new RuntimeException("The namespace $namespace is not valid!");
         }
         $this->projectNamespace = trim($namespace, '\\') . "\\";
         
@@ -319,7 +303,7 @@ SRC;
         $srcDir   = $helper->ask($this->input, $this->output, $question);
         if (!preg_match('#^[a-zA-Z0-9_/]+$#', $srcDir)) {
             $this->output->writeln("<error>The source directory $srcDir is not valid!</error>");
-            exit(1);
+            throw new RuntimeException("The source directory $srcDir is not valid!");
         }
         $this->projectSrcDir = trim($srcDir, "/") . "/";
         
@@ -332,7 +316,7 @@ SRC;
         );
     }
     
-    protected function prepareConfigClassFile()
+    protected function prepareConfigClassFile(): void
     {
         $classname     = $this->mainClassname . "Configuration";
         $classFilename = $this->rootDir . "/" . $this->projectSrcDir . "/" . $classname . ".php";
@@ -364,10 +348,10 @@ class $classname implements ConfigurationInterface
      *
      * @return TreeBuilder The tree builder
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        \$treeBuilder = new TreeBuilder();
-        \$root        = \$treeBuilder->root('app');
+        \$treeBuilder = new TreeBuilder('app');
+        \$root        = \$treeBuilder->getRootNode();
         {
             \$root->children()->booleanNode('is_debug')->defaultValue(true);
             \$dir = \$root->children()->arrayNode('dir');
@@ -491,7 +475,7 @@ SRC;
         $this->writeToTempFile($filename, $configYaml);
     }
     
-    protected function prepareConsoleEntryFile()
+    protected function prepareConsoleEntryFile(): void
     {
         $filename = $this->rootDir . "/bin/" . strtolower($this->projectName) . ".php";
         $date     = date('Y-m-d');
@@ -520,7 +504,7 @@ SRC;
         $this->writeToTempFile($filename, $consoleEntrySource, 0755);
     }
     
-    protected function prepareDatabaseCliConfigFile()
+    protected function prepareDatabaseCliConfigFile(): void
     {
         if ($this->ormSupportEnabled) {
             $filename = $this->rootDir . "/config/cli-config.php";
@@ -576,7 +560,7 @@ SRC;
         }
     }
     
-    protected function prepareDatabaseManagerFile()
+    protected function prepareDatabaseManagerFile(): void
     {
         $filename = $this->rootDir . "/" . $this->projectSrcDir . "/Database/" . $this->mainClassname . "Database.php";
         $date     = date('Y-m-d');
@@ -688,7 +672,7 @@ SRC;
         $this->writeToTempFile($filename, $dbManagerSource);
     }
     
-    protected function prepareDatabaseRelatedFiles()
+    protected function prepareDatabaseRelatedFiles(): void
     {
         $helper   = $this->getHelper('question');
         $question = new Question(
@@ -728,7 +712,7 @@ SRC;
         $this->prepareDatabaseCliConfigFile();
     }
     
-    protected function prepareUnitTestFiles()
+    protected function prepareUnitTestFiles(): void
     {
         $helper   = $this->getHelper('question');
         $question = new Question(
@@ -752,13 +736,12 @@ SRC;
         $date            = date('Y-m-d');
         $time            = date('H:i');
         $xmlFile         = <<<XML
-<!--suppress XmlUnboundNsPrefix -->
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/5.7/phpunit.xsd"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.0/phpunit.xsd"
         bootstrap="ut/bootstrap.php"
         backupGlobals="false"
-        backupStaticAttributes="false"
+        colors="true"
 >
     <testsuites>
         <testsuite name="basic">
@@ -843,7 +826,7 @@ PHP;
         
     }
     
-    protected function prepareDemoControllerFile()
+    protected function prepareDemoControllerFile(): void
     {
         $filename = $this->rootDir . "/" . $this->projectSrcDir . "/Controllers/DemoController.php";
         $date     = date('Y-m-d');
@@ -876,7 +859,7 @@ SRC;
         $this->writeToTempFile($filename, $demoControllerSource);
     }
     
-    protected function prepareDirectoryStructure()
+    protected function prepareDirectoryStructure(): void
     {
         $this->fs->mkdir($this->rootDir . "/bin");
         $this->fs->mkdir($this->rootDir . "/cache");
@@ -892,7 +875,7 @@ SRC;
         
     }
     
-    protected function prepareFrontControllerFile()
+    protected function prepareFrontControllerFile(): void
     {
         $filename = $this->rootDir . "/web/front.php";
         $date     = date('Y-m-d');
@@ -920,7 +903,7 @@ SRC;
         $this->writeToTempFile($filename, $frontSource);
     }
     
-    protected function prepareRoutesYaml()
+    protected function prepareRoutesYaml(): void
     {
         $filename    = $this->rootDir . "/config/routes.yml";
         $services    = [
@@ -936,7 +919,7 @@ SRC;
         $this->writeToTempFile($filename, $serviceYaml);
     }
     
-    protected function prepareServicesYaml()
+    protected function prepareServicesYaml(): void
     {
         //$helper = $this->getHelper('question');
         
@@ -1029,58 +1012,52 @@ SRC;
         $this->writeToTempFile($filename, $serviceYaml);
     }
     
-    protected function updateComposerInfo()
+    protected function updateComposerInfo(): void
     {
         $this->output->writeln("Will now update composer related files ...");
         $oldDir = getcwd();
         chdir($this->rootDir);
         
-        if ($this->ormSupportEnabled) {
-            system("composer require oasis/doctrine-addon", $retval);
-            if ($retval == 0) {
-                $this->output->writeln("<info>ORM support component updated.</info>");
+        try {
+            if ($this->ormSupportEnabled) {
+                system("composer require oasis/doctrine-addon", $retval);
+                if ($retval === 0) {
+                    $this->output->writeln("<info>ORM support component updated.</info>");
+                } else {
+                    throw new RuntimeException('Error while updating ORM support component.');
+                }
             }
-            else {
-                $this->output->writeln("<error>Error while updating ORM support component.</error>");
-                exit(1);
+            
+            if ($this->odmSupportEnabled) {
+                system("composer require oasis/dynamodb-odm", $retval);
+                if ($retval === 0) {
+                    $this->output->writeln("<info>ODM support component updated.</info>");
+                } else {
+                    throw new RuntimeException('Error while updating ODM support component.');
+                }
             }
+            
+            if ($this->phpunitSupportEnabled) {
+                system("composer require --dev phpunit/phpunit:^13", $retval);
+                if ($retval === 0) {
+                    $this->output->writeln("<info>phpunit component updated.</info>");
+                } else {
+                    throw new RuntimeException('Error while updating phpunit component.');
+                }
+            }
+            
+            system("composer dumpautoload", $retval);
+            if ($retval === 0) {
+                $this->output->writeln("<info>Autoloader updated.</info>");
+            } else {
+                throw new RuntimeException('Error while updating autoload file.');
+            }
+        } finally {
+            chdir($oldDir);
         }
-        
-        if ($this->odmSupportEnabled) {
-            system("composer require oasis/dynamodb-odm", $retval);
-            if ($retval == 0) {
-                $this->output->writeln("<info>ODM support component updated.</info>");
-            }
-            else {
-                $this->output->writeln("<error>Error while updating ODM support component.</error>");
-                exit(1);
-            }
-        }
-        
-        if ($this->phpunitSupportEnabled) {
-            system("composer require --dev phpunit/phpunit:^5.7", $retval);
-            if ($retval == 0) {
-                $this->output->writeln("<info>phpunit component updated.</info>");
-            }
-            else {
-                $this->output->writeln("<error>Error while updating phpunit component.</error>");
-                exit(1);
-            }
-        }
-        
-        system("composer dumpautoload", $retval);
-        if ($retval == 0) {
-            $this->output->writeln("<info>Autoloader updated.</info>");
-        }
-        else {
-            $this->output->writeln("<error>Error while updating autoload file.</error>");
-            exit(1);
-        }
-        
-        chdir($oldDir);
     }
     
-    protected function writeToTempFile($realFilename, $content, $mode = 0644)
+    protected function writeToTempFile(string $realFilename, string $content, int $mode = 0644): void
     {
         $dir = dirname($realFilename);
         $this->fs->mkdir($dir);

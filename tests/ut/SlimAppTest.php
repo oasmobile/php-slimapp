@@ -1,21 +1,24 @@
 <?php
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\Tests;
 
+use Oasis\Mlib\Http\MicroKernel;
+use Oasis\Mlib\Utils\DataType;
 use Oasis\SlimApp\SlimApp;
 use Oasis\SlimApp\Tests\Integration\Fixtures\TestAppConfig;
+use PHPUnit\Framework\TestCase;
 
-class SlimAppTest extends \PHPUnit_Framework_TestCase
+class SlimAppTest extends TestCase
 {
-    /** @var string */
-    private $configDir;
+    private string $configDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configDir = __DIR__ . '/../integration/config';
     }
 
-    private function clearUtCache()
+    private function clearUtCache(): void
     {
         $cacheDir = $this->configDir . '/cache';
         if (is_dir($cacheDir)) {
@@ -28,26 +31,27 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testAppReturnsSingleton()
+    public function testAppReturnsSingleton(): void
     {
         $app1 = SlimApp::app();
         $app2 = SlimApp::app();
         $this->assertSame($app1, $app2);
     }
 
-    public function testAppReturnsSlimAppInstance()
+    public function testAppReturnsSlimAppInstance(): void
     {
         $this->assertInstanceOf(SlimApp::class, SlimApp::app());
     }
 
-    public function testInitWithInvalidPathThrowsException()
+    public function testInitWithInvalidPathThrowsException(): void
     {
         $app = new SlimApp();
-        $this->setExpectedException(\InvalidArgumentException::class, 'Config path must be a directory');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Config path must be a directory');
         $app->init('/non/existent/path/that/does/not/exist', new TestAppConfig());
     }
 
-    public function testInitLoadsConfiguration()
+    public function testInitLoadsConfiguration(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -56,28 +60,31 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($app->getConfigCachePath());
     }
 
-    public function testGetMandatoryConfig()
+    public function testGetMandatoryConfig(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
         $this->assertEquals('Jason', $app->getMandatoryConfig('name'));
     }
 
-    public function testGetOptionalConfigWithDefault()
+    public function testGetOptionalConfigWithDefault(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
-        $this->assertEquals('default_val', $app->getOptionalConfig('nonexistent', \Oasis\Mlib\Utils\AbstractDataProvider::STRING_TYPE, 'default_val'));
+        $this->assertEquals(
+            'default_val',
+            $app->getOptionalConfig('nonexistent', DataType::String, 'default_val')
+        );
     }
 
-    public function testGetOptionalConfigExistingKey()
+    public function testGetOptionalConfigExistingKey(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
         $this->assertEquals('Jason', $app->getOptionalConfig('name'));
     }
 
-    public function testGetConfigCachePath()
+    public function testGetConfigCachePath(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -85,32 +92,31 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertStringEndsWith('/cache', $cachePath);
     }
 
-    public function testGetConfigCachePathDefault()
+    public function testGetConfigCachePathDefault(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
         $ref = new \ReflectionProperty($app, 'configCachePath');
-        $ref->setAccessible(true);
         $this->assertNotEmpty($ref->getValue($app));
     }
 
-    public function testGetParameter()
+    public function testGetParameter(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
         $this->assertEquals('Jason', $app->getParameter('app.name'));
     }
 
-    public function testGetServiceIds()
+    public function testGetServiceIds(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
         $ids = $app->getServiceIds();
-        $this->assertInternalType('array', $ids);
+        $this->assertIsArray($ids);
         $this->assertContains('app', $ids);
     }
 
-    public function testSetAndGetService()
+    public function testSetAndGetService(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -121,7 +127,7 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($obj, $app->getService('test.custom'));
     }
 
-    public function testGetServiceWithTypeCheck()
+    public function testGetServiceWithTypeCheck(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -131,17 +137,17 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($obj, $app->getService('test.typed', \stdClass::class));
     }
 
-    public function testGetServiceWithWrongTypeThrowsException()
+    public function testGetServiceWithWrongTypeThrowsException(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
 
         $app->setService('test.wrongtype', new \stdClass());
-        $this->setExpectedException('Symfony\\Component\\DependencyInjection\\Exception\\InvalidArgumentException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $app->getService('test.wrongtype', SlimApp::class);
     }
 
-    public function testResetService()
+    public function testResetService(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -151,11 +157,11 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($obj, $app->getService('test.reset'));
 
         $app->resetService('test.reset');
-        $this->setExpectedException('Symfony\\Component\\DependencyInjection\\Exception\\ServiceNotFoundException');
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException::class);
         $app->getService('test.reset');
     }
 
-    public function testMagicSetCliProperty()
+    public function testMagicSetCliProperty(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -166,57 +172,74 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2.0', $console->getVersion());
     }
 
-    public function testMagicSetLoggingPropertyWithPath()
+    public function testMagicSetLoggingPropertyWithPath(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
         $app->logging = ['path' => '/tmp/test-logs', 'level' => 300];
 
         $ref = new \ReflectionProperty($app, 'loggingPath');
-        $ref->setAccessible(true);
         $this->assertEquals('/tmp/test-logs', $ref->getValue($app));
 
         $levelRef = new \ReflectionProperty($app, 'loggingLevel');
-        $levelRef->setAccessible(true);
-        $this->assertEquals(300, $levelRef->getValue($app));
+        $this->assertEquals(\Monolog\Level::Warning, $levelRef->getValue($app));
     }
 
-    public function testMagicSetLoggingPropertyWithPattern()
+    public function testMagicSetLoggingPropertyWithLevelInstance(): void
+    {
+        $app = new SlimApp();
+        $app->init($this->configDir, new TestAppConfig());
+        $app->logging = ['level' => \Monolog\Level::Error];
+
+        $levelRef = new \ReflectionProperty($app, 'loggingLevel');
+        $this->assertEquals(\Monolog\Level::Error, $levelRef->getValue($app));
+    }
+
+    public function testMagicSetLoggingPropertyWithLevelString(): void
+    {
+        $app = new SlimApp();
+        $app->init($this->configDir, new TestAppConfig());
+        $app->logging = ['level' => 'warning'];
+
+        $levelRef = new \ReflectionProperty($app, 'loggingLevel');
+        $this->assertEquals(\Monolog\Level::Warning, $levelRef->getValue($app));
+    }
+
+    public function testMagicSetLoggingPropertyWithPattern(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
         $app->logging = ['pattern' => 'custom/%type%'];
 
         $ref = new \ReflectionProperty($app, 'loggingPattern');
-        $ref->setAccessible(true);
         $this->assertEquals('custom/%type%', $ref->getValue($app));
     }
 
-    public function testMagicSetLoggingPropertyNonArrayThrowsException()
+    public function testMagicSetLoggingPropertyNonArrayThrowsException(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
 
-        $this->setExpectedException(
-            'Symfony\\Component\\Config\\Definition\\Exception\\InvalidConfigurationException',
-            'logging property should be an array'
+        $this->expectException(
+            \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class
         );
+        $this->expectExceptionMessage('logging property should be an array');
         $app->logging = 'not-an-array';
     }
 
-    public function testMagicSetLoggingPropertyWithInvalidHandlerThrowsException()
+    public function testMagicSetLoggingPropertyWithInvalidHandlerThrowsException(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
 
-        $this->setExpectedException(
-            'Symfony\\Component\\Config\\Definition\\Exception\\InvalidConfigurationException',
-            'logging property should be an array of log handlers'
+        $this->expectException(
+            \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class
         );
+        $this->expectExceptionMessage('logging property should be an array of log handlers');
         $app->logging = ['handlers' => ['not-a-handler']];
     }
 
-    public function testMagicSetHttpProperty()
+    public function testMagicSetHttpProperty(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -225,18 +248,17 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $app->http  = $httpConfig;
 
         $ref = new \ReflectionProperty($app, 'httpConfig');
-        $ref->setAccessible(true);
         $this->assertEquals($httpConfig, $ref->getValue($app));
     }
 
-    public function testMagicSetUnknownPropertyDoesNothing()
+    public function testMagicSetUnknownPropertyDoesNothing(): void
     {
         $app = new SlimApp();
         $app->unknownProperty = 'value';
         $this->assertTrue(true);
     }
 
-    public function testGetConsoleApplicationCreatesOnce()
+    public function testGetConsoleApplicationCreatesOnce(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -245,7 +267,7 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($app->getConsoleApplication(), $app->getConsoleApplication());
     }
 
-    public function testGetConsoleApplicationHasBuiltInCommands()
+    public function testGetConsoleApplicationHasBuiltInCommands(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -257,7 +279,7 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($console->has('slimapp:project:init'));
     }
 
-    public function testGetConsoleApplicationWithCustomCommands()
+    public function testGetConsoleApplicationWithCustomCommands(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -268,7 +290,7 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($app->getConsoleApplication()->has('custom:test'));
     }
 
-    public function testGetConsoleApplicationDefaultNameAndVersion()
+    public function testGetConsoleApplicationDefaultNameAndVersion(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -278,14 +300,14 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('UNKNOWN', $console->getVersion());
     }
 
-    public function testIsDebug()
+    public function testIsDebug(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
         $this->assertTrue($app->isDebug());
     }
 
-    public function testInitWithCacheReusesConfig()
+    public function testInitWithCacheReusesConfig(): void
     {
         $app1 = new SlimApp();
         $app1->init($this->configDir, new TestAppConfig());
@@ -296,7 +318,7 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($app1->getMandatoryConfig('name'), $app2->getMandatoryConfig('name'));
     }
 
-    public function testInitRebuildsWhenCacheCleared()
+    public function testInitRebuildsWhenCacheCleared(): void
     {
         $this->clearUtCache();
 
@@ -304,11 +326,11 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $app->init($this->configDir, new TestAppConfig());
 
         $this->assertEquals('Jason', $app->getMandatoryConfig('name'));
-        $this->assertEquals(2, $app->getMandatoryConfig('count', \Oasis\Mlib\Utils\AbstractDataProvider::INT_TYPE));
+        $this->assertEquals(2, $app->getMandatoryConfig('count', DataType::Int));
         $this->assertFileExists($this->configDir . '/cache/config.cache');
     }
 
-    public function testMagicSetResetsConsoleApp()
+    public function testMagicSetResetsConsoleApp(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -323,58 +345,57 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($console1, $console2);
     }
 
-    public function testMagicSetHttpResetsKernel()
+    public function testMagicSetHttpResetsKernel(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
         $app->http = ['routing' => ['path' => '/first']];
 
-        $ref = new \ReflectionProperty($app, 'silexKernel');
-        $ref->setAccessible(true);
+        $ref = new \ReflectionProperty($app, 'microKernel');
         $this->assertNull($ref->getValue($app));
     }
 
-    public function testGetMandatoryConfigIntType()
+    public function testGetMandatoryConfigIntType(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
-        $this->assertEquals(2, $app->getMandatoryConfig('count', \Oasis\Mlib\Utils\AbstractDataProvider::INT_TYPE));
+        $this->assertEquals(2, $app->getMandatoryConfig('count', DataType::Int));
     }
 
-    public function testGetMandatoryConfigBoolType()
+    public function testGetMandatoryConfigBoolType(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
-        $this->assertFalse($app->getMandatoryConfig('once', \Oasis\Mlib\Utils\AbstractDataProvider::BOOL_TYPE));
+        $this->assertFalse($app->getMandatoryConfig('once', DataType::Bool));
     }
 
-    public function testGetMandatoryConfigArrayType()
+    public function testGetMandatoryConfigArrayType(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
-        $dir = $app->getMandatoryConfig('dir', \Oasis\Mlib\Utils\AbstractDataProvider::ARRAY_TYPE);
-        $this->assertInternalType('array', $dir);
+        $dir = $app->getMandatoryConfig('dir', DataType::Array);
+        $this->assertIsArray($dir);
         $this->assertArrayHasKey('log', $dir);
     }
 
-    public function testGetParameterNestedKey()
+    public function testGetParameterNestedKey(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
         $this->assertEquals('/data/logs/slimapp', $app->getParameter('app.dir.log'));
     }
 
-    public function testMagicSetLoggingPropertyWithValidHandler()
+    public function testMagicSetLoggingPropertyWithValidHandler(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
 
-        $handler = $this->getMockBuilder(\Monolog\Handler\HandlerInterface::class)->getMock();
+        $handler      = $this->createStub(\Monolog\Handler\HandlerInterface::class);
         $app->logging = ['handlers' => [$handler]];
         $this->assertTrue(true);
     }
 
-    public function testGetHttpKernel()
+    public function testGetHttpKernel(): void
     {
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
@@ -386,11 +407,11 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
         ];
 
         $kernel = $app->getHttpKernel();
-        $this->assertInstanceOf(\Oasis\Mlib\Http\SilexKernel::class, $kernel);
+        $this->assertInstanceOf(MicroKernel::class, $kernel);
         $this->assertSame($kernel, $app->getHttpKernel());
     }
 
-    public function testMagicSetWithDotNotation()
+    public function testMagicSetWithDotNotation(): void
     {
         $app = new SlimApp();
         $app->cli = ['name' => 'DotTest', 'version' => '1.0'];
