@@ -6,7 +6,7 @@
 
 ## Tasks
 
-- [-] 1. Composer 依赖升级（Phase 0）
+- [x] 1. Composer 依赖升级（Phase 0）
   - [x] 1.1 更新 `composer.json` 中所有依赖版本
     - 将 `php` 要求改为 `>=8.5`
     - 将 `symfony/dependency-injection`、`symfony/config`、`symfony/console`、`symfony/finder`、`symfony/filesystem` 改为 `^8.0`
@@ -19,16 +19,16 @@
     - 确保 lock 文件正确生成
     - 此阶段不要求代码编译通过
     - Ref: Req 1, AC 16
-  - [-] 1.3 Checkpoint: 确认 `composer.json` 和 `composer.lock` 正确更新，所有依赖版本符合 Req 1 的 AC。如有问题请向用户确认。Commit。
+  - [x] 1.3 Checkpoint: 确认 `composer.json` 和 `composer.lock` 正确更新，所有依赖版本符合 Req 1 的 AC。如有问题请向用户确认。Commit。
 
-- [~] 2. SlimApp 核心语法升级 + ConfigParser 提取 + HTTP Kernel 适配
-  - [ ] 2.1 升级 `src/SlimApp.php` 为 PHP 8.5 语法
+- [x] 2. SlimApp 核心语法升级 + ConfigParser 提取 + HTTP Kernel 适配
+  - [x] 2.1 升级 `src/SlimApp.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 所有属性添加类型声明（`bool`、`array`、`?ArrayDataProvider`、`?Container`、`?string`、`int`、`?ConsoleApplication`、`?MicroKernel`、`?array`、`string` 等）
     - 所有方法添加参数类型和返回类型
     - 对确定不会被重新赋值的属性使用 `readonly`（`resetService()` 涉及的属性除外）
     - Ref: Req 2, AC 1–3, 6
-  - [ ] 2.2 将 `SilexKernel` 替换为 `MicroKernel`
+  - [x] 2.2 将 `SilexKernel` 替换为 `MicroKernel`
     - `$silexKernel` 属性重命名为 `$microKernel`，类型改为 `?MicroKernel`
     - `getHttpKernel()` 返回类型声明为 `MicroKernel`
     - `getHttpKernel()` 内部实例化改为 `new MicroKernel($this->httpConfig, $this->isDebugMode)`
@@ -36,14 +36,14 @@
     - `setHttpProperty()` 中 `$this->silexKernel = null` 改为 `$this->microKernel = null`
     - 移除所有 `SilexKernel` 的 import 和引用
     - Ref: Req 3, AC 1–6
-  - [ ] 2.3 提取 `ConfigParser` 类（`src/ConfigParser.php`）
+  - [x] 2.3 提取 `ConfigParser` 类（`src/ConfigParser.php`）
     - 创建 `Oasis\SlimApp\ConfigParser` 类，包含 `parse()`、`flatten()`、`retrieve()` 三个静态方法
     - `parse()`: 使用 Symfony Processor 处理配置数组
     - `flatten()`: 将配置树扁平化为 `key => value` 参数映射
     - `retrieve()`: 从扁平化参数中按 key 检索值
     - 在 `SlimApp::init()` 中使用 `ConfigParser` 替代内联的配置解析和扁平化逻辑
     - Ref: Req 7, AC 5
-  - [ ] 2.4 更新 `SlimAppTest.php` 适配 PHPUnit 13 和 MicroKernel
+  - [x] 2.4 更新 `SlimAppTest.php` 适配 PHPUnit 13 和 MicroKernel
     - 基类从 `\PHPUnit_Framework_TestCase` 改为 `\PHPUnit\Framework\TestCase`
     - `setExpectedException()` 改为 `expectException()` + `expectExceptionMessage()`
     - `assertInternalType('array', ...)` 改为 `assertIsArray(...)`
@@ -52,16 +52,16 @@
     - `testGetHttpKernel` 中 `SilexKernel` 断言改为 `MicroKernel`
     - `testMagicSetHttpResetsKernel` 中反射属性名从 `silexKernel` 改为 `microKernel`
     - Ref: Req 3, AC 1–2; Req 6, AC 3–6
-  - [ ] 2.5 为 `ConfigParser` 编写单元测试（`tests/ut/ConfigParserTest.php`）
+  - [x] 2.5 为 `ConfigParser` 编写单元测试（`tests/ut/ConfigParserTest.php`）
     - 测试 `parse()` 基本行为
     - 测试 `flatten()` 扁平化逻辑
     - 测试 `retrieve()` 检索行为
     - 测试 round-trip 基本示例
     - Ref: Req 7, AC 5
-  - [ ] 2.6 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'SlimAppTest|ConfigParserTest'`，确认 SlimApp 和 ConfigParser 相关测试通过。Commit。
+  - [x] 2.6 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'SlimAppTest|ConfigParserTest'`，确认 SlimApp 和 ConfigParser 相关测试通过。Commit。
 
-- [~] 3. SlimAppCompilerPass 语法升级 + NamespaceResolver 提取 + 移除全 Public
-  - [ ] 3.1 升级 `src/SlimAppCompilerPass.php` 为 PHP 8.5 语法并移除全 public 逻辑
+- [-] 3. SlimAppCompilerPass 语法升级 + NamespaceResolver 提取 + 移除全 Public
+  - [x] 3.1 升级 `src/SlimAppCompilerPass.php` 为 PHP 8.5 语法并移除全 public 逻辑
     - 添加 `declare(strict_types=1)`
     - `$classname` 属性改为 constructor promotion：`protected readonly string $classname`
     - `process()` 方法添加返回类型 `: void`
@@ -69,23 +69,23 @@
     - 在 `app` 服务处理分支中显式添加 `$definition->setPublic(true)`
     - `==` 比较改为 `===`
     - Ref: Req 2, AC 1–3, 5; Req 4, AC 1–5
-  - [ ] 3.2 提取 `NamespaceResolver` 类（`src/NamespaceResolver.php`）
+  - [x] 3.2 提取 `NamespaceResolver` 类（`src/NamespaceResolver.php`）
     - 创建 `Oasis\SlimApp\NamespaceResolver` 类，包含 `resolve(string $className, array $namespaces): string` 静态方法
     - 将 `SlimAppCompilerPass::process()` 中的类名解析和工厂类名解析逻辑委托给 `NamespaceResolver::resolve()`
     - Ref: Req 7, AC 6
-  - [ ] 3.3 更新 `SlimAppCompilerPassTest.php` 适配 PHPUnit 13 和新行为
+  - [x] 3.3 更新 `SlimAppCompilerPassTest.php` 适配 PHPUnit 13 和新行为
     - 基类改为 `\PHPUnit\Framework\TestCase`
     - `testProcessSetsAllServicesPublic` 测试改为验证非 `app` 服务保持其声明的可见性（不再被强制 public）
     - `testProcessSetsAppServiceClassAndFactory` 验证 `app` 服务仍为 public
     - `testConstructorStoresClassname` 适配 constructor promotion（反射方式可能需调整）
     - Ref: Req 4, AC 3–5; Req 6, AC 3
-  - [ ] 3.4 为 `NamespaceResolver` 编写单元测试（`tests/ut/NamespaceResolverTest.php`）
+  - [x] 3.4 为 `NamespaceResolver` 编写单元测试（`tests/ut/NamespaceResolverTest.php`）
     - 测试已存在的完全限定类名直接返回
     - 测试短类名在命名空间下解析成功
     - 测试不存在的类名返回原始输入
     - 测试多命名空间优先级
     - Ref: Req 7, AC 6
-  - [ ] 3.5 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'SlimAppCompilerPassTest|NamespaceResolverTest'`，确认 CompilerPass 和 NamespaceResolver 相关测试通过。Commit。
+  - [-] 3.5 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'SlimAppCompilerPassTest|NamespaceResolverTest'`，确认 CompilerPass 和 NamespaceResolver 相关测试通过。Commit。
 
 - [~] 4. AbstractAlertableCommand + AbstractParallelCommand 语法升级
   - [ ] 4.1 升级 `src/AbstractAlertableCommand.php` 为 PHP 8.5 语法

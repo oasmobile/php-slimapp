@@ -1,14 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\Tests;
 
 use Oasis\SlimApp\SlimAppCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class SlimAppCompilerPassTest extends \PHPUnit_Framework_TestCase
+class SlimAppCompilerPassTest extends TestCase
 {
-    public function testProcessSetsAppServiceClassAndFactory()
+    public function testProcessSetsAppServiceClassAndFactory(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('default.namespace', ['Oasis\\SlimApp']);
@@ -24,7 +26,7 @@ class SlimAppCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($appDef->isPublic());
     }
 
-    public function testProcessResolvesClassWithDefaultNamespace()
+    public function testProcessResolvesClassWithDefaultNamespace(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('default.namespace', ['Symfony\\Component\\DependencyInjection']);
@@ -43,10 +45,9 @@ class SlimAppCompilerPassTest extends \PHPUnit_Framework_TestCase
             'Symfony\\Component\\DependencyInjection\\ContainerBuilder',
             $def->getClass()
         );
-        $this->assertTrue($def->isPublic());
     }
 
-    public function testProcessDoesNotChangeExistingFullyQualifiedClass()
+    public function testProcessDoesNotChangeExistingFullyQualifiedClass(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('default.namespace', ['Oasis\\SlimApp']);
@@ -67,7 +68,7 @@ class SlimAppCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessWithStringDefaultNamespace()
+    public function testProcessWithStringDefaultNamespace(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('default.namespace', 'Symfony\\Component\\DependencyInjection');
@@ -88,7 +89,7 @@ class SlimAppCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessWithoutDefaultNamespaceParameter()
+    public function testProcessWithoutDefaultNamespaceParameter(): void
     {
         $builder = new ContainerBuilder();
 
@@ -105,7 +106,7 @@ class SlimAppCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('SomeNonExistentClass', $def->getClass());
     }
 
-    public function testProcessResolvesFactoryClassWithDefaultNamespace()
+    public function testProcessResolvesFactoryClassWithDefaultNamespace(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('default.namespace', ['Symfony\\Component\\DependencyInjection']);
@@ -126,7 +127,7 @@ class SlimAppCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('someMethod', $factory[1]);
     }
 
-    public function testProcessDoesNotResolveServiceReferenceFactory()
+    public function testProcessDoesNotResolveServiceReferenceFactory(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('default.namespace', ['Oasis\\SlimApp']);
@@ -146,7 +147,7 @@ class SlimAppCompilerPassTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('@some_service', $factory[0]);
     }
 
-    public function testProcessWithMultipleDefaultNamespaces()
+    public function testProcessWithMultipleDefaultNamespaces(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('default.namespace', [
@@ -170,15 +171,14 @@ class SlimAppCompilerPassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testConstructorStoresClassname()
+    public function testConstructorStoresClassname(): void
     {
         $pass = new SlimAppCompilerPass('My\\Custom\\App');
-        $ref  = new \ReflectionProperty($pass, 'classname');
-        $ref->setAccessible(true);
+        $ref = new \ReflectionProperty($pass, 'classname');
         $this->assertEquals('My\\Custom\\App', $ref->getValue($pass));
     }
 
-    public function testProcessSetsAllServicesPublic()
+    public function testNonAppServicesRetainDeclaredVisibility(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('default.namespace', ['Oasis\\SlimApp']);
@@ -196,11 +196,14 @@ class SlimAppCompilerPassTest extends \PHPUnit_Framework_TestCase
         $pass = new SlimAppCompilerPass('Oasis\\SlimApp\\SlimApp');
         $pass->process($builder);
 
-        $this->assertTrue($def1->isPublic());
-        $this->assertTrue($def2->isPublic());
+        // app service should be public
+        $this->assertTrue($appDef->isPublic());
+
+        // Non-app services retain their declared visibility (not forced to public)
+        $this->assertFalse($def2->isPublic());
     }
 
-    public function testProcessWithNoClassDefinition()
+    public function testProcessWithNoClassDefinition(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('default.namespace', ['Oasis\\SlimApp']);
