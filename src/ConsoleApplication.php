@@ -1,14 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-01-10
- * Time: 14:57
- */
+declare(strict_types=1);
 
 namespace Oasis\SlimApp;
 
-use Monolog\Logger;
+use Monolog\Level;
 use Oasis\Mlib\Logging\ConsoleHandler;
 use Oasis\Mlib\Logging\LocalErrorHandler;
 use Oasis\Mlib\Logging\LocalFileHandler;
@@ -19,148 +14,108 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ConsoleApplication extends Application
 {
-    /** @var SlimApp */
-    protected $slimapp = null;
-    
-    protected $loggingEnabled = true;
-    protected $loggingPath    = null;
-    protected $logFilePattern = "%date%/%script%.%command%.%type%";
-    protected $loggingLevel   = Logger::DEBUG;
+    protected ?SlimApp $slimapp = null;
 
-    public function __construct($name = 'UNKNOWN', $version = 'UNKNOWN')
+    protected bool $loggingEnabled = true;
+    protected ?string $loggingPath = null;
+    protected string $logFilePattern = '%date%/%script%.%command%.%type%';
+    protected Level $loggingLevel = Level::Debug;
+
+    public function __construct(string $name = 'UNKNOWN', string $version = 'UNKNOWN')
     {
         parent::__construct($name, $version);
     }
 
-    /**
-     * @return boolean
-     */
-    public function isLoggingEnabled()
+    public function isLoggingEnabled(): bool
     {
         return $this->loggingEnabled;
     }
-    
-    /**
-     * @param boolean $loggingEnabled
-     */
-    public function setLoggingEnabled($loggingEnabled)
+
+    public function setLoggingEnabled(bool $loggingEnabled): void
     {
         $this->loggingEnabled = $loggingEnabled;
     }
-    
-    /**
-     * @return string
-     */
-    public function getLogFilePattern()
+
+    public function getLogFilePattern(): string
     {
         return $this->logFilePattern;
     }
-    
-    /**
-     * @param string $logFilePattern
-     */
-    public function setLogFilePattern($logFilePattern)
+
+    public function setLogFilePattern(string $logFilePattern): void
     {
         $this->logFilePattern = $logFilePattern;
     }
-    
-    /**
-     * @return int
-     */
-    public function getLoggingLevel()
+
+    public function getLoggingLevel(): Level
     {
         return $this->loggingLevel;
     }
-    
-    /**
-     * @param int $loggingLevel
-     */
-    public function setLoggingLevel($loggingLevel)
+
+    public function setLoggingLevel(Level $loggingLevel): void
     {
         $this->loggingLevel = $loggingLevel;
     }
-    
-    /**
-     * @return null
-     */
-    public function getLoggingPath()
+
+    public function getLoggingPath(): string
     {
         if ($this->loggingPath === null) {
-            $this->loggingPath = sys_get_temp_dir() . "/logs";
+            $this->loggingPath = sys_get_temp_dir() . '/logs';
         }
-        
+
         return $this->loggingPath;
     }
-    
-    /**
-     * @param null $loggingPath
-     */
-    public function setLoggingPath($loggingPath)
+
+    public function setLoggingPath(?string $loggingPath): void
     {
         $this->loggingPath = $loggingPath;
     }
-    
-    /**
-     * @return SlimApp
-     */
-    public function getSlimapp()
+
+    public function getSlimapp(): ?SlimApp
     {
         return $this->slimapp;
     }
-    
-    /**
-     * @param SlimApp $slimapp
-     */
-    public function setSlimapp($slimapp)
+
+    public function setSlimapp(SlimApp $slimapp): void
     {
         $this->slimapp = $slimapp;
     }
-    
+
     protected function configureIO(InputInterface $input, OutputInterface $output): void
     {
         parent::configureIO($input, $output);
-        
-        $level = Logger::DEBUG;
-        switch ($output->getVerbosity()) {
-            case OutputInterface::VERBOSITY_VERY_VERBOSE:
-                $level = Logger::INFO;
-                break;
-            case OutputInterface::VERBOSITY_VERBOSE:
-                $level = Logger::NOTICE;
-                break;
-            case OutputInterface::VERBOSITY_DEBUG:
-                $level = Logger::DEBUG;
-                break;
-            case OutputInterface::VERBOSITY_NORMAL:
-                $level = Logger::WARNING;
-                break;
-            case OutputInterface::VERBOSITY_QUIET:
-                $level = Logger::CRITICAL;
-                break;
-        }
+
+        $level = match ($output->getVerbosity()) {
+            OutputInterface::VERBOSITY_QUIET        => Level::Critical,
+            OutputInterface::VERBOSITY_NORMAL       => Level::Warning,
+            OutputInterface::VERBOSITY_VERBOSE      => Level::Notice,
+            OutputInterface::VERBOSITY_VERY_VERBOSE => Level::Info,
+            OutputInterface::VERBOSITY_DEBUG        => Level::Debug,
+            default                                 => Level::Debug,
+        };
+
         if ($this->loggingEnabled) {
             $handler = new ConsoleHandler($level);
             $handler->install();
         }
     }
-    
+
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
         if ($this->loggingEnabled) {
             $name             = $command->getName();
-            $name             = strtr($name, ":", ".");
+            $name             = strtr($name, ':', '.');
             $logFilePattern   = strtr(
                 $this->logFilePattern,
                 [
-                    "%script%" => $name,
-                    "%type%"   => "log",
+                    '%script%' => $name,
+                    '%type%'   => 'log',
                 ]
             );
             $errorFilePattern = strtr(
                 $this->logFilePattern,
                 [
-                    "%script%" => $name,
-                    "%type%"   => "error",
+                    '%script%' => $name,
+                    '%type%'   => 'error',
                 ]
             );
             $logger           = new LocalFileHandler(
@@ -172,7 +127,7 @@ class ConsoleApplication extends Application
             );
             $logger->install();
         }
-        
+
         return parent::doRunCommand($command, $input, $output);
     }
 }
