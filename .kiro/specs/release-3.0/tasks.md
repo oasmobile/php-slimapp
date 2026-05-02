@@ -6,8 +6,8 @@
 
 ## Tasks
 
-- [ ] 1. Composer 依赖升级（Phase 0）
-  - [ ] 1.1 更新 `composer.json` 中所有依赖版本
+- [-] 1. Composer 依赖升级（Phase 0）
+  - [x] 1.1 更新 `composer.json` 中所有依赖版本
     - 将 `php` 要求改为 `>=8.5`
     - 将 `symfony/dependency-injection`、`symfony/config`、`symfony/console`、`symfony/finder`、`symfony/filesystem` 改为 `^8.0`
     - 将 `oasis/logging` 改为 `^3.0`，`oasis/utils` 改为 `^3.0`，`oasis/http` 改为 `^3.0`
@@ -15,13 +15,13 @@
     - 将 `oasis/aws-wrappers` 改为 `^3.0`，`oasis/dynamodb-odm` 改为 `^2.0`，`oasis/doctrine-addon` 改为 `^3.1`
     - 新增 `giorgiosironi/eris` `^1.1` 到 require-dev
     - Ref: Req 1, AC 1–15
-  - [ ] 1.2 执行 `composer update` 并验证依赖解析无冲突
+  - [x] 1.2 执行 `composer update` 并验证依赖解析无冲突
     - 确保 lock 文件正确生成
     - 此阶段不要求代码编译通过
     - Ref: Req 1, AC 16
-  - [ ] 1.3 Checkpoint: 确认 `composer.json` 和 `composer.lock` 正确更新，所有依赖版本符合 Req 1 的 AC。如有问题请向用户确认。Commit。
+  - [-] 1.3 Checkpoint: 确认 `composer.json` 和 `composer.lock` 正确更新，所有依赖版本符合 Req 1 的 AC。如有问题请向用户确认。Commit。
 
-- [ ] 2. SlimApp 核心语法升级 + ConfigParser 提取 + HTTP Kernel 适配
+- [~] 2. SlimApp 核心语法升级 + ConfigParser 提取 + HTTP Kernel 适配
   - [ ] 2.1 升级 `src/SlimApp.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 所有属性添加类型声明（`bool`、`array`、`?ArrayDataProvider`、`?Container`、`?string`、`int`、`?ConsoleApplication`、`?MicroKernel`、`?array`、`string` 等）
@@ -60,7 +60,7 @@
     - Ref: Req 7, AC 5
   - [ ] 2.6 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'SlimAppTest|ConfigParserTest'`，确认 SlimApp 和 ConfigParser 相关测试通过。Commit。
 
-- [ ] 3. SlimAppCompilerPass 语法升级 + NamespaceResolver 提取 + 移除全 Public
+- [~] 3. SlimAppCompilerPass 语法升级 + NamespaceResolver 提取 + 移除全 Public
   - [ ] 3.1 升级 `src/SlimAppCompilerPass.php` 为 PHP 8.5 语法并移除全 public 逻辑
     - 添加 `declare(strict_types=1)`
     - `$classname` 属性改为 constructor promotion：`protected readonly string $classname`
@@ -87,7 +87,7 @@
     - Ref: Req 7, AC 6
   - [ ] 3.5 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'SlimAppCompilerPassTest|NamespaceResolverTest'`，确认 CompilerPass 和 NamespaceResolver 相关测试通过。Commit。
 
-- [ ] 4. AbstractAlertableCommand + AbstractParallelCommand 语法升级
+- [~] 4. AbstractAlertableCommand + AbstractParallelCommand 语法升级
   - [ ] 4.1 升级 `src/AbstractAlertableCommand.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 方法添加参数类型和返回类型
@@ -105,7 +105,7 @@
     - Ref: Req 6, AC 3–4
   - [ ] 4.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'AbstractAlertableCommandTest|AbstractParallelCommandTest'`，确认测试通过。Commit。
 
-- [ ] 5. DaemonSentinelCommand 重构 — 移除 AbstractDaemonSentinelCommand
+- [~] 5. DaemonSentinelCommand 重构 — 移除 AbstractDaemonSentinelCommand
   - [ ] 5.1 重构 `src/SentinelCommand/DaemonSentinelCommand.php`
     - 将继承关系从 `extends AbstractDaemonSentinelCommand` 改为 `extends AbstractAlertableCommand`
     - 从 `AbstractDaemonSentinelCommand` 内联所有逻辑到 `DaemonSentinelCommand`：
@@ -127,7 +127,7 @@
     - Ref: Req 5, AC 7; Req 6, AC 3
   - [ ] 5.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'DaemonSentinelCommandTest'`，确认测试通过。Commit。
 
-- [ ] 6. ConsoleApplication 语法升级
+- [~] 6. ConsoleApplication 语法升级
   - [ ] 6.1 升级 `src/ConsoleApplication.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 所有属性添加类型声明
@@ -141,7 +141,7 @@
     - Ref: Req 6, AC 3, 6
   - [ ] 6.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ConsoleApplicationTest'`，确认测试通过。Commit。
 
-- [ ] 7. ClearCacheCommand 语法升级 + MicroKernel 适配
+- [~] 7. ClearCacheCommand 语法升级 + MicroKernel 适配
   - [ ] 7.1 升级 `src/BuiltInCommands/ClearCacheCommand.php` 为 PHP 8.5 语法并适配 MicroKernel
     - 添加 `declare(strict_types=1)`
     - 方法添加参数类型和返回类型（`configure(): void`、`execute(...): int`）
@@ -157,7 +157,7 @@
     - Ref: Req 3, AC 7; Req 6, AC 3, 6
   - [ ] 7.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ClearCacheCommandTest'`，确认测试通过。Commit。
 
-- [ ] 8. CommandConfiguration 语法升级 + TreeBuilder API 升级
+- [~] 8. CommandConfiguration 语法升级 + TreeBuilder API 升级
   - [ ] 8.1 升级 `src/SentinelCommand/CommandConfiguration.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - `$application` 属性改为 constructor promotion：`private readonly Application $application`
@@ -172,7 +172,7 @@
     - Ref: Req 6, AC 3–4, 6
   - [ ] 8.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'CommandConfigurationTest'`，确认测试通过。Commit。
 
-- [ ] 9. CommandRunner 语法升级
+- [~] 9. CommandRunner 语法升级
   - [ ] 9.1 升级 `src/SentinelCommand/CommandRunner.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 所有属性添加类型声明
@@ -185,7 +185,7 @@
     - Ref: Req 6, AC 3
   - [ ] 9.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'CommandRunnerTest'`，确认测试通过。Commit。
 
-- [ ] 10. ValidateServicesCommand 语法升级
+- [~] 10. ValidateServicesCommand 语法升级
   - [ ] 10.1 升级 `src/BuiltInCommands/ValidateServicesCommand.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 方法添加参数类型和返回类型（`configure(): void`、`execute(...): int`）
@@ -200,7 +200,7 @@
     - Ref: Req 6, AC 3, 6
   - [ ] 10.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ValidateServicesCommandTest'`，确认测试通过。Commit。
 
-- [ ] 11. PHPUnit 配置 + 测试 bootstrap 升级
+- [~] 11. PHPUnit 配置 + 测试 bootstrap 升级
   - [ ] 11.1 升级 `phpunit.xml` 为 PHPUnit 13 格式
     - Schema 改为 `https://schema.phpunit.de/13.0/phpunit.xsd`
     - `<filter><whitelist>` 改为 `<source><include>/<exclude>`
@@ -219,7 +219,7 @@
     - Ref: Req 6, AC 3, 7
   - [ ] 11.4 Checkpoint: 运行 `./vendor/bin/phpunit --testsuite ut`，确保所有单元测试通过且无 PHPUnit deprecation 警告。Commit。
 
-- [ ] 12. 集成测试适配
+- [~] 12. 集成测试适配
   - [ ] 12.1 升级 `tests/integration/fixtures/TestAppConfig.php`
     - 添加 `declare(strict_types=1)`
     - TreeBuilder API 升级：`new TreeBuilder()` + `$treeBuilder->root('app')` 改为 `new TreeBuilder('app')` + `$treeBuilder->getRootNode()`
@@ -242,7 +242,7 @@
     - Ref: Req 6, AC 8; Req 9, AC 5
   - [ ] 12.6 Checkpoint: 运行集成测试和 fork 测试脚本，确保所有集成测试通过且无错误。Commit。
 
-- [ ] 13. Property-Based Testing 引入
+- [~] 13. Property-Based Testing 引入
   - [ ] 13.1 创建 `tests/pbt/` 目录和 PBT 基础设施
     - 创建 `tests/pbt/` 目录
     - 确认 `phpunit.xml` 中 `pbt` 测试套件已配置（Task 11.1 已完成）
@@ -279,7 +279,7 @@
     - Ref: Req 7, AC 7
   - [ ] 13.7 Checkpoint: 运行 `./vendor/bin/phpunit --testsuite pbt`，确保所有 PBT 通过。Commit。
 
-- [ ] 14. 覆盖率目标验证
+- [~] 14. 覆盖率目标验证
   - [ ] 14.1 更新 `tests/run_all_coverage.sh` 覆盖率合并脚本
     - 适配 PHPUnit 13 覆盖率 API
     - 添加 `pbt` 测试套件到覆盖率收集流程
