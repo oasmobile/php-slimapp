@@ -185,7 +185,7 @@
     - Ref: Req 6, AC 3
   - [x] 9.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'CommandRunnerTest'`，确认测试通过。Commit。
 
-- [-] 10. ValidateServicesCommand 语法升级
+- [x] 10. ValidateServicesCommand 语法升级
   - [x] 10.1 升级 `src/BuiltInCommands/ValidateServicesCommand.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 方法添加参数类型和返回类型（`configure(): void`、`execute(...): int`）
@@ -198,10 +198,10 @@
     - `getMockBuilder(...)->getMock()` 改为 `createMock(...)`
     - `assertContains` 改为 `assertStringContainsString`
     - Ref: Req 6, AC 3, 6
-  - [-] 10.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ValidateServicesCommandTest'`，确认测试通过。Commit。
+  - [x] 10.3 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'ValidateServicesCommandTest'`，确认测试通过。Commit。
 
-- [~] 11. PHPUnit 配置 + 测试 bootstrap 升级
-  - [ ] 11.1 升级 `phpunit.xml` 为 PHPUnit 13 格式
+- [x] 11. PHPUnit 配置 + 测试 bootstrap 升级
+  - [x] 11.1 升级 `phpunit.xml` 为 PHPUnit 13 格式
     - Schema 改为 `https://schema.phpunit.de/13.0/phpunit.xsd`
     - `<filter><whitelist>` 改为 `<source><include>/<exclude>`
     - `<logging><log type="coverage-text">` 改为 `<coverage><report><text>`
@@ -209,88 +209,88 @@
     - 添加 `pbt` 测试套件指向 `tests/pbt/`
     - 排除 `src/BuiltInCommands/InitializeProjectCommand.php` 和 `src/tests/`
     - Ref: Req 6, AC 1–2; Req 8, AC 1–2, 5
-  - [ ] 11.2 升级 `tests/bootstrap.php` 兼容 PHPUnit 13
+  - [x] 11.2 升级 `tests/bootstrap.php` 兼容 PHPUnit 13
     - 移除 PHPUnit 5.7 的 `ReflectionType::__toString()` deprecation 抑制逻辑
     - 保持 oasis/logging 静默配置
     - Ref: Req 6, AC 8
-  - [ ] 11.3 更新剩余测试文件适配 PHPUnit 13
+  - [x] 11.3 更新剩余测试文件适配 PHPUnit 13
     - `tests/ut/ForkProcessTest.php`：基类改为 `\PHPUnit\Framework\TestCase`，`setUpBeforeClass()` 添加 `: void`
     - `tests/ut/BuiltInCommands/InitializeProjectCommandTest.php`（如存在）：基类改为 `\PHPUnit\Framework\TestCase`
     - Ref: Req 6, AC 3, 7
-  - [ ] 11.4 Checkpoint: 运行 `./vendor/bin/phpunit --testsuite ut`，确保所有单元测试通过且无 PHPUnit deprecation 警告。Commit。
+  - [x] 11.4 Checkpoint: 运行 `./vendor/bin/phpunit --testsuite ut`，确保所有单元测试通过且无 PHPUnit deprecation 警告。Commit。
 
-- [~] 12. 集成测试适配
-  - [ ] 12.1 升级 `tests/integration/fixtures/TestAppConfig.php`
+- [x] 12. 集成测试适配
+  - [x] 12.1 升级 `tests/integration/fixtures/TestAppConfig.php`
     - 添加 `declare(strict_types=1)`
     - TreeBuilder API 升级：`new TreeBuilder()` + `$treeBuilder->root('app')` 改为 `new TreeBuilder('app')` + `$treeBuilder->getRootNode()`
     - 方法添加返回类型
     - Ref: Req 9, AC 1
-  - [ ] 12.2 更新 `tests/integration/config/services.yml`
+  - [x] 12.2 更新 `tests/integration/config/services.yml`
     - 需要通过 `getService()` 获取的服务添加 `public: true`（如 `app`、`cli.command.dummy`、`cli.command.sentinel` 等）
     - Ref: Req 9, AC 2
-  - [ ] 12.3 升级集成测试 fixtures 为 PHP 8.5 语法
+  - [x] 12.3 升级集成测试 fixtures 为 PHP 8.5 语法
     - `DummyCommand.php`：添加 `declare(strict_types=1)`，方法添加类型声明
     - `TestSentinelCommand.php`：添加 `declare(strict_types=1)`，方法添加类型声明
     - `TestController.php`：添加 `declare(strict_types=1)`，方法添加类型声明
     - Ref: Req 9, AC 3
-  - [ ] 12.4 升级集成测试脚本兼容升级后的框架
+  - [x] 12.4 升级集成测试脚本兼容升级后的框架
     - `tests/scripts/parallel_command_test.php`：适配 PHPUnit 13 覆盖率 API（`Filter` 和 `CodeCoverage` 构造函数签名可能变化）
     - `tests/scripts/sentinel_command_test.php`：同上
     - `tests/scripts/merge_coverage.php`：适配 PHPUnit 13 覆盖率 API，更新文件列表（移除 `AbstractDaemonSentinelCommand.php`，添加 `ConfigParser.php` 和 `NamespaceResolver.php`）
     - Ref: Req 9, AC 4
-  - [ ] 12.5 升级 `tests/integration/bootstrap.php` 兼容 PHPUnit 13
+  - [x] 12.5 升级 `tests/integration/bootstrap.php` 兼容 PHPUnit 13
     - Ref: Req 6, AC 8; Req 9, AC 5
-  - [ ] 12.6 Checkpoint: 运行集成测试和 fork 测试脚本，确保所有集成测试通过且无错误。Commit。
+  - [x] 12.6 Checkpoint: 运行集成测试和 fork 测试脚本，确保所有集成测试通过且无错误。Commit。
 
-- [~] 13. Property-Based Testing 引入
-  - [ ] 13.1 创建 `tests/pbt/` 目录和 PBT 基础设施
+- [x] 13. Property-Based Testing 引入
+  - [x] 13.1 创建 `tests/pbt/` 目录和 PBT 基础设施
     - 创建 `tests/pbt/` 目录
     - 确认 `phpunit.xml` 中 `pbt` 测试套件已配置（Task 11.1 已完成）
     - Ref: Req 7, AC 1–2
-  - [ ] 13.2 编写 CommandConfiguration 幂等性 PBT（`tests/pbt/CommandConfigurationPbtTest.php`）
+  - [x] 13.2 编写 CommandConfiguration 幂等性 PBT（`tests/pbt/CommandConfigurationPbtTest.php`）
     - **Property 1: CommandConfiguration 处理幂等性**
     - 生成随机 command config 数组（name: string, args: array, parallel: int 1-10, once/alert/frequency_fixed: bool, interval/frequency: int 0-300）
     - 验证：处理一次得到 R1，将 R1 作为输入再处理得到 R2，R1 === R2
     - 最小迭代次数 100 次
     - Ref: Req 7, AC 3
-  - [ ] 13.3 编写 CommandRunner 调度约束 PBT（`tests/pbt/CommandRunnerSchedulingPbtTest.php`）
+  - [x] 13.3 编写 CommandRunner 调度约束 PBT（`tests/pbt/CommandRunnerSchedulingPbtTest.php`）
     - **Property 2: CommandRunner 调度约束**
     - 生成随机 once (bool)、interval (int 0-300)、frequency (int 0-300)、frequency_fixed (bool)、lastRun (int time()-600..time())、exitStatus (int 0-255)
     - 验证：非 once 时，`nextRun >= lastRun + frequency`（当 frequency > 0）；`nextRun >= now + interval`（当 interval > 0）；frequency=0 且 interval=0 时 `nextRun ≈ now`
     - 最小迭代次数 100 次
     - Ref: Req 7, AC 4
-  - [ ] 13.4 编写 ConfigParser Round-Trip PBT（`tests/pbt/ConfigParserPbtTest.php`）
+  - [x] 13.4 编写 ConfigParser Round-Trip PBT（`tests/pbt/ConfigParserPbtTest.php`）
     - **Property 3: 配置解析 Round-Trip**
     - 生成随机配置树（叶子值为 string/int/bool，嵌套深度 1-3 层，key 为合法 YAML key）
     - 验证：对于配置树中每个叶子节点路径 `path`，`ConfigParser::retrieve(ConfigParser::flatten($config), 'app.' + path)` 等于原始值
     - 最小迭代次数 100 次
     - Ref: Req 7, AC 5
-  - [ ] 13.5 编写 NamespaceResolver Metamorphic PBT（`tests/pbt/NamespaceResolverPbtTest.php`）
+  - [x] 13.5 编写 NamespaceResolver Metamorphic PBT（`tests/pbt/NamespaceResolverPbtTest.php`）
     - **Property 4: 命名空间解析 Metamorphic 属性**
     - 生成随机短类名 (string) 和命名空间数组 (string[])，混合存在/不存在的类名
     - 验证：结果要么是存在的 FQCN（`class_exists(result) === true`），要么等于原始输入
     - 最小迭代次数 100 次
     - Ref: Req 4, AC 1; Req 7, AC 6
-  - [ ] 13.6 编写 Verbosity-to-LogLevel 全函数 PBT（`tests/pbt/VerbosityMappingPbtTest.php`）
+  - [x] 13.6 编写 Verbosity-to-LogLevel 全函数 PBT（`tests/pbt/VerbosityMappingPbtTest.php`）
     - **Property 5: Verbosity-to-LogLevel 全函数属性**
     - 从 5 个有效 Symfony verbosity 常量中随机选择
     - 验证：映射结果属于有效的 Monolog Logger 级别常量集合
     - 最小迭代次数 100 次
     - Ref: Req 7, AC 7
-  - [ ] 13.7 Checkpoint: 运行 `./vendor/bin/phpunit --testsuite pbt`，确保所有 PBT 通过。Commit。
+  - [x] 13.7 Checkpoint: 运行 `./vendor/bin/phpunit --testsuite pbt`，确保所有 PBT 通过。Commit。
 
-- [~] 14. 覆盖率目标验证
-  - [ ] 14.1 更新 `tests/run_all_coverage.sh` 覆盖率合并脚本
+- [x] 14. 覆盖率目标验证
+  - [x] 14.1 更新 `tests/run_all_coverage.sh` 覆盖率合并脚本
     - 适配 PHPUnit 13 覆盖率 API
     - 添加 `pbt` 测试套件到覆盖率收集流程
     - 更新 PHP 二进制路径（从 `php74` 改为当前 PHP 8.5 路径）
     - Ref: Req 8, AC 4
-  - [ ] 14.2 验证综合覆盖率达到 90%+
+  - [x] 14.2 验证综合覆盖率达到 90%+
     - 运行全量覆盖率脚本
     - 确认排除 `InitializeProjectCommand` 和 `src/tests/` 后，ut + pbt + integration 综合覆盖率 ≥ 90%
     - 如未达标，补充测试用例
     - Ref: Req 8, AC 1–3, 5
-  - [ ] 14.3 Checkpoint: 运行全量测试套件（ut + pbt + integration），确保全部通过。确认覆盖率达标。Commit。
+  - [x] 14.3 Checkpoint: 运行全量测试套件（ut + pbt + integration），确保全部通过。确认覆盖率达标。Commit。
 
 - [ ] 15. 文档更新
   - [ ] 15.1 更新 `docs/state/architecture.md`
