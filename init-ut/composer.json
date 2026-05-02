@@ -2,11 +2,14 @@
 	"name" : "slimapp/test",
 	"repositories" : [
 		{
-			"type" : "vcs",
-			"url" : "../"
+			"type" : "path",
+			"url" : "../",
+			"options": {
+				"symlink": true
+			}
 		}
 	],
 	"require": {
-		"oasis/slimapp": "dev-master"
+		"oasis/slimapp": "dev-release/3.0"
 	}
 }

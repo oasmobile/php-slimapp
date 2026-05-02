@@ -333,7 +333,7 @@
     - Ref: Req 11, AC 1–8
   - [x] 16.2 Checkpoint: Review 迁移指南内容完整性和准确性。Commit。
 
-- [-] 17. 手工测试
+- [x] 17. 手工测试
   - [x] 17.1 Increment alpha tag
   - [x] 17.2 验证 CLI 模式基本功能
     - [ ] 执行 `slimapp:cache:clear`，确认缓存目录被正确清除
@@ -346,9 +346,9 @@
     - [ ] 确认 `getService()` 调用非 public 服务抛出 `ServiceNotFoundException`
   - [x] 17.5 验证 Daemon Sentinel 基本功能
     - [ ] 使用测试配置文件执行 DaemonSentinelCommand，确认进程 fork 和调度正常
-  - [-] 17.6 Checkpoint: 汇总手工测试结果，确认所有场景通过。Commit。
+  - [x] 17.6 Checkpoint: 汇总手工测试结果，确认所有场景通过。Commit。
 
-- [~] 18. Code Review
+- [x] 18. Code Review
   - 委托给 code-reviewer sub-agent 执行。
 
 ## Issues
