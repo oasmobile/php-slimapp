@@ -37,5 +37,16 @@
         "psr-4": {
             "Oasis\\SlimApp\\": "src/"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Oasis\\SlimApp\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "audit": {
+            "abandoned": "report",
+            "block-insecure": false
+        }
     }
 }
