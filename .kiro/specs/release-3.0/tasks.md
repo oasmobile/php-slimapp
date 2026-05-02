@@ -87,7 +87,7 @@
     - Ref: Req 7, AC 6
   - [x] 3.5 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'SlimAppCompilerPassTest|NamespaceResolverTest'`，确认 CompilerPass 和 NamespaceResolver 相关测试通过。Commit。
 
-- [-] 4. AbstractAlertableCommand + AbstractParallelCommand 语法升级
+- [x] 4. AbstractAlertableCommand + AbstractParallelCommand 语法升级
   - [x] 4.1 升级 `src/AbstractAlertableCommand.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 方法添加参数类型和返回类型
@@ -103,10 +103,10 @@
     - `setExpectedException()` 改为 `expectException()`
     - `setUp()` 添加 `: void` 返回类型
     - Ref: Req 6, AC 3–4
-  - [-] 4.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'AbstractAlertableCommandTest|AbstractParallelCommandTest'`，确认测试通过。Commit。
+  - [x] 4.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'AbstractAlertableCommandTest|AbstractParallelCommandTest'`，确认测试通过。Commit。
 
-- [~] 5. DaemonSentinelCommand 重构 — 移除 AbstractDaemonSentinelCommand
-  - [ ] 5.1 重构 `src/SentinelCommand/DaemonSentinelCommand.php`
+- [-] 5. DaemonSentinelCommand 重构 — 移除 AbstractDaemonSentinelCommand
+  - [x] 5.1 重构 `src/SentinelCommand/DaemonSentinelCommand.php`
     - 将继承关系从 `extends AbstractDaemonSentinelCommand` 改为 `extends AbstractAlertableCommand`
     - 从 `AbstractDaemonSentinelCommand` 内联所有逻辑到 `DaemonSentinelCommand`：
       - `$runningProcesses` 属性（typed: `array`）
@@ -115,9 +115,9 @@
       - `waitForBackgroundProcesses()` 方法（pcntl_waitpid 循环、early-runner 逻辑、进程退出处理）
     - 添加 `declare(strict_types=1)` 和类型声明
     - Ref: Req 2, AC 1–3; Req 5, AC 1–6
-  - [ ] 5.2 删除 `src/SentinelCommand/AbstractDaemonSentinelCommand.php`
+  - [x] 5.2 删除 `src/SentinelCommand/AbstractDaemonSentinelCommand.php`
     - Ref: Req 5, AC 1
-  - [ ] 5.3 更新 Sentinel 相关测试
+  - [x] 5.3 更新 Sentinel 相关测试
     - 删除 `tests/ut/SentinelCommand/AbstractDaemonSentinelCommandTest.php`
     - 重写 `tests/ut/SentinelCommand/DaemonSentinelCommandTest.php`：
       - 基类改为 `\PHPUnit\Framework\TestCase`
@@ -125,7 +125,7 @@
       - 验证 command 定义（name、description、file argument）
       - 验证空配置文件执行返回 0
     - Ref: Req 5, AC 7; Req 6, AC 3
-  - [ ] 5.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'DaemonSentinelCommandTest'`，确认测试通过。Commit。
+  - [-] 5.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'DaemonSentinelCommandTest'`，确认测试通过。Commit。
 
 - [~] 6. ConsoleApplication 语法升级
   - [ ] 6.1 升级 `src/ConsoleApplication.php` 为 PHP 8.5 语法
