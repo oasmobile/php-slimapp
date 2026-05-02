@@ -21,7 +21,7 @@ class ValidateServicesCommandTest extends TestCase
 
     public function testExecuteValidatesServices(): void
     {
-        $slimapp = $this->createMock(SlimApp::class);
+        $slimapp = $this->createStub(SlimApp::class);
         $slimapp->method('getServiceIds')->willReturn(['app', 'test.service']);
         $slimapp->method('getService')->willReturn(new \stdClass());
 
@@ -44,7 +44,7 @@ class ValidateServicesCommandTest extends TestCase
 
     public function testExecuteHandlesMisconfiguredService(): void
     {
-        $slimapp = $this->createMock(SlimApp::class);
+        $slimapp = $this->createStub(SlimApp::class);
         $slimapp->method('getServiceIds')->willReturn(['bad.service']);
         $slimapp->method('getService')->willThrowException(new \RuntimeException('Service misconfigured'));
 

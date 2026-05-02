@@ -185,6 +185,26 @@ class SlimAppTest extends TestCase
         $this->assertEquals(\Monolog\Level::Warning, $levelRef->getValue($app));
     }
 
+    public function testMagicSetLoggingPropertyWithLevelInstance(): void
+    {
+        $app = new SlimApp();
+        $app->init($this->configDir, new TestAppConfig());
+        $app->logging = ['level' => \Monolog\Level::Error];
+
+        $levelRef = new \ReflectionProperty($app, 'loggingLevel');
+        $this->assertEquals(\Monolog\Level::Error, $levelRef->getValue($app));
+    }
+
+    public function testMagicSetLoggingPropertyWithLevelString(): void
+    {
+        $app = new SlimApp();
+        $app->init($this->configDir, new TestAppConfig());
+        $app->logging = ['level' => 'warning'];
+
+        $levelRef = new \ReflectionProperty($app, 'loggingLevel');
+        $this->assertEquals(\Monolog\Level::Warning, $levelRef->getValue($app));
+    }
+
     public function testMagicSetLoggingPropertyWithPattern(): void
     {
         $app = new SlimApp();
@@ -370,7 +390,7 @@ class SlimAppTest extends TestCase
         $app = new SlimApp();
         $app->init($this->configDir, new TestAppConfig());
 
-        $handler      = $this->createMock(\Monolog\Handler\HandlerInterface::class);
+        $handler      = $this->createStub(\Monolog\Handler\HandlerInterface::class);
         $app->logging = ['handlers' => [$handler]];
         $this->assertTrue(true);
     }

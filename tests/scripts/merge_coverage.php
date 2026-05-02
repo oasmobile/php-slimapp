@@ -4,7 +4,11 @@
  *
  * 适配 phpunit/php-code-coverage 14.x（PHPUnit 13）。
  * 使用 Serializer/Unserializer API 替代 raw serialize/unserialize。
+ *
+ * 用法: php tests/scripts/merge_coverage.php <cov-file1> [cov-file2] ...
  */
+
+declare(strict_types=1);
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -56,6 +60,21 @@ foreach ($argv as $i => $file) {
 
     try {
         $data = $unserializer->unserialize($file);
+        $covData = $data['codeCoverage'];
+        $basePath = $data['basePath'] ?? '';
+
+        // 将相对路径转为绝对路径（Unserializer 返回的路径是相对于 basePath 的）
+        if ($basePath !== '') {
+            foreach ($covData->coveredFiles() as $relFile) {
+                // 跳过已经是绝对路径的文件
+                if (str_starts_with($relFile, '/')) {
+                    continue;
+                }
+                $absFile = $basePath . '/' . $relFile;
+                $covData->renameFile($relFile, $absFile);
+            }
+        }
+
         // 从反序列化数据重建 CodeCoverage 对象
         $itemFilter = new Filter();
         foreach ($files as $f) {
@@ -67,7 +86,7 @@ foreach ($argv as $i => $file) {
             (new Selector())->forLineCoverage($itemFilter),
             $itemFilter,
         );
-        $itemCoverage->setData($data['codeCoverage']);
+        $itemCoverage->setData($covData);
         $itemCoverage->setTests($data['testResults']);
         $merged->merge($itemCoverage);
     } catch (\Throwable $e) {
@@ -77,7 +96,7 @@ foreach ($argv as $i => $file) {
 
 // 输出文本报告
 $report = new Text(Thresholds::from(50, 90));
-echo $report->process($merged->getReport(), true);
+echo $report->process($merged->getReport(), false);
 
 // 输出目标文件覆盖率摘要
 $directory = $merged->getReport();

@@ -18,12 +18,32 @@ $coverage = null;
 if ($covFile) {
     $filter = new Filter();
     $srcDir = __DIR__ . '/../../src';
+    $excludes = [
+        realpath($srcDir . '/BuiltInCommands/InitializeProjectCommand.php'),
+    ];
+    $excludeDirs = [
+        realpath($srcDir . '/tests') ?: $srcDir . '/tests',
+    ];
     $iterator = new \RecursiveIteratorIterator(
         new \RecursiveDirectoryIterator($srcDir, \FilesystemIterator::SKIP_DOTS),
     );
     foreach ($iterator as $file) {
         if ($file->isFile() && $file->getExtension() === 'php') {
-            $filter->includeFile($file->getRealPath());
+            $realPath = $file->getRealPath();
+            if (in_array($realPath, $excludes, true)) {
+                continue;
+            }
+            $skip = false;
+            foreach ($excludeDirs as $dir) {
+                if (str_starts_with($realPath, $dir . '/')) {
+                    $skip = true;
+                    break;
+                }
+            }
+            if ($skip) {
+                continue;
+            }
+            $filter->includeFile($realPath);
         }
     }
     $coverage = new CodeCoverage((new Selector())->forLineCoverage($filter), $filter);
