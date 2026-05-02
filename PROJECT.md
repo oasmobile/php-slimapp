@@ -6,23 +6,24 @@ SlimApp 是一个 PHP 全栈微框架，支持 Web（HTTP Kernel）和 CLI（Con
 
 ## 技术栈
 
-- **语言**: PHP >= 7.0
+- **语言**: PHP >= 8.5
 - **包管理**: Composer
 - **核心依赖**:
-  - `symfony/dependency-injection` ^4.0（服务容器）
-  - `symfony/config` ^4.0（配置定义与解析）
-  - `symfony/console` ^4.0（CLI 框架）
-  - `symfony/finder` ^4.0
-  - `symfony/filesystem` ^4.0
-  - `oasis/logging` ^1.2.0（日志，基于 Monolog）
-  - `oasis/utils` ^1.6
-  - `oasis/http` ^2.0（HTTP Kernel，基于 Silex）
+  - `symfony/dependency-injection` ^8.0（服务容器）
+  - `symfony/config` ^8.0（配置定义与解析）
+  - `symfony/console` ^8.0（CLI 框架）
+  - `symfony/finder` ^8.0
+  - `symfony/filesystem` ^8.0
+  - `oasis/logging` ^3.0（日志，基于 Monolog）
+  - `oasis/utils` ^3.0
+  - `oasis/http` ^3.0（HTTP Kernel，MicroKernel）
 - **开发依赖**:
-  - `phpunit/phpunit` ^5.7
-  - `doctrine/orm` ^2.5
-  - `oasis/aws-wrappers` ^2.2.1
-  - `oasis/dynamodb-odm` ^1.0
-  - `oasis/doctrine-addon` ^2.0.2
+  - `phpunit/phpunit` ^13
+  - `doctrine/orm` ^3.6
+  - `oasis/aws-wrappers` ^3.0
+  - `oasis/dynamodb-odm` ^2.0
+  - `oasis/doctrine-addon` ^3.1
+  - `giorgiosironi/eris` ^1.1（Property-Based Testing）
 
 ## 命名空间
 
@@ -36,7 +37,13 @@ Oasis\SlimApp\  →  src/
 # 安装依赖
 composer install
 
-# 运行测试（项目根目录下）
+# 运行单元测试
+./vendor/bin/phpunit --testsuite ut
+
+# 运行 Property-Based Testing
+./vendor/bin/phpunit --testsuite pbt
+
+# 运行全量测试（ut + pbt）
 ./vendor/bin/phpunit
 
 # 运行 CLI 入口（开发用）
@@ -68,6 +75,8 @@ src/                          # 框架源码（Oasis\SlimApp 命名空间）
 ├── SlimApp.php               # 核心类，单例，初始化容器/配置/日志
 ├── ConsoleApplication.php    # CLI Application，扩展 Symfony Console
 ├── SlimAppCompilerPass.php   # DI 编译器 Pass（默认命名空间解析、app 服务注册）
+├── ConfigParser.php          # 配置解析工具（parse/flatten/retrieve）
+├── NamespaceResolver.php     # 命名空间解析工具（短类名 → FQCN）
 ├── AbstractAlertableCommand.php   # 支持 --alert 选项的 Command 基类
 ├── AbstractParallelCommand.php    # 支持 pcntl_fork 并行执行的 Command 基类
 ├── BuiltInCommands/          # 内置命令
@@ -75,10 +84,14 @@ src/                          # 框架源码（Oasis\SlimApp 命名空间）
 │   ├── InitializeProjectCommand.php   # slimapp:project:init
 │   └── ValidateServicesCommand.php    # slimapp:services:validate
 ├── SentinelCommand/          # Daemon Sentinel 子系统
-│   ├── AbstractDaemonSentinelCommand.php  # (deprecated) 抽象哨兵命令
-│   ├── DaemonSentinelCommand.php          # 哨兵命令（推荐使用）
+│   ├── DaemonSentinelCommand.php          # 哨兵命令（直接继承 AbstractAlertableCommand）
 │   ├── CommandConfiguration.php           # 哨兵 YAML 配置定义
 │   └── CommandRunner.php                  # 子进程 fork/管理/调度
 └── tests/                    # 框架自身的测试辅助类
+tests/                        # 测试目录
+├── ut/                       # 单元测试
+├── pbt/                      # Property-Based Testing（Eris）
+├── integration/              # 集成测试
+└── scripts/                  # 覆盖率合并等脚本
 ut/                           # 集成测试 / 手动测试配置
 ```

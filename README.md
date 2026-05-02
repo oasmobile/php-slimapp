@@ -25,6 +25,10 @@ The Slim Application Framework (SlimApp) is an all-in-one framework aiming to ma
 
 ### Installation & Setup
 
+**Requirements**: PHP >= 8.5
+
+**Key Dependencies**: Symfony ^8.0, oasis/http ^3.0 (MicroKernel), oasis/logging ^3.0, PHPUnit ^13 (dev)
+
 The framework includes a list of useful PHP components. This makes it easy when setting up a new project: you would only need to use composer to require the project itself, and then run the project setup command.
 
 Run the following command under a new project root directory to install the project:
@@ -348,7 +352,7 @@ handlers                | array of additional log handlers to install, use other
 
 Remember we claimed that SlimApp is a micro framework for both web and console development? It is now time to learn how SlimApp offers us the ability to make web applications in an easy yet powerful fashion.
 
-SlimApp uses [oasis/http] as its HTTP Kernel implementation. [oasis/http] is an extension to the widely used [Silex] framework, and provides a kernel definition strictly implementing the `Symfony\Component\HttpKernel\HttpKernelInterface`.
+SlimApp uses [oasis/http] as its HTTP Kernel implementation. [oasis/http] provides a `MicroKernel` built on top of the Symfony HttpKernel component, implementing the `Symfony\Component\HttpKernel\HttpKernelInterface`.
 
 It is already well documented in [oasis/http] about how to bootstrap an HTTP Kernel. So what we are going to introduce here is much simpler, i.e. how to inject bootstrap configuration in our service definition:
 
@@ -587,18 +591,18 @@ Hello, John?
 
 In practice, a project can have a number of commands to be executed in a pre-determined schedule. Some of the commands need to be executed at a given interval, some need to run more than one instance in parallel, some need to automatically send alert when execution fails, and so on. SlimApp provides a very useful feature called the Daemon Sentinel just to solve this problem.
 
-A Daemon Sentinel itself is also a **command**. Your application should extend the `Oasis\SlimApp\SentinelCommand\AbstractDaemonSentinelCommand` to have your command class:
+A Daemon Sentinel itself is also a **command**. You can use the built-in `Oasis\SlimApp\SentinelCommand\DaemonSentinelCommand` directly, or extend it for customization:
 
 ```php
 <?php
 
 namespace Minhao\TestProject\Console\Commands;
 
-use Oasis\SlimApp\SentinelCommand\AbstractDaemonSentinelCommand;
+use Oasis\SlimApp\SentinelCommand\DaemonSentinelCommand;
 
-class TestSentinelCommand extends AbstractDaemonSentinelCommand
+class TestSentinelCommand extends DaemonSentinelCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
         $this->setName('test:daemon');
@@ -652,6 +656,5 @@ commands:
 [symfony/console]: http://symfony.com/doc/current/components/console.html
 [oasis/http]: https://github.com/oasmobile/php-http/ "Oasis HTTP Kernel Component"
 [oasis/logging]: https://github.com/oasmobile/php-logging/ "Oasis Logging Component"
-[Silex]: http://silex.sensiolabs.org/
 [monolog]: https://github.com/Seldaek/monolog
 [PSR-3]: www.php-fig.org/psr/psr-3/ "PHP Standard Recommendation for Logging Interface"

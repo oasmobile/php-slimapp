@@ -42,10 +42,11 @@ SlimApp 采用单体框架设计，核心类 `SlimApp` 作为单例入口，统�
 
 - 基于 `symfony/dependency-injection`
 - 通过 `services.yml`（YAML 格式）定义服务
+- 服务默认 private（遵循 Symfony 标准约定），`app` 服务保持 public
 - `SlimAppCompilerPass` 提供：
-  - `default.namespace` 参数支持：类名不含完整命名空间时自动补全
-  - `app` 服务自动注册为当前 SlimApp 子类的单例
-  - 所有服务设为 public
+  - `default.namespace` 参数支持：类名不含完整命名空间时自动补全（委托 `NamespaceResolver` 实现）
+  - `app` 服务自动注册为当前 SlimApp 子类的单例（显式设为 public）
+- 需要通过 `getService()` 获取的服务须在 `services.yml` 中显式声明 `public: true`
 
 ### 配置系统
 
@@ -69,8 +70,9 @@ SlimApp 采用单体框架设计，核心类 `SlimApp` 作为单例入口，统�
 
 ### HTTP Kernel
 
-- 基于 `oasis/http`（Silex 扩展）
+- 基于 `oasis/http`（MicroKernel，基于 Symfony HttpKernel）
 - 通过 `app` 服务的 `http` 属性配置
+- `getHttpKernel()` 返回 `MicroKernel` 实例
 - 支持: routing、twig 模板、CORS、error handler、view handler
 - 入口: `$app->getHttpKernel()->run()`
 
@@ -93,7 +95,7 @@ SlimApp 采用单体框架设计，核心类 `SlimApp` 作为单例入口，统�
 
 ### Daemon Sentinel
 
-- 类: `DaemonSentinelCommand`（推荐）/ `AbstractDaemonSentinelCommand`（deprecated）
+- 类: `DaemonSentinelCommand`（直接继承 `AbstractAlertableCommand`）
 - 功能: 读取 YAML 配置文件，按配置 fork 子进程执行多个命令
 - 调度参数:
   - `parallel` — 并行实例数
