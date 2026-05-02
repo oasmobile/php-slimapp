@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-01-11
- * Time: 22:01
- */
+declare(strict_types=1);
 
 namespace Oasis\SlimApp;
 
@@ -15,14 +10,11 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 abstract class AbstractParallelCommand extends AbstractAlertableCommand
 {
-    private $parallelCount = 0;
-    private $pids          = [];
-    private $isFailed      = false;
+    private int $parallelCount = 0;
+    private array $pids = [];
+    private bool $isFailed = false;
 
-    /**
-     * @return int
-     */
-    protected function getParallelCount()
+    protected function getParallelCount(): int
     {
         return $this->parallelCount;
     }
@@ -83,7 +75,7 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
         return $this->waitForBackground($input, $output);
     }
 
-    protected function waitForBackground(InputInterface $input, OutputInterface $output)
+    protected function waitForBackground(InputInterface $input, OutputInterface $output): int
     {
         $lastMemory = memory_get_usage(true);
         while (true) {
@@ -101,7 +93,7 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
             if ($pid == 0) { // no child process has quit
                 //usleep(200 * 1000);
             }
-            else if ($pid > 0) { // child process with pid = $pid exits
+            elseif ($pid > 0) { // child process with pid = $pid exits
                 $exitStatus = pcntl_wexitstatus($status);
                 $this->onChildProcessExit($pid, $exitStatus, $input, $output);
             }
@@ -122,7 +114,7 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
         return $this->isFailed ? self::EXIT_CODE_COMMON_ERROR : self::EXIT_CODE_OK;
     }
 
-    protected function doFork(InputInterface $input, OutputInterface $output)
+    protected function doFork(InputInterface $input, OutputInterface $output): int
     {
         $pid = pcntl_fork();
         if ($pid < 0) {
@@ -139,7 +131,7 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
         }
     }
 
-    protected function onChildProcessExit($pid, $exitStatus, InputInterface $input, OutputInterface $output)
+    protected function onChildProcessExit(int $pid, int $exitStatus, InputInterface $input, OutputInterface $output): void
     {
         if (($key = array_search($pid, $this->pids)) !== false) {
             //mdebug("Child process $pid exit with code: %x", $exitStatus);
@@ -163,5 +155,5 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
         }
     }
 
-    abstract protected function doExecute(InputInterface $input, OutputInterface $output);
+    abstract protected function doExecute(InputInterface $input, OutputInterface $output): int;
 }

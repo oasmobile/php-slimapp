@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-01-20
- * Time: 00:59
- */
+declare(strict_types=1);
 
 namespace Oasis\SlimApp;
 
@@ -36,5 +31,4 @@ class AbstractAlertableCommand extends Command
             throw $e;
         }
     }
-
 }

@@ -60,7 +60,7 @@
     - Ref: Req 7, AC 5
   - [x] 2.6 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'SlimAppTest|ConfigParserTest'`，确认 SlimApp 和 ConfigParser 相关测试通过。Commit。
 
-- [-] 3. SlimAppCompilerPass 语法升级 + NamespaceResolver 提取 + 移除全 Public
+- [x] 3. SlimAppCompilerPass 语法升级 + NamespaceResolver 提取 + 移除全 Public
   - [x] 3.1 升级 `src/SlimAppCompilerPass.php` 为 PHP 8.5 语法并移除全 public 逻辑
     - 添加 `declare(strict_types=1)`
     - `$classname` 属性改为 constructor promotion：`protected readonly string $classname`
@@ -85,25 +85,25 @@
     - 测试不存在的类名返回原始输入
     - 测试多命名空间优先级
     - Ref: Req 7, AC 6
-  - [-] 3.5 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'SlimAppCompilerPassTest|NamespaceResolverTest'`，确认 CompilerPass 和 NamespaceResolver 相关测试通过。Commit。
+  - [x] 3.5 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'SlimAppCompilerPassTest|NamespaceResolverTest'`，确认 CompilerPass 和 NamespaceResolver 相关测试通过。Commit。
 
-- [~] 4. AbstractAlertableCommand + AbstractParallelCommand 语法升级
-  - [ ] 4.1 升级 `src/AbstractAlertableCommand.php` 为 PHP 8.5 语法
+- [-] 4. AbstractAlertableCommand + AbstractParallelCommand 语法升级
+  - [x] 4.1 升级 `src/AbstractAlertableCommand.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 方法添加参数类型和返回类型
     - `const` 常量保持不变（PHP 8.5 中 class constants 已有类型推断）
     - Ref: Req 2, AC 1, 3
-  - [ ] 4.2 升级 `src/AbstractParallelCommand.php` 为 PHP 8.5 语法
+  - [x] 4.2 升级 `src/AbstractParallelCommand.php` 为 PHP 8.5 语法
     - 添加 `declare(strict_types=1)`
     - 所有属性添加类型声明
     - 所有方法添加参数类型和返回类型
     - Ref: Req 2, AC 1–3
-  - [ ] 4.3 更新 `AbstractAlertableCommandTest.php` 和 `AbstractParallelCommandTest.php` 适配 PHPUnit 13
+  - [x] 4.3 更新 `AbstractAlertableCommandTest.php` 和 `AbstractParallelCommandTest.php` 适配 PHPUnit 13
     - 基类改为 `\PHPUnit\Framework\TestCase`
     - `setExpectedException()` 改为 `expectException()`
     - `setUp()` 添加 `: void` 返回类型
     - Ref: Req 6, AC 3–4
-  - [ ] 4.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'AbstractAlertableCommandTest|AbstractParallelCommandTest'`，确认测试通过。Commit。
+  - [-] 4.4 Checkpoint: 运行 `./vendor/bin/phpunit --filter 'AbstractAlertableCommandTest|AbstractParallelCommandTest'`，确认测试通过。Commit。
 
 - [~] 5. DaemonSentinelCommand 重构 — 移除 AbstractDaemonSentinelCommand
   - [ ] 5.1 重构 `src/SentinelCommand/DaemonSentinelCommand.php`
