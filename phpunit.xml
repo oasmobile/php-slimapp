@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.0/phpunit.xsd"
+    bootstrap="tests/bootstrap.php"
+    backupGlobals="false"
+    colors="true"
+    failOnAllIssues="true"
+>
+    <testsuites>
+        <testsuite name="ut">
+            <directory suffix="Test.php">tests/ut</directory>
+        </testsuite>
+        <testsuite name="pbt">
+            <directory suffix="Test.php">tests/pbt</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">src/tests</directory>
+            <file>src/BuiltInCommands/InitializeProjectCommand.php</file>
+        </exclude>
+    </source>
+    <coverage>
+        <report>
+            <text outputFile="php://stdout" showOnlySummary="true"/>
+        </report>
+    </coverage>
+</phpunit>

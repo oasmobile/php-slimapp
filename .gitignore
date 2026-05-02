@@ -1,5 +1,17 @@
 /config/cache
-/ut/cache
+/tests/integration/config/cache
 /vendor
 /.idea/
 /2019/
+
+# PHPUnit cache (PHPUnit 11+)
+.phpunit.cache/
+.phpunit.result.cache
+
+# Agent playbook export
+agent-playbook.zip
+
+# Graphify generated artifacts
+graphify-out/.graphify_python
+graphify-out/cache/
+graphify-out/manifest.json

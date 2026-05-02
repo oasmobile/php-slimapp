@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-02-02
- * Time: 14:37
- */
+declare(strict_types=1);
 
 namespace Oasis\SlimApp\SentinelCommand;
 
@@ -17,46 +12,35 @@ use Symfony\Component\Console\Application;
 
 class CommandConfiguration implements ConfigurationInterface
 {
-    /**
-     * @var Application
-     */
-    private $application;
-    
-    public function __construct(Application $application)
+    public function __construct(
+        private readonly Application $application,
+    ) {}
+
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $this->application = $application;
-    }
-    
-    /**
-     * Generates the configuration tree builder.
-     *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
-     */
-    public function getConfigTreeBuilder()
-    {
-        $builder = new TreeBuilder();
-        
-        $root = $builder->root('daemon-monitor');
+        $builder = new TreeBuilder('daemon-monitor');
+
+        $root = $builder->getRootNode();
         {
             $commands = $root->children()->arrayNode('commands');
             {
                 /** @var ArrayNodeDefinition $command */
                 $command = $commands->prototype('array');
                 {
-                    $normalizer = function ($value) {
+                    $normalizer = function (mixed $value): mixed {
                         return $this->replaceParameterInValue($value);
                     };
-                    
+
                     $command->children()->scalarNode('name')->isRequired();
                     $command->children()->variableNode('args')->defaultValue([])->beforeNormalization()->always(
-                        function ($array) {
+                        function (mixed $array): array {
                             if (!is_array($array)) {
                                 throw new InvalidConfigurationException("args is not an array!");
                             }
                             foreach ($array as &$value) {
                                 $value = $this->replaceParameterInValue($value);
                             }
-                            
+
                             return $array;
                         }
                     );
@@ -83,11 +67,11 @@ class CommandConfiguration implements ConfigurationInterface
                 }
             }
         }
-        
+
         return $builder;
     }
-    
-    protected function replaceParameterInValue($value)
+
+    protected function replaceParameterInValue(mixed $value): mixed
     {
         if ($this->application instanceof ConsoleApplication
             && is_string($value)
@@ -100,7 +84,7 @@ class CommandConfiguration implements ConfigurationInterface
             }
             $value = $replacement;
         }
-        
+
         return $value;
     }
 }
