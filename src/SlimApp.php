@@ -5,7 +5,6 @@ namespace Oasis\SlimApp;
 
 use Monolog\Handler\HandlerInterface;
 use Monolog\Level;
-use Monolog\Logger;
 use Oasis\Mlib\Http\MicroKernel;
 use Oasis\Mlib\Logging\LocalErrorHandler;
 use Oasis\Mlib\Logging\LocalFileHandler;
