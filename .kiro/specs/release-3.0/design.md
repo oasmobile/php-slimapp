@@ -445,6 +445,18 @@ protected function execute(InputInterface $input, OutputInterface $output): int
 ## 依赖变更清单
 （表格：依赖名 | 2.x 版本 | 3.0 版本）
 
+## 配置文件兼容性
+
+| 配置文件 | 兼容性 | 说明 |
+|----------|--------|------|
+| `config.yml` | ✅ 无缝兼容 | 格式由使用方 ConfigurationInterface 定义，框架侧无变化 |
+| `routes.yml` | ✅ 无缝兼容 | MicroKernel 保持与 SilexKernel 等价的路由解析接口 |
+| `sentinel.yml` | ✅ 无缝兼容 | CommandConfiguration schema 无变化，`%param%` 和 `$PARALLEL_INDEX` 保持不变 |
+| `services.yml` | ⚠️ 需手动调整 | 通过 `getService()` 获取的服务须显式声明 `public: true` |
+
+> 缓存文件（`container.php`、`config.cache`）因 Symfony 8.0 序列化格式变化不兼容旧缓存，
+> 升级后首次运行会自动重建，或手动执行 `slimapp:cache:clear`。
+
 ## Breaking Changes
 
 ### 1. PHP 版本要求
@@ -461,6 +473,32 @@ protected function execute(InputInterface $input, OutputInterface $output): int
 - 推荐使用构造函数注入替代 `getService()`
 - `app` 服务保持 public，但建议迁移到构造函数注入
 
+#### services.yml 升级示例
+
+**Before (2.x)**:
+```yaml
+services:
+    my.service:
+        class: App\MyService
+```
+
+**After (3.0)** — 如果代码中通过 `$app->getService('my.service')` 获取:
+```yaml
+services:
+    my.service:
+        class: App\MyService
+        public: true
+```
+
+> 纯通过构造函数注入使用的服务无需改动。
+
+#### 自查 Checklist
+
+1. 在项目代码中搜索所有 `getService(` 调用：`grep -rn 'getService(' src/`
+2. 列出所有被获取的 service ID
+3. 逐一确认这些 service ID 在 `services.yml` 中是否声明了 `public: true`
+4. 未声明的须添加 `public: true`，或改为构造函数注入（推荐）
+
 ### 4. AbstractDaemonSentinelCommand 移除
 - 直接使用 DaemonSentinelCommand 或继承它
 - 如有自定义子类继承 AbstractDaemonSentinelCommand，改为继承 DaemonSentinelCommand
@@ -470,7 +508,13 @@ protected function execute(InputInterface $input, OutputInterface $output): int
 - 基类、断言方法、Mock API 变更
 
 ## 升级步骤清单
-（有序列表：逐步操作指引）
+
+1. 更新 `composer.json` 依赖版本
+2. 执行 `composer update`
+3. 按 Breaking Changes 逐项适配代码
+4. 执行 `slimapp:cache:clear` 清除旧缓存
+5. 执行 `slimapp:services:validate` 验证 public 服务可正常实例化
+6. 运行业务测试套件，确认无回归
 ```
 
 ---

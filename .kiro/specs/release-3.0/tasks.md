@@ -292,7 +292,7 @@
     - Ref: Req 8, AC 1–3, 5
   - [x] 14.3 Checkpoint: 运行全量测试套件（ut + pbt + integration），确保全部通过。确认覆盖率达标。Commit。
 
-- [ ] 15. 文档更新
+- [-] 15. 文档更新
   - [ ] 15.1 更新 `docs/state/architecture.md`
     - HTTP Kernel 段落：SilexKernel → MicroKernel
     - DI 容器段落：移除"所有服务设为 public"，改为"默认 private，`app` 服务保持 public"
@@ -316,20 +316,24 @@
     - Ref: Req 10, AC 5
   - [ ] 15.6 Checkpoint: Review 所有文档变更，确认内容准确。Commit。
 
-- [ ] 16. 迁移指南
+- [~] 16. 迁移指南
   - [ ] 16.1 创建 `docs/manual/migration-v2-to-v3.md`
     - 依赖变更清单（表格：依赖名 | 2.x 版本 | 3.0 版本）
     - Breaking Change 1: PHP 版本要求（>=7.0 → >=8.5）
     - Breaking Change 2: HTTP Kernel 变更（`getHttpKernel()` 返回类型从 `SilexKernel` 改为 `MicroKernel`，使用方代码中的类型提示需更新）
     - Breaking Change 3: DI 容器可见性变更（服务默认 private，`getService()` 仅适用于 public 服务，推荐构造函数注入）
+      - 包含 `services.yml` 升级 before/after 示例：展示如何给需要通过 `getService()` 获取的服务添加 `public: true`
+      - 包含自查 checklist：指导用户 grep 自身代码中的 `getService(` 调用，列出所有 service ID，逐一确认是否在 `services.yml` 中声明了 `public: true`
+      - 说明配置文件兼容性总结：`config.yml`、`routes.yml`、`sentinel.yml` 格式无变化可无缝使用；`services.yml` 是唯一需要用户手动调整的配置文件
     - Breaking Change 4: AbstractDaemonSentinelCommand 移除（迁移路径：直接使用或继承 DaemonSentinelCommand）
     - Breaking Change 5: PHPUnit 升级（基类、断言方法、Mock API 变更清单）
     - `app` 服务保持 public，但建议迁移到构造函数注入
+    - 升级后验证步骤：`composer update` → `slimapp:cache:clear` → `slimapp:services:validate` → 运行业务测试套件
     - 升级步骤清单（有序列表）
     - Ref: Req 11, AC 1–8
   - [ ] 16.2 Checkpoint: Review 迁移指南内容完整性和准确性。Commit。
 
-- [ ] 17. 手工测试
+- [~] 17. 手工测试
   - [ ] 17.1 Increment alpha tag
   - [ ] 17.2 验证 CLI 模式基本功能
     - [ ] 执行 `slimapp:cache:clear`，确认缓存目录被正确清除
@@ -344,7 +348,7 @@
     - [ ] 使用测试配置文件执行 DaemonSentinelCommand，确认进程 fork 和调度正常
   - [ ] 17.6 Checkpoint: 汇总手工测试结果，确认所有场景通过。Commit。
 
-- [ ] 18. Code Review
+- [~] 18. Code Review
   - 委托给 code-reviewer sub-agent 执行。
 
 ## Issues
