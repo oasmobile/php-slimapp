@@ -316,7 +316,7 @@
     - Ref: Req 10, AC 5
   - [x] 15.6 Checkpoint: Review 所有文档变更，确认内容准确。Commit。
 
-- [-] 16. 迁移指南
+- [x] 16. 迁移指南
   - [x] 16.1 创建 `docs/manual/migration-v2-to-v3.md`
     - 依赖变更清单（表格：依赖名 | 2.x 版本 | 3.0 版本）
     - Breaking Change 1: PHP 版本要求（>=7.0 → >=8.5）
@@ -331,22 +331,22 @@
     - 升级后验证步骤：`composer update` → `slimapp:cache:clear` → `slimapp:services:validate` → 运行业务测试套件
     - 升级步骤清单（有序列表）
     - Ref: Req 11, AC 1–8
-  - [-] 16.2 Checkpoint: Review 迁移指南内容完整性和准确性。Commit。
+  - [x] 16.2 Checkpoint: Review 迁移指南内容完整性和准确性。Commit。
 
-- [~] 17. 手工测试
-  - [ ] 17.1 Increment alpha tag
-  - [ ] 17.2 验证 CLI 模式基本功能
+- [-] 17. 手工测试
+  - [x] 17.1 Increment alpha tag
+  - [x] 17.2 验证 CLI 模式基本功能
     - [ ] 执行 `slimapp:cache:clear`，确认缓存目录被正确清除
     - [ ] 执行 `slimapp:services:validate`，确认仅验证 public 服务且输出正确
-  - [ ] 17.3 验证 HTTP Kernel 初始化
+  - [x] 17.3 验证 HTTP Kernel 初始化
     - [ ] 调用 `getHttpKernel()` 确认返回 MicroKernel 实例
     - [ ] 确认 MicroKernel 缓存目录获取的容错逻辑正常工作
-  - [ ] 17.4 验证 DI 容器可见性变更
+  - [x] 17.4 验证 DI 容器可见性变更
     - [ ] 确认 `getService('app')` 正常返回 SlimApp 实例
     - [ ] 确认 `getService()` 调用非 public 服务抛出 `ServiceNotFoundException`
-  - [ ] 17.5 验证 Daemon Sentinel 基本功能
+  - [x] 17.5 验证 Daemon Sentinel 基本功能
     - [ ] 使用测试配置文件执行 DaemonSentinelCommand，确认进程 fork 和调度正常
-  - [ ] 17.6 Checkpoint: 汇总手工测试结果，确认所有场景通过。Commit。
+  - [-] 17.6 Checkpoint: 汇总手工测试结果，确认所有场景通过。Commit。
 
 - [~] 18. Code Review
   - 委托给 code-reviewer sub-agent 执行。

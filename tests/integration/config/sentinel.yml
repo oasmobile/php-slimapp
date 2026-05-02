@@ -2,11 +2,11 @@ commands:
     dummy:
         name: dummy:job
         args:
-            a: %app.name%
+            a: "%app.name%"
             --tt: true
-            --idx: $PARALLEL_INDEX
+            --idx: "$PARALLEL_INDEX"
         parallel: "%app.count%"
-        once: %app.once%
+        once: "%app.once%"
         alert: false
         frequency: 3
         frequency_fixed: true
