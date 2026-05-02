@@ -39,10 +39,44 @@
 |----------|--------|------|
 | `config.yml` | ✅ 无缝兼容 | 格式由使用方 `ConfigurationInterface` 定义，框架侧无变化 |
 | `routes.yml` | ✅ 无缝兼容 | MicroKernel 保持与 SilexKernel 等价的路由解析接口 |
-| `sentinel.yml` | ✅ 无缝兼容 | CommandConfiguration schema 无变化，`%param%` 和 `$PARALLEL_INDEX` 替换保持不变 |
+| `sentinel.yml` | ⚠️ 可能需调整引号 | CommandConfiguration schema 无变化，但 YAML 语法要求更严格（详见下方说明） |
 | `services.yml` | ⚠️ 需手动调整 | 通过 `getService()` 获取的服务须显式声明 `public: true`（详见 Breaking Change 3） |
 
 > 缓存文件（`container.php`、`config.cache`）因 Symfony 8.0 序列化格式变化不兼容旧缓存，升级后首次运行会自动重建，或手动执行 `slimapp:cache:clear`。
+
+### `sentinel.yml` 引号问题
+
+Symfony 8.0 的 YAML 解析器对 `%` 保留字符的处理更严格。2.x 中可以不加引号的 `%param%` 参数引用和 `$PARALLEL_INDEX` 变量，在 3.0 中必须用双引号包裹，否则 `Yaml::parse()` 会抛出异常：
+
+```
+The reserved indicator "%" cannot start a plain scalar; you need to quote the scalar
+```
+
+**Before (2.x)** — 不加引号可正常解析：
+
+```yaml
+commands:
+    my_command:
+        name: my:command
+        args:
+            a: %app.name%
+            --idx: $PARALLEL_INDEX
+        once: %app.once%
+```
+
+**After (3.0)** — 必须用双引号包裹含 `%` 或 `$` 的值：
+
+```yaml
+commands:
+    my_command:
+        name: my:command
+        args:
+            a: "%app.name%"
+            --idx: "$PARALLEL_INDEX"
+        once: "%app.once%"
+```
+
+> `%param%` 参数替换和 `$PARALLEL_INDEX` 变量替换的功能本身不变，仅 YAML 语法要求更严格。
 
 ---
 
