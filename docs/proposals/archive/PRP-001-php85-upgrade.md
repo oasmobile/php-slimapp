@@ -1,6 +1,6 @@
 # PRP-001 PHP 8.5 Upgrade
 
-**Status**: `in-progress`
+**Status**: `released`
 
 ---
 
