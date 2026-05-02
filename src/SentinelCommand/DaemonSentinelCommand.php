@@ -32,6 +32,8 @@ class DaemonSentinelCommand extends AbstractAlertableCommand
                     $filename
                 )
             );
+
+            return 1;
         }
         $config    = Yaml::parse(file_get_contents($filename));
         $configs   = [$config];

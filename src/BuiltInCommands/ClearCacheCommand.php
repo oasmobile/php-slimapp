@@ -29,7 +29,7 @@ class ClearCacheCommand extends Command
 
         $cacheDirs = [$slimapp->getConfigCachePath()];
 
-        $httpKernel    = $slimapp->getHttpKernel();
+        $httpKernel = $slimapp->getHttpKernel();
         if (method_exists($httpKernel, 'getCacheDirectories')) {
             $httpCacheDirs = $httpKernel->getCacheDirectories();
         } elseif (method_exists($httpKernel, 'getCacheDir')) {
@@ -51,7 +51,7 @@ class ClearCacheCommand extends Command
                 $output->writeln(sprintf("removing file: %s", $splInfo->getPathname()), OutputInterface::VERBOSITY_VERBOSE);
                 $fs->remove($splInfo->getPathname());
             }
-            $output->writeln(sprintf('<info>done.</info>', $dir));
+            $output->writeln('<info>done.</info>');
         }
 
         return 0;

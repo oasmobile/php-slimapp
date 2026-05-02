@@ -49,6 +49,24 @@ class DaemonSentinelCommandTest extends TestCase
         $this->assertTrue($command->getDefinition()->hasOption('alert'));
     }
 
+    public function testExecuteWithUnreadableFileReturnsNonZero(): void
+    {
+        $command = new DaemonSentinelCommand('test:sentinel');
+
+        $app = new Application('test', '1.0');
+        $app->setAutoExit(false);
+        $app->setCatchExceptions(false);
+        $app->addCommand($command);
+
+        $input  = new ArrayInput(['command' => 'test:sentinel', 'file' => '/non/existent/file.yml']);
+        $output = new BufferedOutput();
+
+        $exitCode = $app->run($input, $output);
+
+        $this->assertNotSame(0, $exitCode);
+        $this->assertStringContainsString('not readable', $output->fetch());
+    }
+
     public function testExecuteWithEmptyConfigReturnsZero(): void
     {
         $command = new DaemonSentinelCommand('test:sentinel');
