@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-02-02
- * Time: 14:39
- */
 
-namespace Oasis\SlimApp\tests;
+namespace Oasis\SlimApp\Tests\Integration\Fixtures;
 
 use Oasis\SlimApp\SentinelCommand\DaemonSentinelCommand;
 

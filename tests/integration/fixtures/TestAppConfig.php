@@ -1,19 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-02-02
- * Time: 14:41
- */
 
-namespace Oasis\SlimApp\tests;
+namespace Oasis\SlimApp\Tests\Integration\Fixtures;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class TestAppConfig implements ConfigurationInterface
 {
-    
     /**
      * Generates the configuration tree builder.
      *

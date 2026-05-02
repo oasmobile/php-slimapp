@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: minhao
- * Date: 2016-01-10
- * Time: 15:07
- */
 
-namespace Oasis\SlimApp\tests;
+namespace Oasis\SlimApp\Tests\Integration\Fixtures;
 
 use Oasis\SlimApp\AbstractParallelCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,22 +29,6 @@ class DummyCommand extends AbstractParallelCommand
         sleep(5);
         merror("woww");
         
-        //merror("wow");
-        
         return self::EXIT_CODE_OK;
-        
-        //mdebug("message");
-        //minfo("message");
-        //mnotice("message");
-        //mwarning("message");
-        //merror("message");
-        //mcritical("message");
-        ////malert("message");
-        ////memergency("message");
-        
-        //$s = '';
-        //for ($i = 0; $i < 100000; ++$i) {
-        //    $s .= str_repeat(' ', pow(2, $i));
-        //}
     }
 }

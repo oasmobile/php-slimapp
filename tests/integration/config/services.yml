@@ -5,6 +5,7 @@ parameters:
     default.namespace:
         - Oasis
         - Oasis\SlimApp
+        - Oasis\SlimApp\Tests\Integration\Fixtures
         - Oasis\Mlib
     sns.config:
         profile: minhao
@@ -13,28 +14,22 @@ parameters:
 
 services:
     app:
-#        class: SlimApp
-#        factory: [SlimApp, app]
         properties:
             logging:
                 path: "%app.dir.log%"
                 level: debug
                 pattern: "%%script%%.%%date%%.%%type%%"
-                handlers:
-#                    - '@log.handler.sns'
-#                    - '@log.handler.console'
-#                    - '@log.handler.file'
             cli:
                 name: Slim App Console
                 version: 1.1
-                commands: # array of command object
+                commands:
                     - '@cli.command.dummy'
                     - '@cli.command.sentinel'
             http:
                 routing:
                     path: "%app.dir.config%/routes.yml"
                     namespaces:
-                        - Oasis\SlimApp\Ut\
+                        - Oasis\SlimApp\Tests\Integration\Fixtures\
                 error_handlers: '@http.error_handler'
                 view_handlers: '@http.view_handler'
                 cors:
@@ -50,9 +45,9 @@ services:
             - message from slimapp
 
     cli.command.dummy:
-        class: tests\DummyCommand
+        class: DummyCommand
     cli.command.sentinel:
-        class: tests\TestSentinelCommand
+        class: TestSentinelCommand
 
     http.error_handler:
         class: Http\ErrorHandlers\JsonErrorHandler

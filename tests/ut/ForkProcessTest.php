@@ -30,7 +30,7 @@ class ForkProcessTest extends \PHPUnit_Framework_TestCase
             'COVERAGE_FILE=%s %s %s %s 2>&1',
             escapeshellarg($covFile),
             escapeshellarg($php),
-            escapeshellarg(__DIR__ . '/scripts/' . $script),
+            escapeshellarg(__DIR__ . '/../scripts/' . $script),
             escapeshellarg($testCase)
         );
 

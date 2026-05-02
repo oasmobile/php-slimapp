@@ -40,7 +40,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Oasis\\SlimApp\\Tests\\": "tests/"
+            "Oasis\\SlimApp\\Tests\\": "tests/ut/",
+            "Oasis\\SlimApp\\Tests\\Integration\\Fixtures\\": "tests/integration/fixtures/"
         }
     },
     "config": {

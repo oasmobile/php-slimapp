@@ -3,7 +3,7 @@
 namespace Oasis\SlimApp\Tests;
 
 use Oasis\SlimApp\SlimApp;
-use Oasis\SlimApp\tests\TestAppConfig;
+use Oasis\SlimApp\Tests\Integration\Fixtures\TestAppConfig;
 
 class SlimAppTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +12,7 @@ class SlimAppTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configDir = __DIR__ . '/../ut';
+        $this->configDir = __DIR__ . '/../integration/config';
     }
 
     private function clearUtCache()

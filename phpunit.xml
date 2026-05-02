@@ -12,7 +12,7 @@
 >
     <testsuites>
         <testsuite name="SlimApp Test Suite">
-            <directory suffix="Test.php">tests</directory>
+            <directory suffix="Test.php">tests/ut</directory>
         </testsuite>
     </testsuites>
     <filter>
