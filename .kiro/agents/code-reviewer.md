@@ -62,6 +62,10 @@ tools: ["read", "write", "shell"]
 - 修复后 git commit
 - 修复后重新 review 直到通过
 
+### 问题修复不受扫描范围限制
+
+虽然 review 的扫描/分析范围基于当前分支的 diff，但**发现的问题不应受此范围限制**。无论问题是何时引入的（哪怕不在本次 diff 范围内），只要在 review 过程中被发现且确实是问题，就必须修复。修复方式采用 red-green TDD：先写一个失败的测试暴露问题，再修改代码使测试通过。
+
 ### 非本次 diff 代码中的 Bad Smell
 
 review 过程中如果在 diff 上下文（非本次变更的行）中发现 bad smell：
