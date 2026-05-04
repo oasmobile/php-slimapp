@@ -19,7 +19,8 @@
         "oasis/aws-wrappers"   : "^3.0",
         "oasis/dynamodb-odm"   : "^2.0",
         "oasis/doctrine-addon" : "^3.1",
-        "giorgiosironi/eris"   : "^1.1"
+        "giorgiosironi/eris"   : "^1.1",
+        "phpstan/phpstan": "^2.1"
     },
     "suggest"    : {
         "ext-pcntl": "*"

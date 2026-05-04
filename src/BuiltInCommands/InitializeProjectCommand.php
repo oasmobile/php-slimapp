@@ -6,6 +6,7 @@ namespace Oasis\SlimApp\BuiltInCommands;
 use Oasis\Mlib\Utils\StringUtils;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,9 +34,16 @@ class InitializeProjectCommand extends Command
     /** @var string[] */
     protected array $tempFiles = [];
     
-    protected function applyTempFiles(): void
+    private function getQuestionHelper(): QuestionHelper
     {
         $helper = $this->getHelper('question');
+        assert($helper instanceof QuestionHelper);
+        return $helper;
+    }
+    
+    protected function applyTempFiles(): void
+    {
+        $helper = $this->getQuestionHelper();
         $this->output->writeln("All configuration accepted. Will start to generate needed files.");
         
         $overwriteAll = false;
@@ -89,11 +97,21 @@ class InitializeProjectCommand extends Command
     
     protected function ensureProjectRoot(): void
     {
-        if (!($this->rootDir = $this->input->getOption('project-root'))) {
-            $this->rootDir = getcwd();
+        $projectRoot = $this->input->getOption('project-root');
+        if (!is_string($projectRoot) || $projectRoot === '') {
+            $cwd = getcwd();
+            if ($cwd === false) {
+                throw new RuntimeException('Cannot determine current working directory.');
+            }
+            $this->rootDir = $cwd;
+        } else {
+            $this->rootDir = $projectRoot;
         }
         
-        $this->rootDir = realpath($this->rootDir);
+        $realRoot = realpath($this->rootDir);
+        if ($realRoot !== false) {
+            $this->rootDir = $realRoot;
+        }
         
         $this->fs->mkdir($this->rootDir);
         
@@ -236,12 +254,15 @@ SRC;
     
     protected function prepareComposerInfo(): void
     {
-        $helper           = $this->getHelper('question');
+        $helper           = $this->getQuestionHelper();
         $composerFilename = $this->rootDir . "/composer.json";
         
         $composerContent = file_get_contents($composerFilename);
+        if ($composerContent === false) {
+            throw new RuntimeException("Cannot read $composerFilename");
+        }
         $composerJson    = json_decode($composerContent, true);
-        if (!$composerJson) {
+        if (!is_array($composerJson)) {
             $this->output->writeln("<error>The composer.json file is not valid!</error>");
             throw new RuntimeException('The composer.json file is not valid!');
         }
@@ -312,7 +333,7 @@ SRC;
         
         $this->writeToTempFile(
             $composerFilename,
-            json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+            (string)json_encode($composerJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
     }
     
@@ -405,9 +426,9 @@ SRC;
         $this->writeToTempFile($classFilename, $classSource);
     }
     
-    protected function prepareConfigYaml()
+    protected function prepareConfigYaml(): void
     {
-        $helper = $this->getHelper('question');
+        $helper = $this->getQuestionHelper();
         
         $suggestLoggingDir = "/data/logs/{$this->projectName}";
         $question          = new Question(
@@ -674,7 +695,7 @@ SRC;
     
     protected function prepareDatabaseRelatedFiles(): void
     {
-        $helper   = $this->getHelper('question');
+        $helper   = $this->getQuestionHelper();
         $question = new Question(
             "Do you want to enable ORM support (Doctrine/ORM)?"
             . " <info>[yes]</info>: ",
@@ -714,7 +735,7 @@ SRC;
     
     protected function prepareUnitTestFiles(): void
     {
-        $helper   = $this->getHelper('question');
+        $helper   = $this->getQuestionHelper();
         $question = new Question(
             "Do you want to enable phpunit?"
             . " <info>[yes]</info>: ",
@@ -1016,6 +1037,9 @@ SRC;
     {
         $this->output->writeln("Will now update composer related files ...");
         $oldDir = getcwd();
+        if ($oldDir === false) {
+            throw new RuntimeException('Cannot determine current working directory.');
+        }
         chdir($this->rootDir);
         
         try {

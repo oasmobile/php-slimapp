@@ -11,9 +11,9 @@ class ConfigParser
     /**
      * 解析原始配置数组，返回处理后的配置。
      *
-     * @param array $rawConfigs 原始配置数组（可多个，会被 merge）
+     * @param array<int, array<string, mixed>> $rawConfigs 原始配置数组（可多个，会被 merge）
      * @param ConfigurationInterface $definition 配置定义
-     * @return array 处理后的配置树
+     * @return array<string, mixed> 处理后的配置树
      */
     public static function parse(array $rawConfigs, ConfigurationInterface $definition): array
     {
@@ -25,7 +25,7 @@ class ConfigParser
     /**
      * 将配置树扁平化为 key => value 的参数映射。
      *
-     * @param array $configs 配置树
+     * @param array<string, mixed> $configs 配置树
      * @param string $prefix 前缀（默认 'app.'）
      * @return array<string, mixed> 扁平化后的参数映射
      */

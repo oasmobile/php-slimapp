@@ -102,7 +102,7 @@ class ConsoleApplication extends Application
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
         if ($this->loggingEnabled) {
-            $name             = $command->getName();
+            $name             = $command->getName() ?? 'unknown';
             $name             = strtr($name, ':', '.');
             $logFilePattern   = strtr(
                 $this->logFilePattern,

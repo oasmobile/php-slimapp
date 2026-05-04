@@ -35,9 +35,11 @@ class DaemonSentinelCommand extends AbstractAlertableCommand
 
             return 1;
         }
-        $config    = Yaml::parse(file_get_contents($filename));
+        $config    = Yaml::parse((string)file_get_contents($filename));
         $configs   = [$config];
-        $configDef = new CommandConfiguration($this->getApplication());
+        $application = $this->getApplication();
+        assert($application !== null);
+        $configDef = new CommandConfiguration($application);
 
         $processor = new Processor();
         $processed = $processor->processConfiguration($configDef, $configs);
@@ -50,7 +52,7 @@ class DaemonSentinelCommand extends AbstractAlertableCommand
             }
 
             for ($i = 0; $i < $parallel; ++$i) {
-                $runner = new CommandRunner($this->getApplication(), $i, $command, $output);
+                $runner = new CommandRunner($application, $i, $command, $output);
                 $pid    = $runner->run();
 
                 $this->runningProcesses[$pid] = $runner;
@@ -83,11 +85,13 @@ class DaemonSentinelCommand extends AbstractAlertableCommand
                 usleep(200 * 1000);
             } elseif ($pid > 0) { // child process with pid = $pid exits
                 $exitStatus = pcntl_wexitstatus($status);
-                if (!isset($this->runningProcesses[$pid])
-                    || !(($runner = $this->runningProcesses[$pid]) instanceof CommandRunner)
-                ) {
+                if ($exitStatus === false) {
+                    throw new \RuntimeException(\sprintf('Failed to get exit status for process pid = %d', $pid));
+                }
+                if (!isset($this->runningProcesses[$pid])) {
                     throw new \LogicException(\sprintf('Cannot find command runner for process pid = %d', $pid));
                 }
+                $runner = $this->runningProcesses[$pid];
                 unset($this->runningProcesses[$pid]);
                 $runner->onProcessExit($exitStatus, $pid);
                 $newPid = $runner->run();

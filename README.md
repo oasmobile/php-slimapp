@@ -27,7 +27,7 @@ The Slim Application Framework (SlimApp) is an all-in-one framework aiming to ma
 
 **Requirements**: PHP >= 8.5
 
-**Key Dependencies**: Symfony ^8.0, oasis/http ^3.0 (MicroKernel), oasis/logging ^3.0, PHPUnit ^13 (dev)
+**Key Dependencies**: Symfony ^8.0, oasis/http ^3.2 (MicroKernel), oasis/logging ^3.0, PHPUnit ^13 (dev), PHPStan ^2.1 level 8 (dev)
 
 The framework includes a list of useful PHP components. This makes it easy when setting up a new project: you would only need to use composer to require the project itself, and then run the project setup command.
 
