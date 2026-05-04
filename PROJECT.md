@@ -19,6 +19,7 @@ SlimApp 是一个 PHP 全栈微框架，支持 Web（HTTP Kernel）和 CLI（Con
   - `oasis/http` ^3.0（HTTP Kernel，MicroKernel）
 - **开发依赖**:
   - `phpunit/phpunit` ^13
+  - `phpstan/phpstan` ^2.1（静态分析，level 8）
   - `doctrine/orm` ^3.6
   - `oasis/aws-wrappers` ^3.0
   - `oasis/dynamodb-odm` ^2.0
@@ -45,6 +46,9 @@ composer install
 
 # 运行全量测试（ut + pbt）
 ./vendor/bin/phpunit
+
+# 运行静态分析
+./vendor/bin/phpstan analyse
 
 # 运行 CLI 入口（开发用）
 php test.php <command>
