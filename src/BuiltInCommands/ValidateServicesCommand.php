@@ -23,6 +23,7 @@ class ValidateServicesCommand extends Command
         $console = $this->getApplication();
         assert($console instanceof ConsoleApplication);
         $slimapp = $console->getSlimapp();
+        assert($slimapp instanceof \Oasis\SlimApp\SlimApp);
 
         $ids = $slimapp->getServiceIds();
         foreach ($ids as $id) {

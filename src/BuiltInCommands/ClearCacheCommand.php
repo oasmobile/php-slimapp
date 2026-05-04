@@ -26,13 +26,14 @@ class ClearCacheCommand extends Command
         $console = $this->getApplication();
         assert($console instanceof ConsoleApplication);
         $slimapp = $console->getSlimapp();
+        assert($slimapp instanceof \Oasis\SlimApp\SlimApp);
 
         $cacheDirs = [$slimapp->getConfigCachePath()];
 
         $httpKernel = $slimapp->getHttpKernel();
-        if (method_exists($httpKernel, 'getCacheDirectories')) {
+        if (method_exists($httpKernel, 'getCacheDirectories')) { // @phpstan-ignore function.alreadyNarrowedType
             $httpCacheDirs = $httpKernel->getCacheDirectories();
-        } elseif (method_exists($httpKernel, 'getCacheDir')) {
+        } elseif (method_exists($httpKernel, 'getCacheDir')) { // @phpstan-ignore function.alreadyNarrowedType
             $httpCacheDirs = [$httpKernel->getCacheDir()];
         } else {
             $httpCacheDirs = [];

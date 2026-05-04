@@ -19,6 +19,9 @@ class SlimAppCompilerPass implements CompilerPassInterface
             if (is_string($defaultNamespaces)) {
                 $defaultNamespaces = [$defaultNamespaces];
             }
+            if (!is_array($defaultNamespaces)) {
+                return;
+            }
 
             foreach ($container->getDefinitions() as $id => $definition) {
 
