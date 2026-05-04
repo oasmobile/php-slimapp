@@ -533,16 +533,16 @@
         },
         {
             "name": "oasis/http",
-            "version": "v3.1.0",
+            "version": "v3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oasmobile/php-http.git",
-                "reference": "5b139bc3ba02ad9a7115a3d2d59fb2f24ee5400b"
+                "reference": "c9764ad4c2721d54dc5a71a896b6faa2c2e52362"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/5b139bc3ba02ad9a7115a3d2d59fb2f24ee5400b",
-                "reference": "5b139bc3ba02ad9a7115a3d2d59fb2f24ee5400b",
+                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/c9764ad4c2721d54dc5a71a896b6faa2c2e52362",
+                "reference": "c9764ad4c2721d54dc5a71a896b6faa2c2e52362",
                 "shasum": ""
             },
             "require": {
@@ -593,9 +593,9 @@
             "description": "A Symfony MicroKernel-based HTTP framework for routing, middleware, security, and more.",
             "support": {
                 "issues": "https://github.com/oasmobile/php-http/issues",
-                "source": "https://github.com/oasmobile/php-http/tree/v3.1.0"
+                "source": "https://github.com/oasmobile/php-http/tree/v3.2.0"
             },
-            "time": "2026-05-02T16:38:26+00:00"
+            "time": "2026-05-04T16:28:46+00:00"
         },
         {
             "name": "oasis/logging",
