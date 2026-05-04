@@ -78,7 +78,9 @@ class CommandConfiguration implements ConfigurationInterface
             && preg_match('#(%([^%].*?)%)#', $value, $matches, 0)
         ) {
             $key         = $matches[2];
-            $replacement = $this->application->getSlimapp()->getParameter($key);
+            $slimapp     = $this->application->getSlimapp();
+            assert($slimapp !== null, 'SlimApp not initialized');
+            $replacement = $slimapp->getParameter($key);
             if ($replacement === null) {
                 throw new \InvalidArgumentException("Cannot get config value $key");
             }

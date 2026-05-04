@@ -28,6 +28,9 @@ class CommandRunner
     protected bool $stopped = false;
     protected bool $traceEnabled = false;
 
+    /**
+     * @param array<string, mixed> $command
+     */
     public function __construct(
         Application $application,
         int $parallelIndex,

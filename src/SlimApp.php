@@ -29,6 +29,7 @@ use Symfony\Component\Yaml\Yaml;
 class SlimApp
 {
     protected bool $isDebugMode = false;
+    /** @var array<string, mixed> */
     protected array $configs = [];
     protected ?ArrayDataProvider $configDataProvider = null;
     protected ?Container $container = null;
@@ -36,20 +37,23 @@ class SlimApp
     protected Level $loggingLevel = Level::Debug;
     protected string $loggingPattern = '%date%/%script%.%type%';
     protected ?ConsoleApplication $consoleApp = null;
+    /** @var array<string, mixed> */
     protected array $consoleConfig = [];
     protected ?MicroKernel $microKernel = null;
+    /** @var array<string, mixed>|null */
     protected ?array $httpConfig = null;
     protected ?string $configPath = null;
     protected string $configFilename = 'config.yml';
     protected string $serviceFilename = 'services.yml';
     protected string $configCachePath = '';
+    /** @var \Symfony\Component\Config\Resource\ResourceInterface[] */
     protected array $configRelatedResources = [];
 
     public static function app(): static
     {
         static $inst = null;
         if ($inst === null) {
-            $inst = new static();
+            $inst = new static(); // @phpstan-ignore new.static
         }
 
         return $inst;
@@ -59,7 +63,7 @@ class SlimApp
     {
         $methodName = sprintf("set%sProperty", strtr(ucwords($name, "._-"), ["." => "", "_" => "", "-" => ""]));
         if (method_exists($this, $methodName)) {
-            call_user_func([$this, $methodName], $value);
+            $this->$methodName($value);
         }
     }
 
@@ -82,7 +86,9 @@ class SlimApp
         $this->configRelatedResources = [];
         if ($upToDate = $configYamlCache->isFresh()) {
             $content       = \file_get_contents($configCacheFile);
-            $this->configs = @\unserialize($content);
+            if ($content !== false) {
+                $this->configs = @\unserialize($content);
+            }
         }
 
         if (!$this->configs || !$upToDate) {
@@ -90,8 +96,16 @@ class SlimApp
             $yamlFiles = $locator->locate($this->configFilename, null, false);
             $rawData   = [];
             foreach ($yamlFiles as $file) {
-                $this->configRelatedResources[] = new FileResource(realpath($file));
-                $config                         = Yaml::parse(file_get_contents($file));
+                $realFile = realpath($file);
+                if ($realFile === false) {
+                    throw new \InvalidArgumentException("Cannot resolve real path for config file: $file");
+                }
+                $this->configRelatedResources[] = new FileResource($realFile);
+                $fileContent                    = file_get_contents($file);
+                if ($fileContent === false) {
+                    throw new \InvalidArgumentException("Cannot read config file: $file");
+                }
+                $config                         = Yaml::parse($fileContent);
                 $rawData[]                      = $config;
             }
             $this->configs = ConfigParser::parse($rawData, $configurationInterface);
@@ -144,8 +158,10 @@ class SlimApp
             $resources                    = $builder->getResources();
             $resources[]                  = new FileResource(__FILE__);
             $this->configRelatedResources = array_merge($resources, $this->configRelatedResources);
+            $dumped = $dumper->dump(['class' => 'SlimAppCachedContainer', 'namespace' => __NAMESPACE__]);
+            assert(is_string($dumped));
             $containerConfigCache->write(
-                $dumper->dump(['class' => 'SlimAppCachedContainer', 'namespace' => __NAMESPACE__]),
+                $dumped,
                 $this->configRelatedResources
             );
         }
@@ -153,9 +169,11 @@ class SlimApp
         // create container instance
         /** @noinspection PhpIncludeInspection */
         require_once $cacheFilePath;
-        /** @noinspection PhpUndefinedClassInspection */
+        /**
+         * @phpstan-ignore class.notFound, assign.propertyType
+         */
         $this->container = new SlimAppCachedContainer();
-
+        /** @phpstan-ignore class.notFound */
         $this->container->get('app');
 
         // NOTE: loggers below will be overriden if running in console mode
@@ -180,6 +198,7 @@ class SlimApp
 
     public function resetService(string $id): void
     {
+        assert($this->container !== null, 'SlimApp not initialized');
         $this->container->set($id, null);
     }
 
@@ -198,14 +217,14 @@ class SlimApp
         if (!$this->consoleApp) {
             $name             = $this->consoleConfig['name'] ?? 'UNKNOWN';
             $version          = $this->consoleConfig['version'] ?? 'UNKNOWN';
-            $this->consoleApp = new ConsoleApplication($name, $version);
-            $this->consoleApp->setSlimapp($this);
-            $this->consoleApp->setLoggingPath($this->loggingPath);
-            $this->consoleApp->setLoggingLevel($this->loggingLevel);
-            $this->consoleApp->setLogFilePattern($this->loggingPattern);
+            $consoleApp       = new ConsoleApplication($name, $version);
+            $consoleApp->setSlimapp($this);
+            $consoleApp->setLoggingPath($this->loggingPath);
+            $consoleApp->setLoggingLevel($this->loggingLevel);
+            $consoleApp->setLogFilePattern($this->loggingPattern);
 
             // Add built-in commands
-            $this->consoleApp->addCommands(
+            $consoleApp->addCommands(
                 [
                     new ClearCacheCommand(),
                     new ValidateServicesCommand(),
@@ -215,8 +234,10 @@ class SlimApp
 
             // Add custom commands
             if (isset($this->consoleConfig['commands']) && is_array($this->consoleConfig['commands'])) {
-                $this->consoleApp->addCommands($this->consoleConfig['commands']);
+                $consoleApp->addCommands($this->consoleConfig['commands']);
             }
+            
+            $this->consoleApp = $consoleApp;
         }
 
         return $this->consoleApp;
@@ -225,9 +246,12 @@ class SlimApp
     public function getHttpKernel(): MicroKernel
     {
         if (!$this->microKernel instanceof MicroKernel) {
-            $this->microKernel = new MicroKernel($this->httpConfig, $this->isDebugMode);
-            $this->microKernel->addControllerInjectedArg($this);
-            $this->microKernel->addExtraParameters($this->container->getParameterBag()->all());
+            $container = $this->container;
+            assert($container !== null, 'SlimApp not initialized');
+            $kernel = new MicroKernel($this->httpConfig ?? [], $this->isDebugMode);
+            $kernel->addControllerInjectedArg($this);
+            $kernel->addExtraParameters($container->getParameterBag()->all());
+            $this->microKernel = $kernel;
         }
 
         return $this->microKernel;
@@ -235,21 +259,25 @@ class SlimApp
 
     public function getMandatoryConfig(string $key, DataType $expectedType = DataType::String): mixed
     {
+        assert($this->configDataProvider !== null, 'SlimApp not initialized');
         return $this->configDataProvider->getMandatory($key, $expectedType);
     }
 
     public function getOptionalConfig(string $key, DataType $expectedType = DataType::String, mixed $defaultValue = null): mixed
     {
+        assert($this->configDataProvider !== null, 'SlimApp not initialized');
         return $this->configDataProvider->getOptional($key, $expectedType, $defaultValue);
     }
 
     public function getParameter(string $k): mixed
     {
+        assert($this->container !== null, 'SlimApp not initialized');
         return $this->container->getParameter($k);
     }
 
     public function getService(string $id, ?string $type = null): mixed
     {
+        assert($this->container !== null, 'SlimApp not initialized');
         $service = $this->container->get($id);
         if ($type && (!$service instanceof $type)) {
             throw new InvalidArgumentException(sprintf("Service %s is not of type %s", $id, $type));
@@ -258,13 +286,18 @@ class SlimApp
         return $service;
     }
 
+    /**
+     * @return string[]
+     */
     public function getServiceIds(): array
     {
+        assert($this->container !== null, 'SlimApp not initialized');
         return $this->container->getServiceIds();
     }
 
     public function setService(string $id, ?object $service): void
     {
+        assert($this->container !== null, 'SlimApp not initialized');
         $this->container->set($id, $service);
     }
 
@@ -304,7 +337,7 @@ class SlimApp
             } elseif (is_int($level)) {
                 $this->loggingLevel = Level::from($level);
             } elseif (is_string($level)) {
-                $this->loggingLevel = Level::fromName(ucfirst(strtolower($level)));
+                $this->loggingLevel = Level::fromName(ucfirst(strtolower($level))); // @phpstan-ignore argument.type
             }
         }
         if (isset($value['pattern'])) {

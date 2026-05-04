@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Oasis\SlimApp;
 
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,6 +12,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 abstract class AbstractParallelCommand extends AbstractAlertableCommand
 {
     private int $parallelCount = 0;
+    /** @var int[] */
     private array $pids = [];
     private bool $isFailed = false;
 
@@ -49,6 +51,7 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
         if ($this->parallelCount > 10) {
             if ($input->getOption('no-overflow-confirm') !== true) {
                 $helper   = $this->getHelper('question');
+                assert($helper instanceof QuestionHelper);
                 $question = new ConfirmationQuestion(
                     "Num of parallel processes is set to {$this->parallelCount}, confirm?", false
                 );
@@ -95,6 +98,9 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
             }
             elseif ($pid > 0) { // child process with pid = $pid exits
                 $exitStatus = pcntl_wexitstatus($status);
+                if ($exitStatus === false) {
+                    throw new \RuntimeException("Failed to get exit status for process $pid");
+                }
                 $this->onChildProcessExit($pid, $exitStatus, $input, $output);
             }
             else { // error
@@ -124,7 +130,7 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
         elseif ($pid == 0) {
             // in child process
             $ret = $this->doExecute($input, $output);
-            exit(is_numeric($ret) ? $ret : 0);
+            exit($ret);
         }
         else {
             return $pid;
@@ -133,9 +139,10 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
 
     protected function onChildProcessExit(int $pid, int $exitStatus, InputInterface $input, OutputInterface $output): void
     {
-        if (($key = array_search($pid, $this->pids)) !== false) {
+        $key = array_search($pid, $this->pids);
+        if ($key !== false) {
             //mdebug("Child process $pid exit with code: %x", $exitStatus);
-            array_splice($this->pids, $key, 1);
+            array_splice($this->pids, (int)$key, 1);
 
             switch ($exitStatus) {
                 case self::EXIT_CODE_RESTART:
@@ -149,8 +156,7 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
                 default:
                     $this->isFailed = true;
             }
-        }
-        else {
+        } else {
             mwarning("Un-managed child process $pid exit with code: %d", $exitStatus);
         }
     }
