@@ -180,7 +180,177 @@ services:
 3. 逐一确认这些 service ID 在 `services.yml` 中是否声明了 `public: true`
 4. 未声明的须添加 `public: true`，或改为构造函数注入（推荐）
 
-### 4. AbstractDaemonSentinelCommand 移除
+### 4. Doctrine ORM 3.x 不兼容变更
+
+`doctrine/orm` 从 ^2.5 升级到 ^3.6，涉及多项 API 移除。如果项目启用了 ORM 支持，需要逐一适配。
+
+#### 4a. ORM 命令集注册方式变更
+
+2.x 中通过 `ConsoleRunner::addCommands()` 注册 ORM 命令集（如 `orm:schema-tool:create`）。ORM 3.x 移除了此 API，改为逐个添加命令并注入 `EntityManagerProvider`。
+
+**影响范围**：
+
+- console 入口（`bin/<project>.php`）中注册 ORM 命令的代码
+- 测试 bootstrap 中使用 ORM 命令重建 schema 的代码
+
+**Before (2.x)**：
+
+```php
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+
+$helperSet = require_once __DIR__ . "/../config/cli-config.php";
+$console->setHelperSet($helperSet);
+ConsoleRunner::addCommands($console);
+```
+
+**After (3.0)**：
+
+```php
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
+
+/** @var EntityManagerInterface $em */
+$em = $app->getService('entity_manager');
+$provider = new SingleManagerProvider($em);
+ConsoleRunner::addCommands($app->getConsoleApplication(), $provider);
+```
+
+> 如果项目 console 入口未注册 ORM 命令集，则 `orm:*` 命令不可用。脚手架生成的 `bin/<project>.php` 默认不包含此注册逻辑，需手动添加。
+
+#### 4b. `cli-config.php` 变更
+
+`ConsoleRunner::createHelperSet()` 已移除。如果项目有 `config/cli-config.php`，需改为返回 `EntityManagerProvider`：
+
+**Before (2.x)**：
+
+```php
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+
+return ConsoleRunner::createHelperSet($database::getEntityManager());
+```
+
+**After (3.0)**：
+
+```php
+use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
+
+return new SingleManagerProvider($database::getEntityManager());
+```
+
+#### 4c. Annotation 元数据驱动移除
+
+ORM 3.x 移除了 `Setup::createAnnotationMetadataConfiguration()`。Entity 映射必须使用 PHP 8 Attribute。
+
+**Before (2.x)**：
+
+```php
+use Doctrine\ORM\Tools\Setup;
+
+$config = Setup::createAnnotationMetadataConfiguration(
+    [PROJECT_DIR . "/src/Entities"],
+    $isDevMode,
+    $proxyDir,
+    $cache,
+    false
+);
+```
+
+**After (3.0)**：
+
+```php
+use Doctrine\ORM\ORMSetup;
+
+$config = ORMSetup::createAttributeMetadataConfiguration(
+    [PROJECT_DIR . "/src/Entities"],
+    $isDevMode,
+    $proxyDir
+);
+```
+
+> Entity 类中的 `@ORM\Table`、`@ORM\Column` 等注解需改为对应的 Attribute 语法（如 `#[ORM\Table]`、`#[ORM\Column]`）。
+
+#### 4d. `Doctrine\Common\Cache` 移除
+
+ORM 3.x 不再依赖 `doctrine/cache`，缓存改用 PSR-6（`psr/cache`）。`Doctrine\Common\Cache\MemcachedCache` 不再可用。
+
+**Before (2.x)** — `services.yml`：
+
+```yaml
+services:
+    memcached_cache:
+        class: Doctrine\Common\Cache\MemcachedCache
+        calls:
+            - [setMemcached, ['@memcached']]
+            - [setNamespace, ['%app.memcached.namespace%']]
+```
+
+**After (3.0)** — 使用 `symfony/cache` 提供的 PSR-6 适配器：
+
+```yaml
+services:
+    cache.memcached:
+        class: Symfony\Component\Cache\Adapter\MemcachedAdapter
+        factory: ['Symfony\Component\Cache\Adapter\MemcachedAdapter', 'createConnection']
+        arguments:
+            - 'memcached://%app.memcached.host%:%app.memcached.port%'
+
+    cache.pool:
+        class: Symfony\Component\Cache\Adapter\MemcachedAdapter
+        arguments:
+            - '@cache.memcached'
+            - '%app.memcached.namespace%'
+```
+
+二级缓存配置也需相应调整：
+
+```php
+// Before (2.x)
+$factory = new DefaultCacheFactory($regconfig, $memcachedCache);
+
+// After (3.0)
+use Doctrine\ORM\Cache\DefaultCacheFactory;
+use Doctrine\ORM\Cache\RegionsConfiguration;
+
+$regconfig = new RegionsConfiguration();
+$factory = new DefaultCacheFactory($regconfig, $cachePool); // $cachePool 为 PSR-6 CacheItemPoolInterface
+$config->setSecondLevelCacheEnabled();
+$config->getSecondLevelCacheConfiguration()->setCacheFactory($factory);
+```
+
+#### 4e. `DataProviderInterface` 常量移除（ODM 模板）
+
+`oasis/utils` 3.0 将 `DataProviderInterface::STRING_TYPE` 等常量替换为 `DataType` 枚举。
+
+**Before (2.x)**：
+
+```php
+use Oasis\Mlib\Utils\DataProviderInterface;
+
+$cacheDir = $app->getMandatoryConfig('dir.cache', DataProviderInterface::STRING_TYPE);
+$awsConfig = $app->getMandatoryConfig('aws', DataProviderInterface::ARRAY_TYPE);
+```
+
+**After (3.0)**：
+
+```php
+use Oasis\Mlib\Utils\DataType;
+
+$cacheDir = $app->getMandatoryConfig('dir.cache', DataType::String);
+$awsConfig = $app->getMandatoryConfig('aws', DataType::Array);
+```
+
+#### 自查 Checklist
+
+1. 搜索项目中所有 `ConsoleRunner` 引用，按 4a/4b 适配
+2. 搜索 `Setup::createAnnotationMetadataConfiguration`，按 4c 改为 Attribute 驱动
+3. 搜索 `Doctrine\Common\Cache`，按 4d 替换为 PSR-6 缓存
+4. 搜索 `DataProviderInterface::` 常量引用，按 4e 改为 `DataType` 枚举
+5. 将 Entity 类的 Doctrine 注解改为 Attribute 语法
+
+---
+
+### 5. AbstractDaemonSentinelCommand 移除
 
 `AbstractDaemonSentinelCommand` 已被移除。`DaemonSentinelCommand` 现在直接继承 `AbstractAlertableCommand`，并内联了所有 sentinel 执行逻辑。
 
@@ -201,7 +371,7 @@ use Oasis\SlimApp\SentinelCommand\DaemonSentinelCommand;
 class MySentinel extends DaemonSentinelCommand { ... }
 ```
 
-### 5. PHPUnit 升级（5.7 → 13）
+### 6. PHPUnit 升级（5.7 → 13）
 
 使用方项目的测试套件需要适配 PHPUnit 13 API。主要变更：
 
@@ -254,14 +424,20 @@ class MySentinel extends DaemonSentinelCommand { ... }
 3. **适配 PHP 8.5 语法**：添加 `declare(strict_types=1)`、类型声明等（按需）
 4. **替换 SilexKernel 引用**：将所有 `SilexKernel` 类型提示和 import 改为 `MicroKernel`
 5. **调整 `services.yml`**：为通过 `getService()` 获取的服务添加 `public: true`
-6. **适配 AbstractDaemonSentinelCommand 移除**：如有自定义子类，改为继承 `DaemonSentinelCommand`
-7. **升级测试套件**：按 PHPUnit 13 API 变更清单适配测试代码和 `phpunit.xml`
-8. **清除旧缓存**：
+6. **适配 Doctrine ORM 3.x**（如启用 ORM）：
+   - 将 Entity 注解改为 Attribute 语法
+   - 将 `Setup::createAnnotationMetadataConfiguration()` 改为 `ORMSetup::createAttributeMetadataConfiguration()`
+   - 将 `Doctrine\Common\Cache\MemcachedCache` 替换为 PSR-6 缓存适配器
+   - 更新 `cli-config.php` 和 console 入口中的 ORM 命令注册方式
+   - 将 `DataProviderInterface::*_TYPE` 常量改为 `DataType` 枚举
+7. **适配 AbstractDaemonSentinelCommand 移除**：如有自定义子类，改为继承 `DaemonSentinelCommand`
+8. **升级测试套件**：按 PHPUnit 13 API 变更清单适配测试代码和 `phpunit.xml`
+9. **清除旧缓存**：
    ```bash
    ./bin/<project>.php slimapp:cache:clear
    ```
-9. **验证 public 服务**：
-   ```bash
-   ./bin/<project>.php slimapp:services:validate
-   ```
-10. **运行业务测试套件**：确认无回归
+10. **验证 public 服务**：
+    ```bash
+    ./bin/<project>.php slimapp:services:validate
+    ```
+11. **运行业务测试套件**：确认无回归

@@ -502,6 +502,18 @@ SRC;
         $date     = date('Y-m-d');
         $time     = date('H:i');
         $this->output->writeln("console entry file = $filename");
+        
+        $ormRegistration = '';
+        if ($this->ormSupportEnabled) {
+            $ormRegistration = <<<ORM
+
+
+// Register Doctrine ORM commands
+\$provider = require_once __DIR__ . "/../config/cli-config.php";
+\\Doctrine\\ORM\\Tools\\Console\\ConsoleRunner::addCommands(\$app->getConsoleApplication(), \$provider);
+ORM;
+        }
+        
         $consoleEntrySource = <<<SRC
 #! /usr/bin/env php
 <?php
@@ -517,6 +529,7 @@ use {$this->projectNamespace}{$this->mainClassname};
 
 /** @var {$this->mainClassname} \$app */
 \$app = require_once __DIR__ . "/../bootstrap.php";
+$ormRegistration
 
 \$app->getConsoleApplication()->run();
 
@@ -542,12 +555,12 @@ SRC;
  */
  
  
-use Doctrine\\ORM\\Tools\\Console\\ConsoleRunner;
+use Doctrine\\ORM\\Tools\\Console\\EntityManagerProvider\\SingleManagerProvider;
 use {$this->projectNamespace}Database\\{$this->mainClassname}Database;
 
 require_once __DIR__ . "/../bootstrap.php";
 
-return ConsoleRunner::createHelperSet({$this->mainClassname}Database::getEntityManager());
+return new SingleManagerProvider({$this->mainClassname}Database::getEntityManager());
 
 SRC;
             $this->writeToTempFile($filename, $cliConfigSource);
@@ -591,17 +604,15 @@ SRC;
         $entityNamespaceDeclarationEscaped = addcslashes($namespaceDeclaration . "\\Entities", "\\");
         $itemNamespaceDeclarationEscaped   = addcslashes($namespaceDeclaration . "\\Items", "\\");
         $ormImports                        = <<<SRC
-use Doctrine\\ORM\\Cache\\DefaultCacheFactory;
-use Doctrine\\ORM\\Cache\\RegionsConfiguration;
 use Doctrine\\ORM\\EntityManager;
-use Doctrine\\ORM\\Tools\\Setup;
+use Doctrine\\ORM\\ORMSetup;
 SRC;
         $odmImports                        = <<<SRC
 use Oasis\Mlib\ODM\Dynamodb\ItemManager;
-use Oasis\Mlib\Utils\DataProviderInterface;
+use Oasis\Mlib\Utils\DataType;
 SRC;
         $ormFunction                       = <<<SRC
-    public static function getEntityManager()
+    public static function getEntityManager(): EntityManager
     {
         static \$entityManager = null;
         if (\$entityManager instanceof EntityManager) {
@@ -611,43 +622,31 @@ SRC;
         \$app = {$this->mainClassname}::app();
     
         \$isDevMode = \$app->isDebug();
-        /** @noinspection PhpParamsInspection */
-        \$config    = Setup::createAnnotationMetadataConfiguration(
+        \$config    = ORMSetup::createAttributeMetadataConfiguration(
             [PROJECT_DIR . "/src/Entities"],
             \$isDevMode,
-            \$app->getParameter('app.dir.data') . "/proxies",
-            \$app->getService('memcached_cache'),
-            false /* do not use simple annotation reader, so that we can understand annotations like @ORM/Table */
+            \$app->getParameter('app.dir.data') . "/proxies"
         );
         \$config->addEntityNamespace("{$this->mainClassname}", "{$entityNamespaceDeclarationEscaped}");
-        //\$config->setSQLLogger(new \\Doctrine\\DBAL\\Logging\\EchoSQLLogger());
-
-        \$regconfig = new RegionsConfiguration();
-        /** @noinspection PhpParamsInspection */
-        \$factory   = new DefaultCacheFactory(\$regconfig, \$app->getService('memcached_cache'));
-        \$config->setSecondLevelCacheEnabled();
-        \$config->getSecondLevelCacheConfiguration()->setCacheFactory(\$factory);
 
         \$conn           = \$app->getParameter('app.db');
         \$conn["driver"] = "pdo_mysql";
-        /** @noinspection PhpUnhandledExceptionInspection */
         \$entityManager  = EntityManager::create(\$conn, \$config);
 
         return \$entityManager;
     }
 SRC;
         $odmFunction                       = <<<SRC
-    public static function getItemManager()
+    public static function getItemManager(): ItemManager
     {
-        /** @var ItemManager \$im */
         static \$im = null;
         
         if (\$im === null) {
             \$app = {$this->mainClassname}::app();
             
-            \$cacheDir  = \$app->getMandatoryConfig('dir.cache', DataProviderInterface::STRING_TYPE);
-            \$awsConfig = \$app->getMandatoryConfig('aws', DataProviderInterface::ARRAY_TYPE);
-            \$prefix    = \$app->getMandatoryConfig('dynamodb.prefix', DataProviderInterface::STRING_TYPE);
+            \$cacheDir  = \$app->getMandatoryConfig('dir.cache', DataType::String);
+            \$awsConfig = \$app->getMandatoryConfig('aws', DataType::Array);
+            \$prefix    = \$app->getMandatoryConfig('dynamodb.prefix', DataType::String);
             
             \$im = new ItemManager(\$awsConfig, \$prefix, \$cacheDir, \$app->isDebug());
             \$dir = PROJECT_DIR . "/src/Items";
@@ -776,10 +775,8 @@ XML;
         
 \$console = \$app->getConsoleApplication();
 
-/** @var Symfony\\Component\\Console\\Helper\\HelperSet \$helperSet */
-\$helperSet = require_once __DIR__ . "/../config/cli-config.php";
-\$console->setHelperSet(\$helperSet);
-\\Doctrine\\ORM\\Tools\\Console\\ConsoleRunner::addCommands(\$console);
+\$provider = require_once __DIR__ . "/../config/cli-config.php";
+\\Doctrine\\ORM\\Tools\\Console\\ConsoleRunner::addCommands(\$console, \$provider);
 
 \$output = new \\Symfony\\Component\\Console\\Output\\ConsoleOutput();
 \$console->setAutoExit(false);
@@ -789,8 +786,7 @@ XML;
     new \\Symfony\\Component\\Console\\Input\\ArrayInput(
         [
             "command" => "orm:schema-tool:drop",
-            "-f"      => true,
-            "-vvv"    => true,
+            "--force" => true,
         ]
     ),
     \$output
@@ -990,19 +986,6 @@ SRC;
                     [
                         "addServer",
                         ['%app.memcached.host%', '%app.memcached.port%'],
-                    ],
-                ],
-            ];
-            $services['services']['memcached_cache']                                  = [
-                "class" => "Doctrine\\Common\\Cache\\MemcachedCache",
-                "calls" => [
-                    [
-                        "setMemcached",
-                        ['@memcached'],
-                    ],
-                    [
-                        "setNamespace",
-                        ['%app.memcached.namespace%'],
                     ],
                 ],
             ];
