@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.2.0 - 2026-05-06
+
+修复脚手架模板适配 Doctrine ORM 3.x；迁移文档全面重构。详见 [3.2.0/CHANGELOG.md](3.2.0/CHANGELOG.md)。
+
 ## v3.1.0 - 2026-05-06
 
 升级 oasis/http v3.2.0 → v3.6.3，获得恢复的 Silex 便捷方法（before/after/error/render/json 等）。详见 [3.1.0/CHANGELOG.md](3.1.0/CHANGELOG.md)。
