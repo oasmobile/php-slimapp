@@ -533,16 +533,16 @@
         },
         {
             "name": "oasis/http",
-            "version": "v3.2.0",
+            "version": "v3.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oasmobile/php-http.git",
-                "reference": "c9764ad4c2721d54dc5a71a896b6faa2c2e52362"
+                "reference": "ea2a08d10a89f098e7845c6831ca2e86be9f789a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/c9764ad4c2721d54dc5a71a896b6faa2c2e52362",
-                "reference": "c9764ad4c2721d54dc5a71a896b6faa2c2e52362",
+                "url": "https://api.github.com/repos/oasmobile/php-http/zipball/ea2a08d10a89f098e7845c6831ca2e86be9f789a",
+                "reference": "ea2a08d10a89f098e7845c6831ca2e86be9f789a",
                 "shasum": ""
             },
             "require": {
@@ -593,31 +593,32 @@
             "description": "A Symfony MicroKernel-based HTTP framework for routing, middleware, security, and more.",
             "support": {
                 "issues": "https://github.com/oasmobile/php-http/issues",
-                "source": "https://github.com/oasmobile/php-http/tree/v3.2.0"
+                "source": "https://github.com/oasmobile/php-http/tree/v3.6.3"
             },
-            "time": "2026-05-04T16:28:46+00:00"
+            "time": "2026-05-05T20:27:10+00:00"
         },
         {
             "name": "oasis/logging",
-            "version": "v3.1.0",
+            "version": "v3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oasmobile/php-logging.git",
-                "reference": "93c4e7ff2e2ef375b2bd87dc0d2bd4fb5a301ccd"
+                "reference": "834bb9f6ace66761eb7d06643a6bf314787113e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oasmobile/php-logging/zipball/93c4e7ff2e2ef375b2bd87dc0d2bd4fb5a301ccd",
-                "reference": "93c4e7ff2e2ef375b2bd87dc0d2bd4fb5a301ccd",
+                "url": "https://api.github.com/repos/oasmobile/php-logging/zipball/834bb9f6ace66761eb7d06643a6bf314787113e8",
+                "reference": "834bb9f6ace66761eb7d06643a6bf314787113e8",
                 "shasum": ""
             },
             "require": {
                 "bramus/monolog-colored-line-formatter": "^3.0",
                 "monolog/monolog": "^3.0",
-                "oasis/utils": "^3.0",
+                "oasis/utils": "^3.1",
                 "php": ">=8.5"
             },
             "require-dev": {
+                "giorgiosironi/eris": "^1.1",
                 "phpunit/phpunit": "^13.0",
                 "symfony/console": "^8.0",
                 "symfony/finder": "^8.0"
@@ -648,30 +649,32 @@
             "description": "Wrapper of monolog/monolog. Should be easier to use/configure than monolog",
             "support": {
                 "issues": "https://github.com/oasmobile/php-logging/issues",
-                "source": "https://github.com/oasmobile/php-logging/tree/v3.1.0"
+                "source": "https://github.com/oasmobile/php-logging/tree/v3.1.1"
             },
-            "time": "2026-05-02T16:27:09+00:00"
+            "time": "2026-05-04T20:39:06+00:00"
         },
         {
             "name": "oasis/utils",
-            "version": "v3.0.2",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oasmobile/php-utils.git",
-                "reference": "a1e1c72739415b1c3eba0362d69fc59df5988e80"
+                "reference": "4e903a0f42227e82071b9d034be1394b4e731ad5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oasmobile/php-utils/zipball/a1e1c72739415b1c3eba0362d69fc59df5988e80",
-                "reference": "a1e1c72739415b1c3eba0362d69fc59df5988e80",
+                "url": "https://api.github.com/repos/oasmobile/php-utils/zipball/4e903a0f42227e82071b9d034be1394b4e731ad5",
+                "reference": "4e903a0f42227e82071b9d034be1394b4e731ad5",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.2",
+                "php": ">=8.5",
+                "psr/log": "^3.0",
                 "voku/portable-utf8": "^3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^11.0"
+                "giorgiosironi/eris": "^1.1",
+                "phpunit/phpunit": "^13.0"
             },
             "type": "library",
             "autoload": {
@@ -692,9 +695,9 @@
             "description": "Various utility classes & functions",
             "support": {
                 "issues": "https://github.com/oasmobile/php-utils/issues",
-                "source": "https://github.com/oasmobile/php-utils/tree/v3.0.2"
+                "source": "https://github.com/oasmobile/php-utils/tree/v3.1.0"
             },
-            "time": "2026-05-02T09:16:51+00:00"
+            "time": "2026-05-04T20:17:26+00:00"
         },
         {
             "name": "psr/cache",
