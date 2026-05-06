@@ -1,5 +1,7 @@
 {
 	"name" : "slimapp/test",
+	"minimum-stability": "dev",
+	"prefer-stable": true,
 	"repositories" : [
 		{
 			"type" : "path",
@@ -10,6 +12,6 @@
 		}
 	],
 	"require": {
-		"oasis/slimapp": "dev-release/3.0"
+		"oasis/slimapp": "*"
 	}
 }
