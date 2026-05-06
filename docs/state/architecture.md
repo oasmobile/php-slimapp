@@ -70,11 +70,18 @@ SlimApp 采用单体框架设计，核心类 `SlimApp` 作为单例入口，统�
 
 ### HTTP Kernel
 
-- 基于 `oasis/http`（MicroKernel，基于 Symfony HttpKernel）
+- 基于 `oasis/http` v3.6+（MicroKernel，基于 Symfony HttpKernel）
 - 通过 `app` 服务的 `http` 属性配置
 - `getHttpKernel()` 返回 `MicroKernel` 实例
-- 支持: routing、twig 模板、CORS、error handler、view handler
+- 支持: routing、twig 模板、CORS、security、error handler、view handler、middleware
 - 入口: `$app->getHttpKernel()->run()`
+- 便捷方法（v3.4+ 恢复的 Silex 兼容 API）:
+  - `render()` / `renderView()` — Twig 模板渲染
+  - `path()` / `url()` — URL 生成
+  - `before()` / `after()` — 注册 middleware 回调
+  - `error()` — 注册 error handler 回调
+  - `view()` — 注册 view handler
+  - `abort()` / `redirect()` / `json()` / `stream()` / `sendFile()` — Response 工厂
 
 ### Console Application
 
