@@ -150,11 +150,13 @@ class CommandRunner
 
         $pid = pcntl_fork();
         if ($pid < 0) {
+            // @codeCoverageIgnoreStart
             $errno = pcntl_get_last_error();
             throw new \RuntimeException("Cannot fork process, error = " . pcntl_strerror($errno));
+            // @codeCoverageIgnoreEnd
         }
         elseif ($pid == 0) {
-            // in child process
+            // @codeCoverageIgnoreStart — child process; covered by tests/scripts/sentinel_command_test.php
             $now = time();
             if ($now < $this->nextRun) {
                 if ($this->traceEnabled) {
@@ -185,6 +187,7 @@ class CommandRunner
             else {
                 exit($ret);
             }
+            // @codeCoverageIgnoreEnd
         }
         else {
             $this->lastRun    = $this->nextRun;

@@ -57,6 +57,24 @@ MicroKernel 提供与 SilexKernel 等价的公共 API，无需修改调用代码
 | `run(?Request $request = null): void` | 启动 HTTP 处理 |
 | `getCacheDirectories(): array` | 返回缓存目录列表 |
 
+此外，`oasis/http` v3.4+ 已恢复以下 Silex 时代的便捷方法，下游无需为这些调用做额外迁移：
+
+| 方法 | 恢复版本 | 说明 |
+|------|----------|------|
+| `render($view, $params, $response)` | v3.4 | 渲染 Twig 模板返回 Response |
+| `renderView($view, $params)` | v3.4 | 渲染 Twig 模板返回字符串 |
+| `path($route, $params)` | v3.4 | 生成相对 URL |
+| `url($route, $params)` | v3.4 | 生成绝对 URL |
+| `before($callback, $priority, $masterRequestOnly)` | v3.5 | 注册 before 过滤器 |
+| `after($callback, $priority, $masterRequestOnly)` | v3.5 | 注册 after 过滤器 |
+| `error($callback, $priority)` | v3.5 | 注册 error handler |
+| `view($callback)` | v3.6 | 注册 view handler |
+| `abort($statusCode, $message, $headers)` | v3.6 | 抛出 HttpException |
+| `redirect($url, $status)` | v3.6 | 创建重定向响应 |
+| `json($data, $status, $headers)` | v3.6 | 创建 JSON 响应 |
+| `stream($callback, $status, $headers)` | v3.6 | 创建流式响应 |
+| `sendFile($file, $status, $headers, $contentDisposition)` | v3.6 | 创建文件下载响应 |
+
 **自查**：`grep -rn 'SilexKernel' src/`
 
 ---

@@ -34,9 +34,9 @@ class ClearCacheCommand extends Command
         if (method_exists($httpKernel, 'getCacheDirectories')) { // @phpstan-ignore function.alreadyNarrowedType
             $httpCacheDirs = $httpKernel->getCacheDirectories();
         } elseif (method_exists($httpKernel, 'getCacheDir')) { // @phpstan-ignore function.alreadyNarrowedType
-            $httpCacheDirs = [$httpKernel->getCacheDir()];
+            $httpCacheDirs = [$httpKernel->getCacheDir()]; // @codeCoverageIgnore
         } else {
-            $httpCacheDirs = [];
+            $httpCacheDirs = []; // @codeCoverageIgnore
         }
         $cacheDirs = array_merge($cacheDirs, $httpCacheDirs);
 
