@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.1.0 - 2026-05-06
+
+升级 oasis/http v3.2.0 → v3.6.3，获得恢复的 Silex 便捷方法（before/after/error/render/json 等）。详见 [3.1.0/CHANGELOG.md](3.1.0/CHANGELOG.md)。
+
 ## v3.0.1 - 2026-05-05
 
 引入 phpstan level 8 静态分析并修复全部 74 个错误；升级 oasis/http 至 v3.2.0。详见 [3.0.1/CHANGELOG.md](3.0.1/CHANGELOG.md)。
