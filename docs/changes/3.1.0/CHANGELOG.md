@@ -35,4 +35,6 @@
 
 ## 测试覆盖
 
-- 全量测试：171 tests, 2157 assertions（全部通过）
+- 全量测试：192 tests, 2185 assertions（全部通过）
+- phpstan level 8：零错误
+- 覆盖率：97.87%
