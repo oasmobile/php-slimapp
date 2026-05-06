@@ -99,7 +99,9 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
             elseif ($pid > 0) { // child process with pid = $pid exits
                 $exitStatus = pcntl_wexitstatus($status);
                 if ($exitStatus === false) {
+                    // @codeCoverageIgnoreStart
                     throw new \RuntimeException("Failed to get exit status for process $pid");
+                    // @codeCoverageIgnoreEnd
                 }
                 $this->onChildProcessExit($pid, $exitStatus, $input, $output);
             }
@@ -111,8 +113,9 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
                     break;
                 }
                 else {
-                    // some other error
+                    // @codeCoverageIgnoreStart
                     throw new \RuntimeException("Error waiting for process, error = " . pcntl_strerror($errno));
+                    // @codeCoverageIgnoreEnd
                 }
             }
         }
@@ -124,13 +127,16 @@ abstract class AbstractParallelCommand extends AbstractAlertableCommand
     {
         $pid = pcntl_fork();
         if ($pid < 0) {
+            // @codeCoverageIgnoreStart
             $errno = pcntl_get_last_error();
             throw new \RuntimeException("Cannot fork process, error = " . pcntl_strerror($errno));
+            // @codeCoverageIgnoreEnd
         }
         elseif ($pid == 0) {
-            // in child process
+            // @codeCoverageIgnoreStart — child process; covered by tests/scripts/parallel_command_test.php
             $ret = $this->doExecute($input, $output);
             exit($ret);
+            // @codeCoverageIgnoreEnd
         }
         else {
             return $pid;

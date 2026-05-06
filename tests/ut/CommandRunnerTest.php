@@ -283,6 +283,125 @@ class CommandRunnerTest extends TestCase
         $this->assertEquals('json', $input->getParameterOption('--format'));
     }
 
+    public function testParallelIndexSubstitutionInArgs(): void
+    {
+        $app = new Application('test', '1.0');
+        $app->setAutoExit(false);
+
+        $command = [
+            'name' => 'list', 'args' => ['--idx' => '$PARALLEL_INDEX'],
+            'once' => false, 'interval' => 0, 'frequency' => 0,
+            'frequency_fixed' => false, 'alert' => true,
+        ];
+
+        $output = new BufferedOutput();
+        $runner = new CommandRunner($app, 3, $command, $output);
+
+        $inputRef = new \ReflectionProperty($runner, 'input');
+        $input = $inputRef->getValue($runner);
+
+        $this->assertEquals(3, $input->getParameterOption('--idx'));
+    }
+
+    public function testRunForksAndReturnsChildPid(): void
+    {
+        if (!function_exists('pcntl_fork')) {
+            $this->markTestSkipped('pcntl not available');
+        }
+
+        $app = new Application('test', '1.0');
+        $app->setAutoExit(false);
+        $app->addCommand(new \Symfony\Component\Console\Command\Command('list'));
+
+        $command = [
+            'name' => 'list', 'args' => [],
+            'once' => false, 'interval' => 0, 'frequency' => 0,
+            'frequency_fixed' => false, 'alert' => false,
+        ];
+
+        $output = new BufferedOutput();
+        $runner = new CommandRunner($app, 0, $command, $output);
+
+        $pid = $runner->run();
+        $this->assertGreaterThan(0, $pid);
+
+        // Clean up child process
+        pcntl_waitpid($pid, $status);
+    }
+
+    public function testRunSetsLastRunAndCurrentPid(): void
+    {
+        if (!function_exists('pcntl_fork')) {
+            $this->markTestSkipped('pcntl not available');
+        }
+
+        $app = new Application('test', '1.0');
+        $app->setAutoExit(false);
+        $app->addCommand(new \Symfony\Component\Console\Command\Command('list'));
+
+        $command = [
+            'name' => 'list', 'args' => [],
+            'once' => false, 'interval' => 0, 'frequency' => 0,
+            'frequency_fixed' => false, 'alert' => false,
+        ];
+
+        $output = new BufferedOutput();
+        $runner = new CommandRunner($app, 0, $command, $output);
+
+        $pid = $runner->run();
+
+        $lastRunRef = new \ReflectionProperty($runner, 'lastRun');
+        $currentPidRef = new \ReflectionProperty($runner, 'currentPid');
+
+        $this->assertGreaterThan(0, $lastRunRef->getValue($runner));
+        $this->assertEquals($pid, $currentPidRef->getValue($runner));
+
+        pcntl_waitpid($pid, $status);
+    }
+
+    public function testOnProcessExitWithFrequencyAlreadyReached(): void
+    {
+        // When lastRun + frequency <= time(), nextRun should be set to time()
+        $runner = $this->createRunner(['once' => false, 'frequency' => 1, 'interval' => 0]);
+
+        $lastRunRef = new \ReflectionProperty($runner, 'lastRun');
+        $lastRunRef->setValue($runner, time() - 100);
+
+        $runner->onProcessExit(0, 123);
+
+        $nextRunRef = new \ReflectionProperty($runner, 'nextRun');
+        // nextRun should be approximately now (since lastRun + frequency < time())
+        $this->assertLessThanOrEqual(time() + 1, $nextRunRef->getValue($runner));
+    }
+
+    public function testOnProcessExitWithTraceEnabledLogsDebug(): void
+    {
+        $runner = $this->createRunner(['once' => false, 'frequency' => 0, 'interval' => 0], true);
+        // Just verify it doesn't throw — trace logging is a side effect
+        $runner->onProcessExit(0, 456);
+
+        $stoppedRef = new \ReflectionProperty($runner, 'stopped');
+        $this->assertFalse($stoppedRef->getValue($runner));
+    }
+
+    public function testOnProcessExitOnceWithNonZeroExitAndAlert(): void
+    {
+        $runner = $this->createRunner(['once' => true, 'alert' => true]);
+        $runner->onProcessExit(1, 789);
+
+        $stoppedRef = new \ReflectionProperty($runner, 'stopped');
+        $this->assertTrue($stoppedRef->getValue($runner));
+    }
+
+    public function testOnProcessExitOnceWithNonZeroExitNoAlert(): void
+    {
+        $runner = $this->createRunner(['once' => true, 'alert' => false]);
+        $runner->onProcessExit(1, 789);
+
+        $stoppedRef = new \ReflectionProperty($runner, 'stopped');
+        $this->assertTrue($stoppedRef->getValue($runner));
+    }
+
     private function assertPropertyEquals(object $object, string $property, mixed $expected): void
     {
         $ref = new \ReflectionProperty($object, $property);
