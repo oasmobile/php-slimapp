@@ -86,10 +86,14 @@ class DaemonSentinelCommand extends AbstractAlertableCommand
             } elseif ($pid > 0) { // child process with pid = $pid exits
                 $exitStatus = pcntl_wexitstatus($status);
                 if ($exitStatus === false) {
+                    // @codeCoverageIgnoreStart
                     throw new \RuntimeException(\sprintf('Failed to get exit status for process pid = %d', $pid));
+                    // @codeCoverageIgnoreEnd
                 }
                 if (!isset($this->runningProcesses[$pid])) {
+                    // @codeCoverageIgnoreStart
                     throw new \LogicException(\sprintf('Cannot find command runner for process pid = %d', $pid));
+                    // @codeCoverageIgnoreEnd
                 }
                 $runner = $this->runningProcesses[$pid];
                 unset($this->runningProcesses[$pid]);
@@ -105,8 +109,9 @@ class DaemonSentinelCommand extends AbstractAlertableCommand
                     mdebug('No more BackgroundProcessRunner children, continue ...');
                     break;
                 } else {
-                    // some other error
+                    // @codeCoverageIgnoreStart
                     throw new \RuntimeException('Error waiting for process, error = ' . pcntl_strerror($errno));
+                    // @codeCoverageIgnoreEnd
                 }
             }
         }
