@@ -4,7 +4,334 @@
 
 ---
 
-## 依赖变更清单
+## 前置条件
+
+| 条件 | 要求 | 验证方式 |
+|------|------|----------|
+| PHP 版本 | >=8.5 | `php -v` |
+| Composer | >=2.x | `composer --version` |
+
+---
+
+## 升级步骤
+
+按顺序执行。每步标注了对应的详细说明章节。
+
+1. 确认 PHP >=8.5
+2. 更新 `composer.json` 中的依赖版本（→ [附录：依赖版本对照表](#附录依赖版本对照表)）
+3. `composer update`
+4. 替换代码中的 `SilexKernel` → `MicroKernel`（→ [SilexKernel → MicroKernel](#silexkernel--microkernel)）
+5. 为 `getService()` 获取的服务添加 `public: true`（→ [DI 容器 private-by-default](#di-容器-private-by-default)）
+6. 适配 Doctrine ORM 3.x（如启用 ORM）（→ [Doctrine ORM 3.x](#doctrine-orm-3x)）
+7. 适配 Sentinel 基类移除（如有子类）（→ [AbstractDaemonSentinelCommand 移除](#abstractdaemonsentinelcommand-移除)）
+8. 给 `sentinel.yml` 中的 `%param%` 值加双引号（→ [sentinel.yml 引号](#sentinelyml-引号)）
+9. 适配 PHPUnit 13（→ [PHPUnit 5.7 → 13](#phpunit-57--13)）
+10. 清除旧缓存：`./bin/<project>.php slimapp:cache:clear`
+11. 验证服务：`./bin/<project>.php slimapp:services:validate`
+12. 运行业务测试套件，确认无回归
+
+---
+
+## 框架 API 变更
+
+### SilexKernel → MicroKernel
+
+`oasis/http` v3.0 将基于 Silex 的 `SilexKernel` 替换为基于 Symfony HttpKernel 的 `MicroKernel`。
+
+将所有 `SilexKernel` 引用替换为 `MicroKernel`：
+
+```php
+// Before
+use Oasis\Mlib\Http\SilexKernel;
+
+// After
+use Oasis\Mlib\Http\MicroKernel;
+```
+
+MicroKernel 提供与 SilexKernel 等价的公共 API，无需修改调用代码：
+
+| 方法 | 说明 |
+|------|------|
+| `addControllerInjectedArg(object $arg): void` | 注入控制器参数 |
+| `addExtraParameters(array $params): void` | 注入额外参数 |
+| `run(?Request $request = null): void` | 启动 HTTP 处理 |
+| `getCacheDirectories(): array` | 返回缓存目录列表 |
+
+**自查**：`grep -rn 'SilexKernel' src/`
+
+---
+
+### DI 容器 private-by-default
+
+2.x 中所有服务自动 public。3.0 遵循 Symfony 标准，服务默认 private。
+
+**影响**：通过 `$app->getService('xxx')` 获取的服务，如果 `services.yml` 中未声明 `public: true`，会抛出 `ServiceNotFoundException`。
+
+```yaml
+# 需要通过 getService() 获取的服务，须显式声明
+services:
+    my.service:
+        class: App\MyService
+        public: true
+```
+
+> `app` 服务保持 public，无需改动。纯通过构造函数注入使用的服务也无需改动。
+
+**自查**：
+
+```bash
+grep -rn 'getService(' src/
+```
+
+列出所有被获取的 service ID，逐一确认 `services.yml` 中是否声明了 `public: true`。
+
+---
+
+### AbstractDaemonSentinelCommand 移除
+
+`AbstractDaemonSentinelCommand` 已被移除，`DaemonSentinelCommand` 直接继承 `AbstractAlertableCommand`。
+
+```php
+// Before
+use Oasis\SlimApp\SentinelCommand\AbstractDaemonSentinelCommand;
+class MySentinel extends AbstractDaemonSentinelCommand { ... }
+
+// After
+use Oasis\SlimApp\SentinelCommand\DaemonSentinelCommand;
+class MySentinel extends DaemonSentinelCommand { ... }
+```
+
+> 如果直接使用 `DaemonSentinelCommand`（未继承），无需改动。
+
+---
+
+## 配置文件变更
+
+### `services.yml`
+
+见上方 [DI 容器 private-by-default](#di-容器-private-by-default)。
+
+---
+
+### `sentinel.yml` 引号
+
+Symfony 8.0 YAML 解析器对 `%` 保留字符更严格。含 `%` 或 `$` 的值必须用双引号包裹：
+
+```yaml
+# Before — 3.0 中会抛出解析异常
+commands:
+    my_command:
+        args:
+            a: %app.name%
+            --idx: $PARALLEL_INDEX
+        once: %app.once%
+
+# After
+commands:
+    my_command:
+        args:
+            a: "%app.name%"
+            --idx: "$PARALLEL_INDEX"
+        once: "%app.once%"
+```
+
+功能不变，仅语法要求更严格。
+
+---
+
+## 上游依赖变更
+
+### Doctrine ORM 3.x
+
+> **快速判断**：项目中是否有 `config/cli-config.php`、`src/Database/` 目录、或 `composer.json` 中依赖了 `doctrine/orm`？如果都没有，跳过本节。
+
+#### Annotation → Attribute
+
+ORM 3.x 移除了 Annotation 元数据驱动。Entity 映射必须使用 PHP 8 Attribute。
+
+```php
+// Before — Database 类中
+use Doctrine\ORM\Tools\Setup;
+
+$config = Setup::createAnnotationMetadataConfiguration(
+    [PROJECT_DIR . "/src/Entities"],
+    $isDevMode,
+    $proxyDir,
+    $cache,
+    false
+);
+
+// After
+use Doctrine\ORM\ORMSetup;
+
+$config = ORMSetup::createAttributeMetadataConfiguration(
+    [PROJECT_DIR . "/src/Entities"],
+    $isDevMode,
+    $proxyDir
+);
+```
+
+Entity 类中的注解也需改为 Attribute：
+
+```php
+// Before
+/** @ORM\Entity @ORM\Table(name="users") */
+class User { /** @ORM\Column(type="string") */ public $name; }
+
+// After
+#[ORM\Entity]
+#[ORM\Table(name: "users")]
+class User { #[ORM\Column(type: "string")] public string $name; }
+```
+
+#### `Doctrine\Common\Cache` 移除
+
+ORM 3.x 不再依赖 `doctrine/cache`。`Doctrine\Common\Cache\MemcachedCache` 不可用。
+
+**最简路径**（大多数项目不用二级缓存）：
+
+1. 删除 `services.yml` 中的 `memcached_cache` 服务定义
+2. 从 `Database` 类的 `getEntityManager()` 中移除 `DefaultCacheFactory` / `RegionsConfiguration` / `setSecondLevelCacheEnabled()` 相关代码
+
+**如果确实需要二级缓存**，改用 PSR-6 适配器（需 `composer require symfony/cache`）：
+
+```php
+use Psr\Cache\CacheItemPoolInterface;
+use Doctrine\ORM\Cache\DefaultCacheFactory;
+use Doctrine\ORM\Cache\RegionsConfiguration;
+
+/** @var CacheItemPoolInterface $cachePool */
+$cachePool = $app->getService('cache.pool');
+$factory = new DefaultCacheFactory(new RegionsConfiguration(), $cachePool);
+$config->setSecondLevelCacheEnabled();
+$config->getSecondLevelCacheConfiguration()->setCacheFactory($factory);
+```
+
+#### ORM 命令集注册
+
+`ConsoleRunner::addCommands()` 签名变更，必须传入 `EntityManagerProvider`；`ConsoleRunner::createHelperSet()` 已移除。
+
+**`config/cli-config.php`**：
+
+```php
+// Before
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+return ConsoleRunner::createHelperSet(AppDatabase::getEntityManager());
+
+// After
+use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
+return new SingleManagerProvider(AppDatabase::getEntityManager());
+```
+
+**`bin/<project>.php`**（console 入口）：
+
+```php
+// Before
+$helperSet = require_once __DIR__ . "/../config/cli-config.php";
+$console->setHelperSet($helperSet);
+\Doctrine\ORM\Tools\Console\ConsoleRunner::addCommands($console);
+
+// After
+$provider = require_once __DIR__ . "/../config/cli-config.php";
+\Doctrine\ORM\Tools\Console\ConsoleRunner::addCommands($console, $provider);
+```
+
+> 如果 console 入口从未注册过 ORM 命令（没有上述代码），则 `orm:*` 命令本来就不可用，无需改动。
+
+#### 自查 Checklist
+
+```bash
+grep -rn 'ConsoleRunner' src/ bin/ config/ ut/
+grep -rn 'createAnnotationMetadataConfiguration' src/
+grep -rn 'Doctrine\\Common\\Cache' src/ config/
+```
+
+---
+
+### `oasis/utils` DataType 枚举
+
+`oasis/utils` 3.0 将 `DataProviderInterface::STRING_TYPE` 等常量替换为 `DataType` 枚举。
+
+```php
+// Before
+use Oasis\Mlib\Utils\DataProviderInterface;
+$val = $app->getMandatoryConfig('key', DataProviderInterface::STRING_TYPE);
+
+// After
+use Oasis\Mlib\Utils\DataType;
+$val = $app->getMandatoryConfig('key', DataType::String);
+```
+
+| 旧常量 | 新枚举 |
+|--------|--------|
+| `DataProviderInterface::STRING_TYPE` | `DataType::String` |
+| `DataProviderInterface::INT_TYPE` | `DataType::Int` |
+| `DataProviderInterface::BOOL_TYPE` | `DataType::Bool` |
+| `DataProviderInterface::ARRAY_TYPE` | `DataType::Array` |
+
+**自查**：`grep -rn 'DataProviderInterface::' src/`
+
+---
+
+### PHPUnit 5.7 → 13
+
+| 旧 API | 新 API |
+|--------|--------|
+| `\PHPUnit_Framework_TestCase` | `\PHPUnit\Framework\TestCase` |
+| `setExpectedException(Class)` | `expectException(Class)` |
+| `setExpectedException(Class, msg)` | `expectException(Class)` + `expectExceptionMessage(msg)` |
+| `assertInternalType('array', $v)` | `assertIsArray($v)` |
+| `assertInternalType('string', $v)` | `assertIsString($v)` |
+| `assertInternalType('int', $v)` | `assertIsInt($v)` |
+| `assertInternalType('bool', $v)` | `assertIsBool($v)` |
+| `assertContains($needle, $string)` | `assertStringContainsString($needle, $string)` |
+| `assertFileNotExists($path)` | `assertFileDoesNotExist($path)` |
+| `getMockBuilder(X)->getMock()` | `createMock(X)` 或 `createStub(X)` |
+| `setUp()` (无返回类型) | `setUp(): void` |
+| `tearDown()` (无返回类型) | `tearDown(): void` |
+
+`phpunit.xml` 格式变更：
+
+```xml
+<!-- Before -->
+<phpunit bootstrap="tests/bootstrap.php">
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src</directory>
+        </whitelist>
+    </filter>
+</phpunit>
+
+<!-- After -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.0/phpunit.xsd"
+         bootstrap="tests/bootstrap.php">
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </source>
+</phpunit>
+```
+
+---
+
+## 常见报错速查
+
+| 报错信息 | 原因 | 解决 |
+|----------|------|------|
+| `Class "Oasis\Mlib\Http\SilexKernel" not found` | oasis/http 3.0 移除了 SilexKernel | → [SilexKernel → MicroKernel](#silexkernel--microkernel) |
+| `ServiceNotFoundException: ... has been removed from the container` | 服务未声明 public | → [DI 容器 private-by-default](#di-容器-private-by-default) |
+| `The reserved indicator "%" cannot start a plain scalar` | sentinel.yml 中 `%param%` 未加引号 | → [sentinel.yml 引号](#sentinelyml-引号) |
+| `Class "Doctrine\ORM\Tools\Setup" not found` | ORM 3.x 移除了 Setup 类 | → [Annotation → Attribute](#annotation--attribute) |
+| `Class "Doctrine\Common\Cache\MemcachedCache" not found` | doctrine/cache 已移除 | → [Doctrine\Common\Cache 移除](#doctrinecommoncache-移除) |
+| `ConsoleRunner::createHelperSet() not found` | ORM 3.x 移除了该方法 | → [ORM 命令集注册](#orm-命令集注册) |
+| `DataProviderInterface::STRING_TYPE not found` | oasis/utils 3.0 改为枚举 | → [oasis/utils DataType 枚举](#oasisutils-datatype-枚举) |
+| `Class "Oasis\SlimApp\SentinelCommand\AbstractDaemonSentinelCommand" not found` | 基类已移除 | → [AbstractDaemonSentinelCommand 移除](#abstractdaemonsentinelcommand-移除) |
+
+---
+
+## 附录：依赖版本对照表
 
 ### require
 
@@ -31,418 +358,13 @@
 | `oasis/doctrine-addon` | ^2.0.2 | ^3.1 |
 | `giorgiosironi/eris` | — | ^1.1（新增） |
 
----
-
-## 配置文件兼容性
+### 配置文件兼容性
 
 | 配置文件 | 兼容性 | 说明 |
 |----------|--------|------|
 | `config.yml` | ✅ 无缝兼容 | 格式由使用方 `ConfigurationInterface` 定义，框架侧无变化 |
 | `routes.yml` | ✅ 无缝兼容 | MicroKernel 保持与 SilexKernel 等价的路由解析接口 |
-| `sentinel.yml` | ⚠️ 可能需调整引号 | CommandConfiguration schema 无变化，但 YAML 语法要求更严格（详见下方说明） |
-| `services.yml` | ⚠️ 需手动调整 | 通过 `getService()` 获取的服务须显式声明 `public: true`（详见 Breaking Change 3） |
+| `sentinel.yml` | ⚠️ 需加引号 | 详见 [sentinel.yml 引号](#sentinelyml-引号) |
+| `services.yml` | ⚠️ 需加 public | 详见 [DI 容器 private-by-default](#di-容器-private-by-default) |
 
 > 缓存文件（`container.php`、`config.cache`）因 Symfony 8.0 序列化格式变化不兼容旧缓存，升级后首次运行会自动重建，或手动执行 `slimapp:cache:clear`。
-
-### `sentinel.yml` 引号问题
-
-Symfony 8.0 的 YAML 解析器对 `%` 保留字符的处理更严格。2.x 中可以不加引号的 `%param%` 参数引用和 `$PARALLEL_INDEX` 变量，在 3.0 中必须用双引号包裹，否则 `Yaml::parse()` 会抛出异常：
-
-```
-The reserved indicator "%" cannot start a plain scalar; you need to quote the scalar
-```
-
-**Before (2.x)** — 不加引号可正常解析：
-
-```yaml
-commands:
-    my_command:
-        name: my:command
-        args:
-            a: %app.name%
-            --idx: $PARALLEL_INDEX
-        once: %app.once%
-```
-
-**After (3.0)** — 必须用双引号包裹含 `%` 或 `$` 的值：
-
-```yaml
-commands:
-    my_command:
-        name: my:command
-        args:
-            a: "%app.name%"
-            --idx: "$PARALLEL_INDEX"
-        once: "%app.once%"
-```
-
-> `%param%` 参数替换和 `$PARALLEL_INDEX` 变量替换的功能本身不变，仅 YAML 语法要求更严格。
-
----
-
-## Breaking Changes
-
-### 1. PHP 版本要求
-
-PHP 最低版本从 >=7.0 提升至 >=8.5。
-
-升级前请确认运行环境的 PHP 版本：
-
-```bash
-php -v
-```
-
-### 2. HTTP Kernel 变更（SilexKernel → MicroKernel）
-
-`oasis/http` v3.0 将基于 Silex 的 `SilexKernel` 替换为基于 Symfony HttpKernel 的 `MicroKernel`。
-
-**影响范围**：
-
-- `SlimApp::getHttpKernel()` 返回类型从 `Oasis\Mlib\Http\SilexKernel` 改为 `Oasis\Mlib\Http\MicroKernel`
-- 使用方代码中对 `SilexKernel` 的类型提示、`instanceof` 检查、import 语句均需更新
-
-**迁移方式**：
-
-将所有 `SilexKernel` 引用替换为 `MicroKernel`：
-
-```php
-// Before (2.x)
-use Oasis\Mlib\Http\SilexKernel;
-$kernel = $app->getHttpKernel(); // 返回 SilexKernel
-
-// After (3.0)
-use Oasis\Mlib\Http\MicroKernel;
-$kernel = $app->getHttpKernel(); // 返回 MicroKernel
-```
-
-MicroKernel 提供与 SilexKernel 等价的公共 API：
-
-| 方法 | 说明 |
-|------|------|
-| `addControllerInjectedArg(object $arg): void` | 注入控制器参数 |
-| `addExtraParameters(array $params): void` | 注入额外参数 |
-| `run(?Request $request = null): void` | 启动 HTTP 处理 |
-| `getCacheDirectories(): array` | 返回缓存目录列表 |
-
-### 3. DI 容器可见性变更（private-by-default）
-
-2.x 中 `SlimAppCompilerPass` 会将所有服务强制设为 public。3.0 移除了此行为，服务可见性遵循 Symfony 标准的 private-by-default 约定。
-
-**影响范围**：
-
-- `getService()` 仅能获取显式声明为 `public: true` 的服务
-- 调用 `getService()` 获取未声明为 public 的服务将抛出 `ServiceNotFoundException`
-- `getServiceIds()` 仅返回 public 服务的 ID 列表
-
-**`app` 服务**：`app` 服务保持 public，`getService('app')` 仍可正常使用。但建议逐步迁移到构造函数注入：
-
-```yaml
-# 推荐：通过构造函数注入获取 app 实例
-services:
-    my.service:
-        class: App\MyService
-        arguments:
-            - "@app"
-```
-
-#### `services.yml` 升级示例
-
-**Before (2.x)** — 所有服务自动 public，可直接通过 `getService()` 获取：
-
-```yaml
-services:
-    my.service:
-        class: App\MyService
-        arguments:
-            - "@another.service"
-```
-
-**After (3.0)** — 如果代码中通过 `$app->getService('my.service')` 获取，须显式声明 `public: true`：
-
-```yaml
-services:
-    my.service:
-        class: App\MyService
-        public: true
-        arguments:
-            - "@another.service"
-```
-
-> 纯通过构造函数注入使用的服务无需改动。
-
-#### 自查 Checklist
-
-1. 在项目代码中搜索所有 `getService(` 调用：
-   ```bash
-   grep -rn 'getService(' src/
-   ```
-2. 列出所有被获取的 service ID
-3. 逐一确认这些 service ID 在 `services.yml` 中是否声明了 `public: true`
-4. 未声明的须添加 `public: true`，或改为构造函数注入（推荐）
-
-### 4. Doctrine ORM 3.x 不兼容变更
-
-`doctrine/orm` 从 ^2.5 升级到 ^3.6，涉及多项 API 移除。如果项目启用了 ORM 支持，需要逐一适配。
-
-> **快速判断**：项目中是否有 `config/cli-config.php`、`src/Database/` 目录、或 `composer.json` 中依赖了 `doctrine/orm`？如果都没有，可跳过本节。
-
-#### 4a. ORM 命令集注册方式变更
-
-2.x 中通过 `ConsoleRunner::addCommands($console)` 注册 ORM 命令集（如 `orm:schema-tool:create`）。ORM 3.x 中该方法签名变更，必须传入第二个参数 `EntityManagerProvider`；同时 `ConsoleRunner::createHelperSet()` 和 `setHelperSet()` 方式已移除。
-
-**影响范围**：
-
-- console 入口（`bin/<project>.php`）中注册 ORM 命令的代码
-- 测试 bootstrap 中使用 ORM 命令重建 schema 的代码
-
-**Before (2.x)**：
-
-```php
-use Doctrine\ORM\Tools\Console\ConsoleRunner;
-
-$helperSet = require_once __DIR__ . "/../config/cli-config.php";
-$console->setHelperSet($helperSet);
-ConsoleRunner::addCommands($console);
-```
-
-**After (3.0)**：
-
-```php
-use Doctrine\ORM\Tools\Console\ConsoleRunner;
-
-// cli-config.php 现在返回 EntityManagerProvider（见 4b）
-$provider = require_once __DIR__ . "/../config/cli-config.php";
-ConsoleRunner::addCommands($console, $provider);
-```
-
-> 如果项目 console 入口从未注册过 ORM 命令集（即没有上述代码），则 `orm:*` 命令本来就不可用，无需改动。
->
-> 如果需要新增 ORM 命令支持，在 `bin/<project>.php` 中 `$app->getConsoleApplication()->run()` 之前加入上述两行即可。
-
-#### 4b. `cli-config.php` 变更
-
-`ConsoleRunner::createHelperSet()` 已移除。`config/cli-config.php` 需改为返回 `EntityManagerProvider` 实例：
-
-**Before (2.x)**：
-
-```php
-use Doctrine\ORM\Tools\Console\ConsoleRunner;
-use App\Database\AppDatabase;
-
-require_once __DIR__ . "/../bootstrap.php";
-
-return ConsoleRunner::createHelperSet(AppDatabase::getEntityManager());
-```
-
-**After (3.0)**：
-
-```php
-use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
-use App\Database\AppDatabase;
-
-require_once __DIR__ . "/../bootstrap.php";
-
-return new SingleManagerProvider(AppDatabase::getEntityManager());
-```
-
-#### 4c. Annotation 元数据驱动移除
-
-ORM 3.x 移除了 `Setup::createAnnotationMetadataConfiguration()`。Entity 映射必须使用 PHP 8 Attribute。
-
-**Before (2.x)**：
-
-```php
-use Doctrine\ORM\Tools\Setup;
-
-$config = Setup::createAnnotationMetadataConfiguration(
-    [PROJECT_DIR . "/src/Entities"],
-    $isDevMode,
-    $proxyDir,
-    $cache,
-    false
-);
-```
-
-**After (3.0)**：
-
-```php
-use Doctrine\ORM\ORMSetup;
-
-$config = ORMSetup::createAttributeMetadataConfiguration(
-    [PROJECT_DIR . "/src/Entities"],
-    $isDevMode,
-    $proxyDir
-);
-```
-
-> Entity 类中的 `@ORM\Table`、`@ORM\Column` 等注解需改为对应的 Attribute 语法（如 `#[ORM\Table]`、`#[ORM\Column]`）。
-
-#### 4d. `Doctrine\Common\Cache` 移除
-
-ORM 3.x 不再依赖 `doctrine/cache`，缓存改用 PSR-6（`psr/cache`）。`Doctrine\Common\Cache\MemcachedCache` 不再可用。
-
-**最简路径**：如果项目未使用 Doctrine 二级缓存（大多数项目不用），直接删除 `services.yml` 中的 `memcached_cache` 服务定义，并从 `Database` 类的 `getEntityManager()` 中移除缓存相关代码即可。
-
-**Before (2.x)** — `services.yml`：
-
-```yaml
-services:
-    memcached_cache:
-        class: Doctrine\Common\Cache\MemcachedCache
-        calls:
-            - [setMemcached, ['@memcached']]
-            - [setNamespace, ['%app.memcached.namespace%']]
-```
-
-**After (3.0)** — 不使用二级缓存时，直接删除上述服务定义。
-
-**如果确实需要二级缓存**，改用 `symfony/cache` 提供的 PSR-6 适配器：
-
-```yaml
-services:
-    cache.pool:
-        class: Symfony\Component\Cache\Adapter\MemcachedAdapter
-        arguments:
-            - '@memcached'
-            - '%app.memcached.namespace%'
-```
-
-```php
-// Database 类中
-use Doctrine\ORM\Cache\DefaultCacheFactory;
-use Doctrine\ORM\Cache\RegionsConfiguration;
-use Psr\Cache\CacheItemPoolInterface;
-
-/** @var CacheItemPoolInterface $cachePool */
-$cachePool = $app->getService('cache.pool');
-$regconfig = new RegionsConfiguration();
-$factory = new DefaultCacheFactory($regconfig, $cachePool);
-$config->setSecondLevelCacheEnabled();
-$config->getSecondLevelCacheConfiguration()->setCacheFactory($factory);
-```
-
-> `symfony/cache` 是 `doctrine/orm` ^3.6 的 suggest 依赖，需手动 `composer require symfony/cache`。
-
-#### 4e. `DataProviderInterface` 常量移除（ODM 模板）
-
-`oasis/utils` 3.0 将 `DataProviderInterface::STRING_TYPE` 等常量替换为 `DataType` 枚举。
-
-**Before (2.x)**：
-
-```php
-use Oasis\Mlib\Utils\DataProviderInterface;
-
-$cacheDir = $app->getMandatoryConfig('dir.cache', DataProviderInterface::STRING_TYPE);
-$awsConfig = $app->getMandatoryConfig('aws', DataProviderInterface::ARRAY_TYPE);
-```
-
-**After (3.0)**：
-
-```php
-use Oasis\Mlib\Utils\DataType;
-
-$cacheDir = $app->getMandatoryConfig('dir.cache', DataType::String);
-$awsConfig = $app->getMandatoryConfig('aws', DataType::Array);
-```
-
-#### 自查 Checklist
-
-1. 搜索项目中所有 `ConsoleRunner` 引用，按 4a/4b 适配
-2. 搜索 `Setup::createAnnotationMetadataConfiguration`，按 4c 改为 Attribute 驱动
-3. 搜索 `Doctrine\Common\Cache`，按 4d 替换为 PSR-6 缓存
-4. 搜索 `DataProviderInterface::` 常量引用，按 4e 改为 `DataType` 枚举
-5. 将 Entity 类的 Doctrine 注解改为 Attribute 语法
-
----
-
-### 5. AbstractDaemonSentinelCommand 移除
-
-`AbstractDaemonSentinelCommand` 已被移除。`DaemonSentinelCommand` 现在直接继承 `AbstractAlertableCommand`，并内联了所有 sentinel 执行逻辑。
-
-**迁移方式**：
-
-- 如果项目中有自定义类继承 `AbstractDaemonSentinelCommand`，改为继承 `DaemonSentinelCommand`
-- 如果直接使用 `DaemonSentinelCommand`（未继承），无需改动
-
-```php
-// Before (2.x)
-use Oasis\SlimApp\SentinelCommand\AbstractDaemonSentinelCommand;
-
-class MySentinel extends AbstractDaemonSentinelCommand { ... }
-
-// After (3.0)
-use Oasis\SlimApp\SentinelCommand\DaemonSentinelCommand;
-
-class MySentinel extends DaemonSentinelCommand { ... }
-```
-
-### 6. PHPUnit 升级（5.7 → 13）
-
-使用方项目的测试套件需要适配 PHPUnit 13 API。主要变更：
-
-| 旧 API (PHPUnit 5.7) | 新 API (PHPUnit 13) |
-|----------------------|---------------------|
-| `\PHPUnit_Framework_TestCase` | `\PHPUnit\Framework\TestCase` |
-| `setExpectedException(Class)` | `expectException(Class)` |
-| `setExpectedException(Class, msg)` | `expectException(Class)` + `expectExceptionMessage(msg)` |
-| `assertInternalType('array', $v)` | `assertIsArray($v)` |
-| `assertInternalType('string', $v)` | `assertIsString($v)` |
-| `assertInternalType('int', $v)` | `assertIsInt($v)` |
-| `assertInternalType('bool', $v)` | `assertIsBool($v)` |
-| `assertContains($needle, $string)` | `assertStringContainsString($needle, $string)` |
-| `assertFileNotExists($path)` | `assertFileDoesNotExist($path)` |
-| `getMockBuilder(X)->getMock()` | `createMock(X)` 或 `createStub(X)` |
-| `setUp()` (无返回类型) | `setUp(): void` |
-| `setUpBeforeClass()` (无返回类型) | `setUpBeforeClass(): void` |
-| `tearDown()` (无返回类型) | `tearDown(): void` |
-
-`phpunit.xml` 配置格式也需要更新：
-
-```xml
-<!-- Before (PHPUnit 5.7) -->
-<phpunit bootstrap="tests/bootstrap.php">
-    <filter>
-        <whitelist>
-            <directory suffix=".php">src</directory>
-        </whitelist>
-    </filter>
-</phpunit>
-
-<!-- After (PHPUnit 13) -->
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.0/phpunit.xsd"
-         bootstrap="tests/bootstrap.php">
-    <source>
-        <include>
-            <directory suffix=".php">src</directory>
-        </include>
-    </source>
-</phpunit>
-```
-
----
-
-## 升级步骤
-
-1. **确认 PHP 版本**：确保运行环境已升级到 PHP >=8.5（`php -v`）
-2. **更新 `composer.json`**：按「依赖变更清单」更新所有依赖版本
-3. **执行 `composer update`**：解析并安装新版本依赖
-4. **替换 SilexKernel 引用**：将所有 `SilexKernel` 类型提示和 import 改为 `MicroKernel`
-5. **调整 `services.yml`**：为通过 `getService()` 获取的服务添加 `public: true`
-6. **适配 Doctrine ORM 3.x**（如启用 ORM）：
-   - 将 Entity 注解改为 Attribute 语法
-   - 将 `Setup::createAnnotationMetadataConfiguration()` 改为 `ORMSetup::createAttributeMetadataConfiguration()`
-   - 删除或替换 `Doctrine\Common\Cache\MemcachedCache` 相关服务
-   - 更新 `cli-config.php` 和 console 入口中的 ORM 命令注册方式
-   - 将 `DataProviderInterface::*_TYPE` 常量改为 `DataType` 枚举
-7. **适配 AbstractDaemonSentinelCommand 移除**：如有自定义子类，改为继承 `DaemonSentinelCommand`
-8. **升级测试套件**：按 PHPUnit 13 API 变更清单适配测试代码和 `phpunit.xml`
-9. **清除旧缓存**：
-   ```bash
-   ./bin/<project>.php slimapp:cache:clear
-   ```
-10. **验证 public 服务**：
-    ```bash
-    ./bin/<project>.php slimapp:services:validate
-    ```
-11. **运行业务测试套件**：确认无回归
