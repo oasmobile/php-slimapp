@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.2.1 - 2026-05-10
+
+升级 oasis/utils ^3.2、oasis/http ^3.8。详见 [3.2.1/CHANGELOG.md](3.2.1/CHANGELOG.md)。
+
 ## v3.2.0 - 2026-05-06
 
 修复脚手架模板适配 Doctrine ORM 3.x；迁移文档全面重构。详见 [3.2.0/CHANGELOG.md](3.2.0/CHANGELOG.md)。
