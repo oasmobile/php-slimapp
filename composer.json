@@ -10,8 +10,8 @@
         "symfony/finder"              : "^8.0",
         "symfony/filesystem"          : "^8.0",
         "oasis/logging"               : "^3.0",
-        "oasis/utils"                 : "^3.0",
-        "oasis/http"                  : "^3.0"
+        "oasis/utils"                 : "^3.2",
+        "oasis/http"                  : "^3.8"
     },
     "require-dev": {
         "phpunit/phpunit"      : "^13",
