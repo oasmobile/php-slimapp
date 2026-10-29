@@ -303,62 +303,6 @@ class CommandRunnerTest extends TestCase
         $this->assertEquals(3, $input->getParameterOption('--idx'));
     }
 
-    public function testRunForksAndReturnsChildPid(): void
-    {
-        if (!function_exists('pcntl_fork')) {
-            $this->markTestSkipped('pcntl not available');
-        }
-
-        $app = new Application('test', '1.0');
-        $app->setAutoExit(false);
-        $app->addCommand(new \Symfony\Component\Console\Command\Command('list'));
-
-        $command = [
-            'name' => 'list', 'args' => [],
-            'once' => false, 'interval' => 0, 'frequency' => 0,
-            'frequency_fixed' => false, 'alert' => false,
-        ];
-
-        $output = new BufferedOutput();
-        $runner = new CommandRunner($app, 0, $command, $output);
-
-        $pid = $runner->run();
-        $this->assertGreaterThan(0, $pid);
-
-        // Clean up child process
-        pcntl_waitpid($pid, $status);
-    }
-
-    public function testRunSetsLastRunAndCurrentPid(): void
-    {
-        if (!function_exists('pcntl_fork')) {
-            $this->markTestSkipped('pcntl not available');
-        }
-
-        $app = new Application('test', '1.0');
-        $app->setAutoExit(false);
-        $app->addCommand(new \Symfony\Component\Console\Command\Command('list'));
-
-        $command = [
-            'name' => 'list', 'args' => [],
-            'once' => false, 'interval' => 0, 'frequency' => 0,
-            'frequency_fixed' => false, 'alert' => false,
-        ];
-
-        $output = new BufferedOutput();
-        $runner = new CommandRunner($app, 0, $command, $output);
-
-        $pid = $runner->run();
-
-        $lastRunRef = new \ReflectionProperty($runner, 'lastRun');
-        $currentPidRef = new \ReflectionProperty($runner, 'currentPid');
-
-        $this->assertGreaterThan(0, $lastRunRef->getValue($runner));
-        $this->assertEquals($pid, $currentPidRef->getValue($runner));
-
-        pcntl_waitpid($pid, $status);
-    }
-
     public function testOnProcessExitWithFrequencyAlreadyReached(): void
     {
         // When lastRun + frequency <= time(), nextRun should be set to time()

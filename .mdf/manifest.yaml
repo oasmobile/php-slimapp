@@ -1,0 +1,35 @@
+schema_version: 3
+state: initializing
+logo: "📍"
+versioning:
+  strategy: semver
+  latest_release: "3.2.1"
+implementation_roots:
+  - "src"
+baselines:
+  glossary:
+    status: documented
+    path: "GLOSSARY.md"
+  user_guide:
+    status: documented
+    path: "docs/user-guide/README.md"
+  system_boundary:
+    status: documented
+    path: "docs/system/overview.md"
+  architecture:
+    status: documented
+    path: "docs/system/architecture/current.md"
+  interfaces:
+    status: documented
+    path: "docs/system/interfaces/internal.md"
+  data:
+    status: documented
+    path: "docs/system/data/cache.md"
+  operations:
+    status: documented
+    path: "docs/system/operations/runbook.md"
+  deviations:
+    status: documented
+    path: "docs/system/deviations.md"
+closeout:
+  mode: local

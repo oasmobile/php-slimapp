@@ -1,101 +1,53 @@
-# Project: oasis/slimapp
+# SlimApp 项目维护
 
-## 概述
+本页是维护者与 Agent 的起点；运行时事实按下方主题入口查阅。
 
-SlimApp 是一个 PHP 全栈微框架，支持 Web（HTTP Kernel）和 CLI（Console）两种运行模式。基于 Symfony 组件构建，提供依赖注入容器、YAML 配置、日志、Daemon Sentinel 等能力。
+## 验证卡片
 
-## 技术栈
+环境要求：PHP >=8.5、Composer 2、已按 `composer.lock` 安装开发依赖；smoke/release 需要 pcntl。
 
-- **语言**: PHP >= 8.5
-- **包管理**: Composer
-- **核心依赖**:
-  - `symfony/dependency-injection` ^8.0（服务容器）
-  - `symfony/config` ^8.0（配置定义与解析）
-  - `symfony/console` ^8.0（CLI 框架）
-  - `symfony/finder` ^8.0
-  - `symfony/filesystem` ^8.0
-  - `oasis/logging` ^3.0（日志，基于 Monolog）
-  - `oasis/utils` ^3.0
-  - `oasis/http` ^3.0（HTTP Kernel，MicroKernel）
-- **开发依赖**:
-  - `phpunit/phpunit` ^13
-  - `phpstan/phpstan` ^2.1（静态分析，level 8）
-  - `doctrine/orm` ^3.6
-  - `oasis/aws-wrappers` ^3.0
-  - `oasis/dynamodb-odm` ^2.0
-  - `oasis/doctrine-addon` ^3.1
-  - `giorgiosironi/eris` ^1.1（Property-Based Testing）
+| 入口 | `.mdf/modules.yaml` 中的命令 |
+| --- | --- |
+| lint | `vendor/bin/phpstan analyse --no-progress --debug` |
+| build | `git diff --check` |
+| quick | `vendor/bin/phpunit --testsuite quick --log-junit "$MDF_REPORT_DIR/junit.xml"` |
+| smoke | `vendor/bin/phpunit --testsuite ut,pbt --log-junit "$MDF_REPORT_DIR/junit.xml"` |
+| release | `vendor/bin/phpunit --testsuite ut,pbt --log-junit "$MDF_REPORT_DIR/junit.xml"` |
 
-## 命名空间
+MDF 创建每次运行的报告目录并设置 `MDF_REPORT_DIR`；独立运行时先设置该变量并创建目录。
 
-```
-Oasis\SlimApp\  →  src/
-```
+## 技术栈与维护
 
-## 构建 / 测试命令
+版本与依赖以 `composer.json` 和 `composer.lock` 为准。
 
-```bash
-# 安装依赖
-composer install
+- PHP >=8.5；Symfony ^8.0；oasis/utils ^3.2、oasis/http ^3.8、oasis/logging ^3.0。
+- PHPUnit ^13、Eris ^1.1、PHPStan ^2.1 level 8；静态分析沿用仓库 baseline。
+- 用 `composer install --no-interaction --prefer-dist` 恢复锁定依赖。
+- lint 使用 `--debug` 串行分析，避免受限环境下并行 worker 监听本地端口。
+- 实现位于 `src/`，自动测试位于 `tests/ut/` 与 `tests/pbt/`。
+- 已发布版本由 Git tag 管理；最新版本见 `CHANGELOG.md`。
 
-# 运行单元测试
-./vendor/bin/phpunit --testsuite ut
+## 顶层例外与生成物
 
-# 运行 Property-Based Testing
-./vendor/bin/phpunit --testsuite pbt
+本表仅列标准源码、测试与 MDF 布局以外需要解释的目录。
 
-# 运行全量测试（ut + pbt）
-./vendor/bin/phpunit
+| 路径 | 保留理由 |
+| --- | --- |
+| `bin/` | Composer 分发的框架 CLI 入口 |
+| `config/` | 框架 CLI 自身的容器配置 |
+| `init-ut/` | 通过 Composer path 仓库验证工程生成器的独立测试工程 |
+| `graphify-out/` | 可陈旧的 Graphify 辅助图谱；不作为事实或 CodeWiki |
+| `.agents/`、`.cursor/`、`.kiro/` | 各宿主的项目级 Skill 与活动规则 |
+| `vendor/`、`.idea/` | 已忽略的本地依赖与 IDE 状态 |
 
-# 运行静态分析
-./vendor/bin/phpstan analyse
+缓存、日志及测试临时文件由运行环境产生；MDF 日志、报告、临时文件不提交。
 
-# 运行 CLI 入口（开发用）
-php test.php <command>
-```
+## 文档入口
 
-## 运行入口
+按任务打开对应页面，不通读目录。
 
-| 入口 | 路径 | 说明 |
-|------|------|------|
-| CLI（开发） | `test.php` | 使用 `ut/` 下的测试配置启动 Console |
-| CLI（bin） | `bin/slimapp` | 作为 Composer bin 分发的 CLI 入口 |
-| HTTP | 由使用方项目提供 `web/front.php` | 通过 `$app->getHttpKernel()->run()` 启动 |
-
-## 版本号位置
-
-- `composer.json` → `version` 字段（当前未显式声明，由 Packagist / tag 管理）
-- `services.yml` → `app.cli.version`（使用方项目自行定义）
-
-## 敏感文件
-
-- `ut/credentials.yml` — 测试用凭据（已被 services.yml import）
-- `config/` 目录下的配置文件可能包含数据库密码等
-
-## 目录结构概览
-
-```
-src/                          # 框架源码（Oasis\SlimApp 命名空间）
-├── SlimApp.php               # 核心类，单例，初始化容器/配置/日志
-├── ConsoleApplication.php    # CLI Application，扩展 Symfony Console
-├── SlimAppCompilerPass.php   # DI 编译器 Pass（默认命名空间解析、app 服务注册）
-├── ConfigParser.php          # 配置解析工具（parse/flatten/retrieve）
-├── NamespaceResolver.php     # 命名空间解析工具（短类名 → FQCN）
-├── AbstractAlertableCommand.php   # 支持 --alert 选项的 Command 基类
-├── AbstractParallelCommand.php    # 支持 pcntl_fork 并行执行的 Command 基类
-├── BuiltInCommands/          # 内置命令
-│   ├── ClearCacheCommand.php          # slimapp:cache:clear
-│   ├── InitializeProjectCommand.php   # slimapp:project:init
-│   └── ValidateServicesCommand.php    # slimapp:services:validate
-├── SentinelCommand/          # Daemon Sentinel 子系统
-│   ├── DaemonSentinelCommand.php          # 哨兵命令（直接继承 AbstractAlertableCommand）
-│   ├── CommandConfiguration.php           # 哨兵 YAML 配置定义
-│   └── CommandRunner.php                  # 子进程 fork/管理/调度
-└── tests/                    # 框架自身的测试辅助类
-tests/                        # 测试目录
-├── ut/                       # 单元测试
-├── pbt/                      # Property-Based Testing（Eris）
-├── integration/              # 集成测试
-└── scripts/                  # 覆盖率合并等脚本
-ut/                           # 集成测试 / 手动测试配置
-```
+- [系统边界](docs/system/overview.md)
+- [文档导航](docs/README.md)
+- [测试约定](docs/system/testing/index.md)
+- [领域术语](GLOSSARY.md)
+- [历史工作流档案](docs/context/research/legacy-agent-workflow/README.md)
