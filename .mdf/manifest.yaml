@@ -1,5 +1,5 @@
 schema_version: 3
-state: initializing
+state: ready
 logo: "📍"
 versioning:
   strategy: semver

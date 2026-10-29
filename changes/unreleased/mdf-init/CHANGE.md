@@ -23,7 +23,7 @@ evidence:
 
 ## 结果
 
-已按用户确认方案建立 MDF 配置与文档布局；事实审阅及严格校验通过初始化阶段验收，状态保持 initializing，等待启用确认。
+已按用户确认方案建立 MDF 配置与文档布局；事实审阅及严格校验通过初始化阶段验收，用户已确认启用，状态改为 ready。
 
 - 原 state/manual 内容归入 system/user-guide，修正已核实过时陈述。
 - 旧工作流原文归档，保留通用安全、Git 和 Graphify 入口。
@@ -44,4 +44,5 @@ ORM 生成模板仍调用已移除 API，详见 `docs/system/deviations.md`；�
 JUnit XML 的 testcase classname 已核实；完整命令输出与报告保存在 `.mdf/logs/`。
 事实审阅修正了 CLI 加载顺序、ORM 映射选择与跨页锚点等陈述。
 第二轮全量 Audit 为零 warning；strict validation 仅余允许的 manifest.initializing。
+2026-10-29 经用户确认启用，ready 状态的 basic validation 零 finding。
 完整范围、基线、命令和分支方案见 [初始化审阅报告](fact-audit.md)。

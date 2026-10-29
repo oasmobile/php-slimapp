@@ -1,6 +1,6 @@
 # MDF 初始化审阅报告
 
-本报告记录已获用户确认的迁移结果、验证及启用方案；当前状态仍为 initializing。
+本报告记录已获用户确认的迁移结果、验证及启用方案；审阅时状态为 initializing，用户确认后已改为 ready。
 
 ## 范围与结论
 
@@ -91,3 +91,11 @@ JUnit 已解析核对：有 testcase、classname 非空、没有失败、错误�
 4. 保留现有本地 master 和 develop；当前 develop 不重置、不强行对齐 master。
 
 最新已发布版本为 3.2.1，收口模式为 local；本次不推送、不修改 tag 或远端默认分支。
+
+## 启用记录
+
+2026-10-29 用户明确确认启用，已将状态改为 ready。
+
+- 对照审阅基线未发现新的事实、配置或实现变化，复用同次全量审阅与 strict validation。
+- 本次增量仅含 manifest.state 和初始化启用记录。
+- ready 状态的 basic validation 零 finding，日志为 `.mdf/logs/20261029T091840362088000Z-validate/`。
