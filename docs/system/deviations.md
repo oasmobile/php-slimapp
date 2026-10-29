@@ -28,8 +28,3 @@ ORM 工程生成模板仍含不匹配 Doctrine ORM 3.x 的 API。
 - 服务验证的退出码不表示所有服务成功，见[CLI 命令](../user-guide/cli-commands.md)。
 - app 自动装配有命名空间参数前提，见[内部接口](interfaces/internal.md)。
 - 缓存升级需显式清理，见[运行限制与恢复](operations/limits-and-recovery.md)。
-
-## 初始化状态
-
-文档与工作流迁移已落地；是否启用由 `.mdf/manifest.yaml` 控制。
-本页不保存工作清单，初始化过程见 `changes/unreleased/mdf-init/CHANGE.md`。

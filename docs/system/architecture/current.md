@@ -2,7 +2,19 @@
 title: "当前架构"
 doc_type: system-architecture
 evidence:
-  - path: "src/"
+  - path: "src/AbstractAlertableCommand.php"
+  - path: "src/AbstractParallelCommand.php"
+  - path: "src/BuiltInCommands/ClearCacheCommand.php"
+  - path: "src/BuiltInCommands/InitializeProjectCommand.php"
+  - path: "src/BuiltInCommands/ValidateServicesCommand.php"
+  - path: "src/ConfigParser.php"
+  - path: "src/ConsoleApplication.php"
+  - path: "src/NamespaceResolver.php"
+  - path: "src/SentinelCommand/CommandConfiguration.php"
+  - path: "src/SentinelCommand/CommandRunner.php"
+  - path: "src/SentinelCommand/DaemonSentinelCommand.php"
+  - path: "src/SlimApp.php"
+  - path: "src/SlimAppCompilerPass.php"
 ---
 
 # 当前架构

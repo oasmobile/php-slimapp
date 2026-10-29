@@ -38,15 +38,5 @@ evidence:
 
 调度命令读取独立 YAML 文件，并使用 CommandConfiguration 校验。
 
-| 字段 | 默认值或要求 |
-| --- | --- |
-| name | 必填 |
-| args | 空数组，必须为数组 |
-| parallel | 1 |
-| once | false |
-| alert | true |
-| interval、frequency | 0 |
-| frequency_fixed | false |
-
 使用 ConsoleApplication 时，匹配 `%参数%` 的值整体替换为容器参数，不执行字符串插值。
-调度规则和参数示例见 [Daemon Sentinel](../../user-guide/daemon-sentinel.md)。
+字段默认值、调度规则和参数示例见 [Daemon Sentinel](../../user-guide/daemon-sentinel.md)。

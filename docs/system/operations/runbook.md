@@ -19,7 +19,8 @@ SlimApp 作为 Composer 库分发；生产业务入口由使用方项目生成�
 
 | 路径 | 用途 |
 | --- | --- |
-| bin/slimapp | Composer bin；加载框架的 config/app.php 与内置 Console |
+| bin/slimapp | 探测使用方 bootstrap 或 Composer autoload，取得应用后运行 Console |
+| config/app.php | 保留的单例返回入口；bin 不直接加载此文件 |
 | 使用方 bootstrap.php | 初始化应用单例 |
 | 使用方 web/front.php | 运行 MicroKernel |
 | 使用方 bin/项目.php | 运行应用 Console |

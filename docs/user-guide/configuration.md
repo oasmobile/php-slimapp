@@ -12,7 +12,8 @@ evidence:
 
 ## 读取应用配置
 
-配置由使用方的 ConfigurationInterface 定义；框架读取 `config/config.yml`。
+配置由使用方的 ConfigurationInterface 定义。
+框架从 `init()` 指定的配置目录读取 `config.yml`；生成工程通常使用 `config/config.yml`。
 
 ```php
 use Oasis\Mlib\Utils\DataType;

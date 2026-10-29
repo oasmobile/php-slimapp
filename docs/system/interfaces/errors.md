@@ -26,6 +26,7 @@ evidence:
 | Sentinel 参数引用取值为 null | InvalidArgumentException |
 | Sentinel parallel 不是整数 | InvalidArgumentException |
 | fork 或 wait 失败 | RuntimeException |
+| Sentinel 回收到不在调度记录中的 PID | LogicException |
 
 ## 命令失败语义
 
@@ -35,5 +36,5 @@ evidence:
 - AbstractParallelCommand 的退出码和重启规则见[自定义命令](../../user-guide/console.md)。
 - Sentinel 配置文件不可读时输出错误并返回 1；正常结束返回 0。
 - CommandRunner 在子进程中把命令异常映射为 255；已发送 alert 的失败可改为退出 0。
-- `slimapp:services:validate` 的单服务异常只写输出；最终仍返回 0。
+- 服务检查的输出与退出码边界见 [CLI 命令](../../user-guide/cli-commands.md#验证服务)。
 - 测试入口对失败与跳过的要求见[测试约定](../testing/conventions.md)。

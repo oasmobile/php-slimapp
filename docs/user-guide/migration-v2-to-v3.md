@@ -2,6 +2,7 @@
 title: "从 SlimApp 2.x 升级"
 doc_type: user-guide
 evidence:
+  - path: "composer.lock"
   - path: "composer.json"
   - path: "src/SlimApp.php"
   - path: "src/SlimAppCompilerPass.php"
@@ -68,23 +69,23 @@ use Oasis\Mlib\Http\MicroKernel;
 | `run(?Request $request = null): void` | 启动 HTTP 处理 |
 | `getCacheDirectories(): array` | 返回缓存目录列表 |
 
-此外，`oasis/http` v3.4+ 已恢复以下 Silex 时代的便捷方法，下游无需为这些调用做额外迁移：
+当前安装的 `oasis/http` 提供以下便捷方法；使用方仍须核对签名和业务兼容性：
 
-| 方法 | 恢复版本 | 说明 |
-|------|----------|------|
-| `render($view, $params, $response)` | v3.4 | 渲染 Twig 模板返回 Response |
-| `renderView($view, $params)` | v3.4 | 渲染 Twig 模板返回字符串 |
-| `path($route, $params)` | v3.4 | 生成相对 URL |
-| `url($route, $params)` | v3.4 | 生成绝对 URL |
-| `before($callback, $priority, $masterRequestOnly)` | v3.5 | 注册 before 过滤器 |
-| `after($callback, $priority, $masterRequestOnly)` | v3.5 | 注册 after 过滤器 |
-| `error($callback, $priority)` | v3.5 | 注册 error handler |
-| `view($callback)` | v3.6 | 注册 view handler |
-| `abort($statusCode, $message, $headers)` | v3.6 | 抛出 HttpException |
-| `redirect($url, $status)` | v3.6 | 创建重定向响应 |
-| `json($data, $status, $headers)` | v3.6 | 创建 JSON 响应 |
-| `stream($callback, $status, $headers)` | v3.6 | 创建流式响应 |
-| `sendFile($file, $status, $headers, $contentDisposition)` | v3.6 | 创建文件下载响应 |
+| 方法 | 说明 |
+| --- | --- |
+| `render($view, $params, $response)` | 渲染 Twig 模板返回 Response |
+| `renderView($view, $params)` | 渲染 Twig 模板返回字符串 |
+| `path($route, $params)` | 生成相对 URL |
+| `url($route, $params)` | 生成绝对 URL |
+| `before($callback, $priority, $masterRequestOnly)` | 注册 before 过滤器 |
+| `after($callback, $priority, $masterRequestOnly)` | 注册 after 过滤器 |
+| `error($callback, $priority)` | 注册 error handler |
+| `view($callback)` | 注册 view handler |
+| `abort($statusCode, $message, $headers)` | 抛出 HttpException |
+| `redirect($url, $status)` | 创建重定向响应 |
+| `json($data, $status, $headers)` | 创建 JSON 响应 |
+| `stream($callback, $status, $headers)` | 创建流式响应 |
+| `sendFile($file, $status, $headers, $contentDisposition)` | 创建文件下载响应 |
 
 **自查**：`grep -rn 'SilexKernel' src/`
 
@@ -185,10 +186,10 @@ DataType 与 PHPUnit 升级见[数据访问和测试迁移](migration-data-and-t
 | `Class "Oasis\Mlib\Http\SilexKernel" not found` | oasis/http 3.0 移除了 SilexKernel | → [SilexKernel → MicroKernel](#silexkernel--microkernel) |
 | `ServiceNotFoundException: ... has been removed from the container` | 服务未声明 public | → [DI 容器 private-by-default](#di-容器-private-by-default) |
 | `The reserved indicator "%" cannot start a plain scalar` | sentinel.yml 中 `%param%` 未加引号 | → [sentinel.yml 引号](#sentinelyml-引号) |
-| `Class "Doctrine\ORM\Tools\Setup" not found` | ORM 3.x 移除了 Setup 类 | → [Annotation → Attribute](#annotation--attribute) |
-| `Class "Doctrine\Common\Cache\MemcachedCache" not found` | doctrine/cache 已移除 | → [Doctrine\Common\Cache 移除](#doctrinecommoncache-移除) |
-| `ConsoleRunner::createHelperSet() not found` | ORM 3.x 移除了该方法 | → [ORM 命令集注册](#orm-命令集注册) |
-| `DataProviderInterface::STRING_TYPE not found` | oasis/utils 3.0 改为枚举 | → [oasis/utils DataType 枚举](#oasisutils-datatype-枚举) |
+| `Class "Doctrine\ORM\Tools\Setup" not found` | ORM 3.x 移除了 Setup 类 | → [Annotation → Attribute](migration-orm.md#annotation--attribute) |
+| `Class "Doctrine\Common\Cache\MemcachedCache" not found` | doctrine/cache 已移除 | → [Doctrine\Common\Cache 移除](migration-orm.md#doctrinecommoncache-移除) |
+| `ConsoleRunner::createHelperSet() not found` | ORM 3.x 移除了该方法 | → [ORM 命令集注册](migration-orm.md#orm-命令集注册) |
+| `DataProviderInterface::STRING_TYPE not found` | oasis/utils 3.0 改为枚举 | → [oasis/utils DataType 枚举](migration-data-and-tests.md#oasisutils-datatype-枚举) |
 | `Class "Oasis\SlimApp\SentinelCommand\AbstractDaemonSentinelCommand" not found` | 基类已移除 | → [AbstractDaemonSentinelCommand 移除](#abstractdaemonsentinelcommand-移除) |
 
 ---
@@ -225,7 +226,7 @@ DataType 与 PHPUnit 升级见[数据访问和测试迁移](migration-data-and-t
 | 配置文件 | 兼容性 | 说明 |
 |----------|--------|------|
 | `config.yml` | ✅ 无缝兼容 | 格式由使用方 `ConfigurationInterface` 定义，框架侧无变化 |
-| `routes.yml` | ✅ 无缝兼容 | 按安装版本的 MicroKernel 路由格式及使用方测试核对 |
+| `routes.yml` | 需核对 | 按安装版本的 MicroKernel 路由格式及使用方测试核对 |
 | `sentinel.yml` | ⚠️ 需加引号 | 详见 [sentinel.yml 引号](#sentinelyml-引号) |
 | `services.yml` | ⚠️ 需加 public | 详见 [DI 容器 private-by-default](#di-容器-private-by-default) |
 

@@ -2,6 +2,7 @@
 title: "Doctrine ORM 迁移"
 doc_type: user-guide
 evidence:
+  - path: "composer.lock"
   - path: "composer.json"
   - path: "src/BuiltInCommands/InitializeProjectCommand.php"
 ---
@@ -16,7 +17,7 @@ evidence:
 
 #### Annotation → Attribute
 
-ORM 3.x 移除了 Annotation 元数据驱动。Entity 映射必须使用 PHP 8 Attribute。
+ORM 3.x 移除了 Annotation 元数据驱动。旧 Annotation 映射需迁移为 Attribute（下文示例）或 XML 等受支持驱动。
 
 ```php
 // Before — Database 类中

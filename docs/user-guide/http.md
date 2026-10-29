@@ -2,6 +2,7 @@
 title: "HTTP 接入"
 doc_type: user-guide
 evidence:
+  - path: "composer.lock"
   - path: "src/SlimApp.php"
   - path: "composer.json"
   - path: "tests/integration/http.php"

@@ -2,7 +2,45 @@
 title: "测试约定"
 doc_type: system-testing
 evidence:
-  - path: "tests/"
+  - path: "tests/bootstrap.php"
+  - path: "tests/integration/bootstrap.php"
+  - path: "tests/integration/config/config.yml"
+  - path: "tests/integration/config/routes.yml"
+  - path: "tests/integration/config/sentinel.yml"
+  - path: "tests/integration/config/services.yml"
+  - path: "tests/integration/console.php"
+  - path: "tests/integration/fixtures/DummyCommand.php"
+  - path: "tests/integration/fixtures/TestAppConfig.php"
+  - path: "tests/integration/fixtures/TestController.php"
+  - path: "tests/integration/fixtures/TestSentinelCommand.php"
+  - path: "tests/integration/http.php"
+  - path: "tests/pbt/CommandConfigurationPbtTest.php"
+  - path: "tests/pbt/CommandRunnerSchedulingPbtTest.php"
+  - path: "tests/pbt/ConfigParserPbtTest.php"
+  - path: "tests/pbt/NamespaceResolverPbtTest.php"
+  - path: "tests/pbt/VerbosityMappingPbtTest.php"
+  - path: "tests/run_all_coverage.sh"
+  - path: "tests/scripts/merge_coverage.php"
+  - path: "tests/scripts/parallel_command_test.php"
+  - path: "tests/scripts/sentinel_command_test.php"
+  - path: "tests/ut/AbstractAlertableCommandTest.php"
+  - path: "tests/ut/AbstractParallelCommandPcntlTest.php"
+  - path: "tests/ut/AbstractParallelCommandTest.php"
+  - path: "tests/ut/BuiltInCommands/ClearCacheCommandTest.php"
+  - path: "tests/ut/BuiltInCommands/InitializeProjectCommandTest.php"
+  - path: "tests/ut/BuiltInCommands/ValidateServicesCommandTest.php"
+  - path: "tests/ut/CommandConfigurationTest.php"
+  - path: "tests/ut/CommandRunnerPcntlTest.php"
+  - path: "tests/ut/CommandRunnerTest.php"
+  - path: "tests/ut/ConfigParserTest.php"
+  - path: "tests/ut/ConsoleApplicationTest.php"
+  - path: "tests/ut/Fixtures/ConcreteParallelCommand.php"
+  - path: "tests/ut/ForkProcessTest.php"
+  - path: "tests/ut/NamespaceResolverTest.php"
+  - path: "tests/ut/SentinelCommand/DaemonSentinelCommandPcntlTest.php"
+  - path: "tests/ut/SentinelCommand/DaemonSentinelCommandTest.php"
+  - path: "tests/ut/SlimAppCompilerPassTest.php"
+  - path: "tests/ut/SlimAppTest.php"
   - path: "phpunit.xml"
   - path: "composer.json"
   - path: ".mdf/modules.yaml"
@@ -11,6 +49,8 @@ evidence:
 # 测试约定
 
 本页定义本项目的自动测试成员、运行前提和失败语义。
+
+凭据 fixture 只核对加载关系；配置值不进入事实正文与审阅范围。
 
 ## 测试分类
 
