@@ -36,6 +36,11 @@ evidence:
   - path: "tests/ut/ConsoleApplicationTest.php"
   - path: "tests/ut/Fixtures/ConcreteParallelCommand.php"
   - path: "tests/ut/ForkProcessTest.php"
+  - path: "tests/ut/Regression/Bug2AN6Test.php"
+  - path: "tests/ut/Regression/BugGH7ATest.php"
+  - path: "tests/ut/Regression/BugY68QTest.php"
+  - path: "tests/ut/Regression/BugP4KUTest.php"
+  - path: "tests/ut/Regression/Bug1MW9Test.php"
   - path: "tests/ut/NamespaceResolverTest.php"
   - path: "tests/ut/SentinelCommand/DaemonSentinelCommandPcntlTest.php"
   - path: "tests/ut/SentinelCommand/DaemonSentinelCommandTest.php"
@@ -62,6 +67,9 @@ evidence:
 | PT | tests/pbt；配置、解析、调度和 verbosity 的性质测试 |
 | 人工集成材料 | tests/integration；HTTP/Console 入口与 fixture，不自动纳入套件 |
 | 辅助脚本 | tests/scripts 与 run_all_coverage.sh；子进程覆盖率采集与合并 |
+
+V3 升级 Bug 的复现测试位于 `tests/ut/Regression/`，随 ut 纳入 smoke/release，不进入 quick。
+其 fixture 使用隔离临时目录，子进程输出和命令保存在 `.mdf/reports/v3-bug-repro-*`。
 
 ## 失败语义与依赖
 

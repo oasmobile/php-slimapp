@@ -49,4 +49,6 @@ found_in: 3.2.1
 2. 由人工运行测试，确认失败源于本 Bug，并保存命令、日志及测试报告。
 3. 等待人工明确启动 Bug 修复流程后，再修改实现并运行回归验证。
 
-当前仅完成登记；未编写测试、未运行复现、未启动修复。
+复现测试已编写：`tests/ut/Regression/BugGH7ATest.php`，包含 1 个场景。
+测试使用生成的 bootstrap 启动最小 PHPUnit 用例；当前尚未运行，等待人工确认红灯。
+统一运行与交接见 [复现测试交接](../../changes/unreleased/v3-bug-reproduction-tests/HANDOFF.md)。
