@@ -1,0 +1,91 @@
+<!doctype html>
+{{MDF_METADATA_COMMENT}}
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>{{MDF_DOCUMENT_TITLE}}</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 36px 24px; background: #0e161c; color: #e4edf2;
+      font: 16px/1.85 ui-monospace, "SFMono-Regular", "Cascadia Code", "PingFang SC", monospace; }
+    .document { max-width: 1120px; margin: auto; background: #141d24; border: 1px solid #32454f; }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      padding: 20px 28px; background: #10171d; border-bottom: 1px solid #32454f;
+      color: #a0b2bd; font-size: 12px; letter-spacing: 1.4px; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; }
+    .brand::before { content: ""; width: 7px; height: 7px; background: #a8e3b1; border-radius: 50%; }
+    .layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); }
+    .outline { padding: 36px 22px; border-right: 1px dashed #32454f; font-size: 13px; }
+    .outline-label { margin: 0 0 24px; color: #a8e3b1; font-size: 12px; letter-spacing: 1px; }
+    .outline ol { padding: 0; margin: 0; list-style: none; }
+    .outline li { margin: 0 0 16px; }
+    .outline a { display: block; color: #a0b2bd; text-decoration: none; }
+    .outline a:hover { color: #a8e3b1; }
+    main { min-width: 0; padding: 38px 42px; counter-reset: section;
+      overflow-wrap: anywhere; }
+    h1 { margin: 0 0 36px; padding-bottom: 30px; border-bottom: 1px solid #32454f;
+      font-size: clamp(28px, 3.5vw, 38px); line-height: 1.35; font-weight: 600; letter-spacing: -.8px; }
+    h1::after { content: "_"; color: #a8e3b1; }
+    h2 { margin: 38px 0 16px; color: #a8e3b1; font-size: 19px; line-height: 1.5;
+      font-weight: 600; counter-increment: section; scroll-margin-top: 24px; }
+    h2::before { content: counter(section, decimal-leading-zero) " / ";
+      padding-right: 8px; color: #a0b2bd; font-size: 12px; font-weight: 400; }
+    h3 { margin: 24px 0 12px; font-size: 16px; font-weight: 600; }
+    h4, h5, h6 { font-size: 15px; }
+    p { margin: 12px 0; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+    li > ul, li > ol { margin: 8px 0; }
+    a { color: #a8e3b1; text-underline-offset: 4px; }
+    a:focus-visible { outline: 2px solid #a8e3b1; outline-offset: 4px; }
+    code { padding: 2px 5px; background: #1e3034; color: #bee9c5;
+      font: .9em/1.7 ui-monospace, "SFMono-Regular", "Cascadia Code", monospace; }
+    pre { margin: 20px 0; padding: 20px; border-left: 2px solid #527861;
+      background: #101a20; color: #bee9c5; overflow-x: auto; font-size: 14px; line-height: 1.8; }
+    pre code { padding: 0; background: transparent; }
+    blockquote { margin: 20px 0; padding: 10px 20px; border-left: 2px solid #a8e3b1;
+      background: #1e3034; color: #d5e4df; }
+    .table-wrap { max-width: 100%; margin: 20px 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.75; }
+    th { padding: 12px 16px; background: #1b2a32; color: #a0b2bd;
+      font-size: 12px; font-weight: 500; text-align: left; }
+    td { padding: 14px 16px; vertical-align: top; }
+    th, td { border-bottom: 1px solid #32454f; min-width: 110px; }
+    tbody tr:nth-child(even) { background: #17232b; }
+    hr { margin: 28px 0; border: 0; border-top: 1px solid #32454f; }
+    img { max-width: 100%; height: auto; }
+    .document-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
+      padding: 20px 28px; border-top: 1px solid #32454f; color: #a0b2bd; font-size: 12px; }
+    @media (max-width: 720px) {
+      body { padding: 16px 12px; font-size: 15px; }
+      .layout { grid-template-columns: 1fr; }
+      .outline { padding: 22px; border-right: 0; border-bottom: 1px solid #32454f; }
+      .outline-label { margin-bottom: 12px; }
+      .outline ol { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+      .outline li { margin: 0; }
+      main { padding: 28px 22px; }
+      .masthead, .document-footer { padding: 18px 22px; }
+      h1 { margin-bottom: 28px; padding-bottom: 24px; }
+      th, td { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="document">
+    <header class="masthead"><span class="brand">MDF / WORKSPACE</span><span>工作材料</span></header>
+    <div class="layout">
+      <nav class="outline" aria-label="文档目录">
+        <p class="outline-label">INDEX /</p>
+        <ol>{{MDF_DOCUMENT_OUTLINE}}</ol>
+      </nav>
+      <main>
+{{MDF_DOCUMENT_CONTENT}}
+      </main>
+    </div>
+    <footer class="document-footer"><span>Mars Development Flow</span><span>范围 / 决定 / 证据</span></footer>
+  </div>
+</body>
+</html>

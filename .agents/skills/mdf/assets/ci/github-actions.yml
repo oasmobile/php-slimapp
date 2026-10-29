@@ -1,0 +1,63 @@
+# 复制后由项目配置 runner、依赖、凭据和必需测试；默认不 approve/merge。
+name: MDF CI review
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [develop, master]
+permissions:
+  contents: read
+concurrency:
+  group: mdf-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  review:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: self-hosted
+    env:
+      # runner 固定安装的受信任 Skill 路径；由项目修改，不指向被审 checkout。
+      MDF_SKILL: /opt/mdf
+      MDF_BACKEND: codex
+      # 首次 release 填已确认的固定基线；增量复核的上轮报告由项目下载为 artifact。
+      MDF_REVIEW_BASE: ${{ vars.MDF_REVIEW_BASE }}
+      MDF_PREVIOUS_REPORT: ${{ vars.MDF_PREVIOUS_REPORT }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      # 项目在此运行必需的 lint/tests，保存完整日志及报告。
+      # MDF_SKILL 及脚本应由 runner 固定安装，或从 policy_ref 提取后运行。
+      - name: 外部复核
+        if: github.event_name == 'pull_request'
+        env:
+          SOURCE: ${{ github.event.pull_request.head.ref }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          POLICY: ${{ github.event.pull_request.base.sha }}
+        run: >-
+          python3 "$MDF_SKILL/assets/ci/review.py"
+          --repo "$GITHUB_WORKSPACE" --source "$SOURCE" --head "$HEAD"
+          --policy-ref "$POLICY" --backend "$MDF_BACKEND"
+          --output-dir "$RUNNER_TEMP/mdf-review"
+      - name: Push 审计
+        if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.event.after }}
+        run: |
+          python3 "$MDF_SKILL/scripts/mdf.py" audit-push --repo "$GITHUB_WORKSPACE" \
+            --branch "$GITHUB_REF_NAME" --before "$BEFORE" --after "$AFTER" \
+            --collect-evidence > "$RUNNER_TEMP/mdf-audit.json"
+          python3 -c 'import json,sys; sys.exit(json.load(open(sys.argv[1]))["result"]["verdict"] != "pass")' "$RUNNER_TEMP/mdf-audit.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mdf-review
+          path: |
+            ${{ runner.temp }}/mdf-review/
+            ${{ runner.temp }}/mdf-audit.json
+# 后续独立 job 持有平台写凭据，可调用 publish.py；通知由项目自行配置。

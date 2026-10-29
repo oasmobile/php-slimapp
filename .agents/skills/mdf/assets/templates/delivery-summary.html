@@ -1,0 +1,28 @@
+<!-- 正文模板：填入 document.html 的 MDF_DOCUMENT_CONTENT，输出完整 HTML。 -->
+  <h1>{{MDF_DELIVERY_TITLE}}：设计与开发总结</h1>
+  <h2 id="scope">交付范围与结果</h2>
+  <p>{{MDF_CONFIRMED_SCOPE_AND_ACTUAL_RESULT}}</p>
+  <h2 id="process">完整交付过程</h2>
+  <p>按实际执行顺序记录阶段、参与者、输入、动作、产物与结果；包含失败、修复和续办。</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>阶段 / 顺序</th><th>参与者与输入</th><th>动作与结果</th><th>证据</th></tr></thead>
+    <tbody>{{MDF_DELIVERY_PROCESS_ROWS}}</tbody>
+  </table></div>
+  <h2 id="decisions">设计决策与取舍</h2>
+  <p>逐项记录问题、候选方案、选择、依据与影响；长期决策链接 ADR。</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>问题与候选</th><th>决定与理由</th><th>影响 / 确认</th></tr></thead>
+    <tbody>{{MDF_DESIGN_DECISION_ROWS}}</tbody>
+  </table></div>
+  <h2 id="implementation">开发与测试实现</h2>
+  <p>{{MDF_IMPLEMENTATION_AND_TEST_DETAILS}}</p>
+  <h2 id="deviations">偏差与范围变化</h2>
+  <p>对照已确认 PRP / objectives / design，记录计划、实际、原因、影响、接受人与后续处理。</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>计划与实际</th><th>原因与影响</th><th>接受 / 后续</th></tr></thead>
+    <tbody>{{MDF_DEVIATION_ROWS_OR_NO_DEVIATION}}</tbody>
+  </table></div>
+  <h2 id="evidence">审查与验证证据</h2>
+  <p>{{MDF_REVIEW_FINDINGS_FIXES_AND_VERIFICATION_RESULTS}}</p>
+  <h2 id="follow-up">交付与后续事项</h2>
+  <p>{{MDF_GITFLOW_TARGETS_RELEASE_PLAN_AND_FOLLOW_UP}}</p>

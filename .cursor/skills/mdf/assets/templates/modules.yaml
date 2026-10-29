@@ -1,0 +1,31 @@
+# Module 验证入口。命令与 tests glob 分 module 声明。
+# 默认：repo 级同名入口按 module 名排序后串行展开（id 为 <entry>:<module>）。
+# 可选顶层 verification: 覆写 lint/build/quick/smoke/release 中的一项或多项
+# （覆写项用单命令，不再按 module 展开）。
+# module ignore 仅作用于自身 sourceset；实现审阅仅覆盖已归属文件。
+# 命中路径不触发相应 verify，也不产生 uncovered 提示。
+# named suite 每个名字必须对应 docs/system/testing/<name>.md
+# （frontmatter 含 commands/command，可选 parallel）。
+# quick/smoke/release 可选 parallel: true（按 module 展开的命令并行，≤5）。
+# verification:
+#   lint: "make -j1 lint"
+modules:
+  default:
+    sourceset:
+      - "src/**"
+    ignore: []
+    lint: "true"
+    build: "true"
+    quick:
+      command: "true"
+      tests:
+        - "tests/**"
+    smoke:
+      command: "true"
+      tests:
+        - "tests/**"
+    release:
+      command: "true"
+      tests:
+        - "tests/**"
+    named: []

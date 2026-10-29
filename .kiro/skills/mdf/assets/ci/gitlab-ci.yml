@@ -1,0 +1,42 @@
+# 由项目配置 self-hosted runner 的 mdf 标签、CLI 依赖、凭据及必需测试。
+mdf-review:
+  tags: [mdf]
+  variables:
+    GIT_DEPTH: "0"
+    # runner 固定安装的受信任 Skill 路径；由项目修改，不指向被审 checkout。
+    MDF_SKILL: /opt/mdf
+    MDF_BACKEND: codex
+    # 首次 release 由项目变量 MDF_REVIEW_BASE 指定确认后的固定基线。
+    # 增量复核可通过 MDF_PREVIOUS_REPORT 指向项目已下载的上轮报告。
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "master")'
+  script:
+    - |
+      # 项目先运行必需的 lint/tests，完整保留报告。
+      # OPENAI_API_KEY 或 CURSOR_API_KEY 由项目变量提供。
+      # CLI 脚本由 runner 固定安装，或从目标规则版本提取。
+      MDF_OUTPUT="$CI_BUILDS_DIR/mdf-review-$CI_JOB_ID"
+      mkdir -p "$MDF_OUTPUT"
+      if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then
+        git fetch --tags origin
+        git fetch origin "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+        MDF_POLICY="$(git rev-parse FETCH_HEAD)"
+        MDF_HEAD="${CI_MERGE_REQUEST_SOURCE_BRANCH_SHA:-$CI_COMMIT_SHA}"
+        git checkout --detach "$MDF_HEAD"
+        python3 "$MDF_SKILL/assets/ci/review.py" --repo "$CI_PROJECT_DIR" \
+          --source "$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME" --head "$MDF_HEAD" \
+          --policy-ref "$MDF_POLICY" --backend "$MDF_BACKEND" --output-dir "$MDF_OUTPUT"
+      else
+        python3 "$MDF_SKILL/scripts/mdf.py" audit-push --repo "$CI_PROJECT_DIR" \
+          --branch "$CI_COMMIT_BRANCH" --before "$CI_COMMIT_BEFORE_SHA" --after "$CI_COMMIT_SHA" \
+          --collect-evidence > "$MDF_OUTPUT/audit.json"
+        python3 -c 'import json,sys; sys.exit(json.load(open(sys.argv[1]))["result"]["verdict"] != "pass")' "$MDF_OUTPUT/audit.json"
+      fi
+  after_script:
+    - mkdir -p .mdf/reports/ci
+    - if [ -d "$CI_BUILDS_DIR/mdf-review-$CI_JOB_ID" ]; then cp -R "$CI_BUILDS_DIR/mdf-review-$CI_JOB_ID/." .mdf/reports/ci/; fi
+  artifacts:
+    when: always
+    paths: [.mdf/reports/ci/]
+# 默认仅审查；后续 job 可调用 publish.py，approve/merge 必须由项目显式开启。

@@ -1,0 +1,55 @@
+# 仅为结构定义脚手架；以 `mdf.py init` 的渲染结果为准。
+# 每项基线在已文档化时只保留 `path`，在 not_applicable 时只保留 `reason`；写入前
+# 删除所有 {{MDF_...}} 标记。
+schema_version: 3
+state: initializing
+logo: "📍"
+versioning:
+  strategy: semver
+  latest_release: {{MDF_QUOTED_STABLE_SEMVER_OR_BARE_NULL}}
+implementation_roots:
+  - "{{MDF_REPOSITORY_RELATIVE_IMPLEMENTATION_ROOT}}"
+# 可选 PR/MR 收口；省略为 local。provider 为 github 或 gitlab。
+# closeout:
+#   mode: pr
+#   provider: github
+#   trivial_paths: [".mdf/*", ".codex/*", "AGENTS.md"] # 可选；替代 MDF 默认 trivial 路径
+# 可选 hooks 配置见 references/hooks/post-gitflow-start.md。
+# fact 前的 hook 见 references/hooks/pre-gitflow-finish.md。
+# 可选项目 rule：与 MDF rule merge，冲突时 project 优先；仅 rule，不支持 command。
+# rules:
+#   design: .mdf/rules/design.md
+#   code-review: .mdf/rules/code-review.md
+baselines:
+  glossary:
+    status: "{{MDF_DOCUMENTED_OR_NOT_APPLICABLE}}"
+    path: "{{MDF_REPOSITORY_RELATIVE_PATH_IF_DOCUMENTED}}"
+    reason: "{{MDF_REASON_IF_NOT_APPLICABLE}}"
+  user_guide:
+    status: "{{MDF_DOCUMENTED_OR_NOT_APPLICABLE}}"
+    path: "{{MDF_REPOSITORY_RELATIVE_PATH_IF_DOCUMENTED}}"
+    reason: "{{MDF_REASON_IF_NOT_APPLICABLE}}"
+  system_boundary:
+    status: "{{MDF_DOCUMENTED_OR_NOT_APPLICABLE}}"
+    path: "{{MDF_REPOSITORY_RELATIVE_PATH_IF_DOCUMENTED}}"
+    reason: "{{MDF_REASON_IF_NOT_APPLICABLE}}"
+  architecture:
+    status: "{{MDF_DOCUMENTED_OR_NOT_APPLICABLE}}"
+    path: "{{MDF_REPOSITORY_RELATIVE_PATH_IF_DOCUMENTED}}"
+    reason: "{{MDF_REASON_IF_NOT_APPLICABLE}}"
+  interfaces:
+    status: "{{MDF_DOCUMENTED_OR_NOT_APPLICABLE}}"
+    path: "{{MDF_REPOSITORY_RELATIVE_PATH_IF_DOCUMENTED}}"
+    reason: "{{MDF_REASON_IF_NOT_APPLICABLE}}"
+  data:
+    status: "{{MDF_DOCUMENTED_OR_NOT_APPLICABLE}}"
+    path: "{{MDF_REPOSITORY_RELATIVE_PATH_IF_DOCUMENTED}}"
+    reason: "{{MDF_REASON_IF_NOT_APPLICABLE}}"
+  operations:
+    status: "{{MDF_DOCUMENTED_OR_NOT_APPLICABLE}}"
+    path: "{{MDF_REPOSITORY_RELATIVE_PATH_IF_DOCUMENTED}}"
+    reason: "{{MDF_REASON_IF_NOT_APPLICABLE}}"
+  deviations:
+    status: "{{MDF_DOCUMENTED_OR_NOT_APPLICABLE}}"
+    path: "{{MDF_REPOSITORY_RELATIVE_PATH_IF_DOCUMENTED}}"
+    reason: "{{MDF_REASON_IF_NOT_APPLICABLE}}"
