@@ -11,7 +11,7 @@
 - [x] 确认目标与约束（start）
 - [x] owner 开发：确认有效红灯，修复 bug-1MW9 并让对应回归转绿
 - [x] converge
-- [ ] lint
+- [x] lint
 - [ ] code-review
 - [ ] verify branch
 - [ ] fact audit
