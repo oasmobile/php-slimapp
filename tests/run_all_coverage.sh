@@ -1,47 +1,48 @@
 #!/usr/bin/env bash
-#
-# 运行全量测试并合并覆盖率（含 fork 进程的覆盖率）
-#
-# 用法: bash tests/run_all_coverage.sh
-#   或: PHP=/path/to/php bash tests/run_all_coverage.sh
-#
-
-set -e
+# 运行全量测试并合并覆盖率；任何非预期失败均返回非零状态。
+set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 COV_DIR=$(mktemp -d)
 PHP="${PHP:-php}"
+status=0
+trap 'rm -rf "$COV_DIR"' EXIT
 
 echo "=== 收集覆盖率到 $COV_DIR ==="
-echo "PHP: $($PHP -v | head -1)"
+"$PHP" -v
 
-# 1) PHPUnit 主测试 — ut + pbt（输出覆盖率到 .cov 文件）
-echo ""
 echo "--- PHPUnit 主测试 (ut + pbt) ---"
-$PHP -d pcov.enabled=1 "$PROJECT_DIR/vendor/bin/phpunit" \
-    --coverage-php "$COV_DIR/phpunit.cov" \
-    2>&1 | grep -E "^(OK|FAIL|Tests:|Time:)" || true
+if ! "$PHP" -d pcov.enabled=1 "$PROJECT_DIR/vendor/bin/phpunit" \
+    --coverage-php "$COV_DIR/phpunit.cov"; then
+    status=1
+fi
 
-# 2) Fork 脚本覆盖率
-echo ""
+run_case() {
+    local script="$1" case_name="$2" expected="$3"
+    local covfile="$COV_DIR/$case_name.cov" logfile="$COV_DIR/$case_name.log"
+    local result=0
+    COVERAGE_FILE="$covfile" "$PHP" -d pcov.enabled=1 "$SCRIPT_DIR/scripts/$script" \
+        "$case_name" >"$logfile" 2>&1 || result=$?
+    cat "$logfile"
+    if [ "$result" -ne "$expected" ] || grep -Eq 'Fatal error|Uncaught' "$logfile"; then
+        echo "Unexpected failure: $case_name, exit=$result, expected=$expected" >&2
+        status=1
+    fi
+    if [ ! -f "$covfile" ]; then
+        echo "Missing coverage: $case_name" >&2
+        status=1
+    fi
+}
+
 echo "--- Fork 进程测试覆盖率 ---"
-for case in parallel_ok parallel_fail; do
-    covfile="$COV_DIR/parallel_${case}.cov"
-    COVERAGE_FILE="$covfile" $PHP -d pcov.enabled=1 "$SCRIPT_DIR/scripts/parallel_command_test.php" "$case" 2>/dev/null || true
-    [ -f "$covfile" ] && echo "  collected: $case"
-done
+run_case parallel_command_test.php parallel_ok 0
+run_case parallel_command_test.php parallel_fail 255
+run_case sentinel_command_test.php sentinel_once 0
+run_case sentinel_command_test.php sentinel_parallel 0
 
-for case in sentinel_once sentinel_parallel; do
-    covfile="$COV_DIR/sentinel_${case}.cov"
-    COVERAGE_FILE="$covfile" $PHP -d pcov.enabled=1 "$SCRIPT_DIR/scripts/sentinel_command_test.php" "$case" 2>/dev/null || true
-    [ -f "$covfile" ] && echo "  collected: $case"
-done
-
-# 3) 合并所有 .cov 文件
-echo ""
 echo "=== 合并覆盖率报告 ==="
-$PHP -d pcov.enabled=1 "$SCRIPT_DIR/scripts/merge_coverage.php" "$COV_DIR"/*.cov
-
-# 清理
-rm -rf "$COV_DIR"
+if ! "$PHP" -d pcov.enabled=1 "$SCRIPT_DIR/scripts/merge_coverage.php" "$COV_DIR"/*.cov; then
+    status=1
+fi
+exit "$status"
