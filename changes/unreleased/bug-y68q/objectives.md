@@ -12,7 +12,7 @@
 - [x] owner 开发：确认有效红灯，修复 bug-Y68Q 并让对应回归转绿
 - [x] converge
 - [x] lint
-- [ ] code-review
+- [x] code-review
 - [ ] verify branch
 - [ ] fact audit
 - [ ] close-out
