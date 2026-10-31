@@ -25,10 +25,14 @@ class ForkProcessTest extends \PHPUnit\Framework\TestCase
         $covFile = self::$covDir . '/' . $testCase . '_' . uniqid() . '.cov';
         $php     = defined('PHP_BINARY') ? PHP_BINARY : 'php';
 
-        // 用当前 PHP 二进制运行脚本
+        $coveragePrefix = getenv('COVERAGE_FILE')
+            ? 'COVERAGE_FILE=' . escapeshellarg($covFile) . ' '
+            : '';
+
+        // 普通运行不启用覆盖率；显式请求时才为每个子进程分配文件。
         $cmd = sprintf(
-            'COVERAGE_FILE=%s %s %s %s 2>&1',
-            escapeshellarg($covFile),
+            '%s%s %s %s 2>&1',
+            $coveragePrefix,
             escapeshellarg($php),
             escapeshellarg(__DIR__ . '/../scripts/' . $script),
             escapeshellarg($testCase)
@@ -58,6 +62,8 @@ class ForkProcessTest extends \PHPUnit\Framework\TestCase
         $result = $this->runScript('parallel_command_test.php', 'parallel_fail');
         // 子进程返回 EXIT_CODE_COMMON_ERROR，父进程应返回 EXIT_CODE_COMMON_ERROR (0xff = 255)
         $this->assertEquals(255, $result['exitCode'], 'parallel_fail should exit 255. Output: ' . $result['output']);
+        $this->assertStringNotContainsString('Fatal error', $result['output']);
+        $this->assertStringNotContainsString('Uncaught', $result['output']);
     }
 
     // ── DaemonSentinelCommand + CommandRunner.run() 测试 ──
