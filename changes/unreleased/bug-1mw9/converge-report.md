@@ -21,7 +21,7 @@
 PHPRC=.mdf/tmp/2026-10-31-1mw9-verification/php.ini python3 -B .agents/skills/mdf/scripts/mdf.py verify --repo . --scope smart --module default
 ```
 
-| 入口 | 结果 | 主仓库报告目录 |
+| 入口 | 结果 | 本工作区报告目录 |
 | --- | --- | --- |
 | lint | PHPStan 无错误，规模检查零 finding | .mdf/reports/20261031T044452485499000Z-lint |
 | build | git diff --check 退出 0 | .mdf/reports/20261031T044456583457000Z-build |
