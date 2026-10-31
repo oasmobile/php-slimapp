@@ -80,7 +80,7 @@ V3 升级 Bug 的复现测试位于 `tests/ut/Regression/`，随 ut 纳入 smoke
 - pcntl 方法从原类移入独立类；原断言、子进程等待和文件清理保留。
 - 三个 PcntlTest 共包含 14 个原测试方法，消除 13 处 runtime skip。
 - 第三方 warning/notice/deprecation 没有额外豁免。
-- `tests/run_all_coverage.sh` 会容忍子命令失败且没有 JUnit，不作验证入口。
+- `tests/run_all_coverage.sh` 保留非预期子命令失败状态与错误输出；它没有 JUnit，仍为辅助覆盖率入口。
 
 ## Quick
 
