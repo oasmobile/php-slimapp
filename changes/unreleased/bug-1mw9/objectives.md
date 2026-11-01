@@ -48,5 +48,5 @@ Agent 在新 worktree 准备本地依赖和独立 autoload，无需凭据或外�
 - scope: branch；全部 module，保留 lint、build、quick、smoke 的完整入口。
 - 原请求：`python3 -B .agents/skills/mdf/scripts/mdf.py verify --repo . --scope branch`。
 - 操作左端点：`a617f318571c35b561787f36340bc4d309d01b1a`。
-- 状态：待执行分支验证，转绿后对汇入的四项实现和配置变更做一人增量审查。
+- 状态：首轮 branch 的 lint/build/quick 通过，smoke 为 207 通过、1 个环境设施错误；等待批准最小测试环境隔离修正。
 - 用户于 2026-11-01 明确确认新增 coverage-script-regression 并汇入四条已审修复分支。

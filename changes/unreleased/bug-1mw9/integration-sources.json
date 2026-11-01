@@ -1,0 +1,29 @@
+{
+  "all_four_sources_are_ancestors": true,
+  "checks": [
+    {
+      "bug": "bug-2AN6",
+      "path": "src/BuiltInCommands/Templates/DatabaseTemplates.php",
+      "sha256": "3ea66eebf47dbbcb974d86008411682080b2a697db5a84d741ab990224b4b9ee",
+      "identical": true
+    },
+    {
+      "bug": "bug-GH7A",
+      "path": "src/BuiltInCommands/Templates/UnitTestTemplates.php",
+      "sha256": "aa38ce2485d300a5f09ca3270c95b5b3887bf22104f60fe1123a375943985df9",
+      "identical": true
+    },
+    {
+      "bug": "bug-Y68Q",
+      "path": "src/SlimApp.php",
+      "sha256": "5ff11b5a60c58ad6d7f4599b8629074825b0d9b2e670e2c22948f0d2d8665030",
+      "identical": true
+    },
+    {
+      "bug": "bug-P4KU",
+      "path": "tests/ut/ForkProcessTest.php",
+      "sha256": "9e12b2d27246afd7c1712b2dc403e44f0484879a606988535e75e489297a65dc",
+      "identical": true
+    }
+  ]
+}
