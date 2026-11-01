@@ -1,0 +1,5 @@
+{
+  "suites": [
+    "coverage-script-regression"
+  ]
+}

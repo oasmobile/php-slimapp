@@ -13,3 +13,4 @@ evidence:
 | --- | --- |
 | 理解测试分类、失败语义和套件 | [测试约定](conventions.md) |
 | 执行五个验证入口 | [维护验证卡片](../../../PROJECT.md) |
+| 验证覆盖率脚本的退出状态 | [覆盖率脚本回归](coverage-script-regression.md) |
