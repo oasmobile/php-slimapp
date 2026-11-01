@@ -89,7 +89,7 @@ PHP;
  */
 
 use {$this->projectNamespace}{$this->mainClassname};
-use Monolog\\Logger;
+use Monolog\\Level;
 use Oasis\\Mlib\\Logging\\ConsoleHandler;
 use Oasis\\Mlib\\Logging\\MLogging;
 
@@ -103,7 +103,7 @@ if (!\$app->isDebug()) {
 if (!in_array('-v', \$_SERVER['argv'])
     && !in_array('--verbose', \$_SERVER['argv'])
 ) {
-    MLogging::setMinLogLevel(Logger::CRITICAL);
+    MLogging::setMinLogLevel(Level::Critical);
 }
 
 
