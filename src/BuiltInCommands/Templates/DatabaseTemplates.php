@@ -71,9 +71,9 @@ SRC;
         $time     = date('H:i');
         $this->output->writeln("database manager file = $filename");
         $namespaceDeclaration              = trim($this->projectNamespace, "\\");
-        $entityNamespaceDeclarationEscaped = addcslashes($namespaceDeclaration . "\\Entities", "\\");
         $itemNamespaceDeclarationEscaped   = addcslashes($namespaceDeclaration . "\\Items", "\\");
         $ormImports                        = <<<SRC
+use Doctrine\\DBAL\\DriverManager;
 use Doctrine\\ORM\\EntityManager;
 use Doctrine\\ORM\\ORMSetup;
 SRC;
@@ -97,11 +97,12 @@ SRC;
             \$isDevMode,
             \$app->getParameter('app.dir.data') . "/proxies"
         );
-        \$config->addEntityNamespace("{$this->mainClassname}", "{$entityNamespaceDeclarationEscaped}");
+
+        \$config->enableNativeLazyObjects(true);
 
         \$conn           = \$app->getParameter('app.db');
         \$conn["driver"] = "pdo_mysql";
-        \$entityManager  = EntityManager::create(\$conn, \$config);
+        \$entityManager  = new EntityManager(DriverManager::getConnection(\$conn), \$config);
 
         return \$entityManager;
     }

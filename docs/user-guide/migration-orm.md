@@ -5,6 +5,7 @@ evidence:
   - path: "composer.lock"
   - path: "composer.json"
   - path: "src/BuiltInCommands/InitializeProjectCommand.php"
+  - path: "src/BuiltInCommands/Templates/DatabaseTemplates.php"
 ---
 
 # Doctrine ORM 迁移
@@ -115,3 +116,18 @@ grep -rn 'ConsoleRunner' src/ bin/ config/ ut/
 grep -rn 'createAnnotationMetadataConfiguration' src/
 grep -rn 'Doctrine\\Common\\Cache' src/ config/
 ```
+
+## EntityManager 工厂
+
+ORM 3 工厂通过 DBAL 创建连接，再调用 EntityManager 构造函数。
+
+```php
+use Doctrine\DBAL\DriverManager;
+use Doctrine\ORM\EntityManager;
+
+$config->enableNativeLazyObjects(true);
+$entityManager = new EntityManager(DriverManager::getConnection($connectionParameters), $config);
+```
+
+PHP 8.5 使用原生 lazy objects，避免依赖 Symfony 8 已移除的 LazyGhost 生成 API。
+移除旧 `addEntityNamespace()` 和 `EntityManager::create()` 调用；创建连接对象不代表已连接数据库。
