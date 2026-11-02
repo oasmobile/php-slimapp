@@ -2,6 +2,8 @@
 title: "快速开始"
 doc_type: user-guide
 evidence:
+  - path: "src/BuiltInCommands/Templates/ServicesTemplate.php"
+  - path: "src/BuiltInCommands/Templates/ConfigurationTemplate.php"
   - path: "composer.json"
   - path: "src/BuiltInCommands/InitializeProjectCommand.php"
   - path: "bin/slimapp"
@@ -108,6 +110,6 @@ return $app;
 - `init()` 的三个参数: 配置目录、配置 schema 实例、缓存目录
 - 返回的 `$app` 对象是 `SlimApp` 子类的单例
 
-## 生成器限制
+## ORM 验证
 
-启用 ORM 前先核对[当前限制](../system/deviations.md)；生成后仍需验证数据库适配。
+启用 ORM 时按[ORM 迁移](migration-orm.md)核对数据库适配；生成成功不代表业务数据库连接已验证。

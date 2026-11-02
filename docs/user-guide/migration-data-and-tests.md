@@ -10,6 +10,7 @@ evidence:
 # 数据访问和测试迁移
 
 本页迁移旧数据类型常量和 PHPUnit API；整体升级步骤见[迁移指南](migration-v2-to-v3.md)。
+SlimApp 配置访问方法的类型参数使用 DataType 枚举；这不改变配置缓存的文件格式。
 
 ### `oasis/utils` DataType 枚举
 

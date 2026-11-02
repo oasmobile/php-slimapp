@@ -80,7 +80,8 @@ services:
 
 ## 默认命名空间
 
-在 `parameters` 中定义 `default.namespace` 后，服务的 `class` 和 `factory` 中的类名如果不是完整命名空间，框架会自动尝试补全:
+在 `parameters` 中用字符串或数组定义 `default.namespace`。
+服务的 `class` 和 `factory` 中的类名不存在时，框架按候选命名空间顺序尝试补全：
 
 ```yaml
 parameters:

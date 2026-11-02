@@ -43,4 +43,5 @@ services:
         arguments: ["%app.dir.log%"]
 ```
 
-配置解析、文件和缓存规则见[运行时配置](../system/operations/configuration.md)。
+配置文件的装配规则见[运行时配置](../system/operations/configuration.md)。
+配置缓存的读取与恢复规则见[缓存数据](../system/data/cache.md)。

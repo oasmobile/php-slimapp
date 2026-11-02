@@ -2,6 +2,7 @@
 title: "测试约定"
 doc_type: system-testing
 evidence:
+  - path: "src/BuiltInCommands/Templates/UnitTestTemplates.php"
   - path: "tests/bootstrap.php"
   - path: "tests/integration/bootstrap.php"
   - path: "tests/integration/config/config.yml"
@@ -81,6 +82,9 @@ V3 升级 Bug 的复现测试位于 `tests/ut/Regression/`，随 ut 纳入 smoke
 - 三个 PcntlTest 共包含 14 个原测试方法，消除 13 处 runtime skip。
 - 第三方 warning/notice/deprecation 没有额外豁免。
 - `tests/run_all_coverage.sh` 保留非预期子命令失败状态与错误输出；它没有 JUnit，仍为辅助覆盖率入口。
+- ForkProcessTest 普通运行不启用子进程覆盖率；`COVERAGE_FILE` 的值按 PHP 布尔规则为真时才请求采集。
+- 预期业务退出 255 仍须排除 `Fatal error` 和 `Uncaught`，不能只检查退出码。
+- 无覆盖率驱动回归使用专属空目录隔离 INI 扫描，避免重复加载扩展污染子进程输出。
 
 ## Quick
 
@@ -129,6 +133,7 @@ vendor/bin/phpunit --filter 'ConfigParserTest::test方法名' --log-junit "$MDF_
 1. 在 init-ut 安装该工程自己的依赖。
 2. 交互运行 `php vendor/bin/slimapp slimapp:project:init --project-root=.`。
 3. 检查生成的配置模板、入口、PHPUnit schema 和 PHP 语法。
-4. 启用数据库支持时，另按[已知偏差](../deviations.md)核对 ORM API。
+4. 启用数据库支持时，另按[ORM 迁移](../../user-guide/migration-orm.md)核对数据库适配。
 
+生成的 `ut/bootstrap.php` 安装 ConsoleHandler；未传 `-v` 或 `--verbose` 时，以 `Level::Critical` 设置最低日志级别。
 该流程会生成工程文件，不由初始化验证自动运行；清理前确认只涉及本次生成物。

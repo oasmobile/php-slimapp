@@ -34,10 +34,10 @@ evidence:
 3. `composer update`
 4. 替换代码中的 `SilexKernel` → `MicroKernel`（→ [SilexKernel → MicroKernel](#silexkernel--microkernel)）
 5. 为 `getService()` 获取的服务添加 `public: true`（→ [DI 容器 private-by-default](#di-容器-private-by-default)）
-6. 适配 Doctrine ORM 3.x（如启用 ORM）（→ [Doctrine ORM 3.x](#doctrine-orm-3x)）
+6. 适配 Doctrine ORM 3.x（如启用 ORM）（→ [Doctrine ORM 迁移](migration-orm.md)）
 7. 适配 Sentinel 基类移除（如有子类）（→ [AbstractDaemonSentinelCommand 移除](#abstractdaemonsentinelcommand-移除)）
 8. 给 `sentinel.yml` 中的 `%param%` 值加双引号（→ [sentinel.yml 引号](#sentinelyml-引号)）
-9. 适配 PHPUnit 13（→ [PHPUnit 5.7 → 13](#phpunit-57--13)）
+9. 适配 PHPUnit 13（→ [数据访问和测试迁移](migration-data-and-tests.md#phpunit-57--13)）
 10. 清除旧缓存：`./bin/<project>.php slimapp:cache:clear`
 11. 验证服务：`./bin/<project>.php slimapp:services:validate`
 12. 运行业务测试套件，确认无回归
@@ -232,6 +232,8 @@ DataType 与 PHPUnit 升级见[数据访问和测试迁移](migration-data-and-t
 
 > 升级前清理旧配置与 HTTP 缓存，再启动新版本。生产模式下容器缓存不检查资源变更，不能依赖首次启动自动重建。
 
-## 工程生成器限制
+## 工程生成器与缓存核对
 
-当前 ORM 生成模板仍有已移除 API，见[已知偏差](../system/deviations.md)。不能仅凭生成成功认定 ORM 工程可运行。
+当前生成器的 ORM 工厂适配规则见[ORM 迁移](migration-orm.md#entitymanager-工厂)。
+生成后仍须验证使用方数据库适配，不能仅凭生成成功认定业务工程可运行。
+配置缓存的内容校验见[缓存数据](../system/data/cache.md)；它不替代升级时的容器缓存清理。
