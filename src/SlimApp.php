@@ -87,7 +87,8 @@ class SlimApp
         if ($upToDate = $configYamlCache->isFresh()) {
             $content       = \file_get_contents($configCacheFile);
             if ($content !== false) {
-                $this->configs = @\unserialize($content);
+                $cachedConfigs = @\unserialize($content);
+                $this->configs = is_array($cachedConfigs) ? $cachedConfigs : [];
             }
         }
 

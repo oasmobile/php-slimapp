@@ -1,7 +1,7 @@
 ---
 id: bug-P4KU
 type: bug
-status: open
+status: fixed
 severity: major
 found_in: 3.2.1
 ---
@@ -10,7 +10,7 @@ found_in: 3.2.1
 
 ## 观察到的行为
 
-静态审查发现普通 UT 隐含依赖覆盖率扩展，审查优先级为 P2；尚未运行复现测试。
+静态审查发现普通 UT 隐含依赖覆盖率扩展，审查优先级为 P2；现已按授权运行复现并完成修复。
 
 - `tests/ut/ForkProcessTest.php:30` 无条件向子进程传入 `COVERAGE_FILE`。
 - 两个进程测试脚本据此调用 `Selector::forLineCoverage()`，未安装覆盖率驱动时会抛出异常。
@@ -23,7 +23,7 @@ found_in: 3.2.1
 
 ## 复现步骤
 
-以下步骤作为后续复现测试的设计输入，尚未执行。
+以下步骤保留修复前的复现条件；实际执行证据见下方记录。
 
 1. 准备 PHP 8.5、pcntl 和锁定的开发依赖，确保 PCOV 与 Xdebug 均未启用。
 2. 通过普通 UT 入口运行 `ForkProcessTest`，不指定覆盖率参数。
@@ -43,9 +43,9 @@ found_in: 3.2.1
 - 修复后：无驱动的普通测试通过，失败场景能证明预期业务原因。
 - 显式覆盖率模式：有驱动时仍生成可读取的报告；缺少驱动时给出明确失败原因。
 
-## 执行约束
+## 原始执行约束
 
-用户指定分阶段 TDD，由人工确认红灯并启动修复。
+用户最初指定分阶段 TDD；本次执行授权及结果见下方记录。
 
 1. 后续仅编写能复现本 Bug 的测试，不修改生产代码，不自动运行测试。
 2. 由人工运行测试，确认失败源于本 Bug，并保存命令、日志及测试报告。
@@ -53,4 +53,16 @@ found_in: 3.2.1
 
 复现测试已编写：`tests/ut/Regression/BugP4KUTest.php`，包含原进程测试对应的 4 个场景。
 测试保留其它 PHP 配置并禁用覆盖率驱动，同时检查预期失败场景是否混入 fatal error。
-当前尚未运行，等待人工确认红灯；统一运行见 [复现测试交接](../../changes/unreleased/v3-bug-reproduction-tests/HANDOFF.md)。
+已按本次授权执行，红灯与转绿证据见下方记录；统一运行见 [复现测试交接](../../changes/unreleased/v3-bug-reproduction-tests/HANDOFF.md)。
+
+## 修复与验证记录
+
+用户已于 2026-10-31 明确授权 Agent 执行复现、修复、回归与独立审查。
+原人工执行约束已由本次授权调整，先确认有效红灯，再修改实现，未削弱原缺陷断言。
+
+- 对应正式复现用例已确认红灯并转绿；报告见 `changes/unreleased/bug-p4ku/repair-evidence.md`。
+- smart 的 lint、build、quick 通过；独立 lint 通过，记录见同目录阶段报告。
+- 独立静态审查已覆盖本轮完整范围，无未解决项；结论见同目录 `code-review.md`。
+- 状态仅为 fixed，等待后续整体验收与二次验证；未填写 fixed_in，未关闭 Bug。
+
+该结论只适用于当前独立修复分支；尚未合入 develop，也未宣称其它已知缺陷已经消除。

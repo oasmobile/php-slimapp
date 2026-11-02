@@ -2,6 +2,10 @@
 title: "当前架构"
 doc_type: system-architecture
 evidence:
+  - path: "src/BuiltInCommands/Templates/DatabaseTemplates.php"
+  - path: "src/BuiltInCommands/Templates/UnitTestTemplates.php"
+  - path: "src/BuiltInCommands/Templates/ServicesTemplate.php"
+  - path: "src/BuiltInCommands/Templates/ConfigurationTemplate.php"
   - path: "src/AbstractAlertableCommand.php"
   - path: "src/AbstractParallelCommand.php"
   - path: "src/BuiltInCommands/ClearCacheCommand.php"
@@ -56,6 +60,9 @@ flowchart LR
 | AbstractParallelCommand | 并行执行、等待与子进程重启 |
 | Sentinel 三类 | 配置校验、命令实例调度和子进程回收 |
 | BuiltInCommands | 生成使用方工程、清缓存、检查可获取服务 |
+
+工程生成命令调用四个模板 trait，分别生成配置 schema、数据库、服务 YAML 和单测文件。
+模板复用命令的临时文件写入与覆盖确认流程，不改变生成入口。
 
 ## 约束与主题归属
 

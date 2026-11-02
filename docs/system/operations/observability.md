@@ -15,6 +15,7 @@ SlimApp 使用 oasis/logging 与 Monolog 安装全局日志 handler。
 ## Handler 装配
 
 应用初始化和 Console 执行分别添加适用 handler。
+SlimApp 将已解析的 Monolog Level 传给 handler 和由它创建的 Console 实例。
 
 - SlimApp 初始化安装 LocalFileHandler 和 LocalErrorHandler。
 - 错误 handler 使用错误触发的缓冲日志；不能理解成只保存逐条 error 记录。

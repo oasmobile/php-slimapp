@@ -1,0 +1,155 @@
+<!doctype html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>V3 升级五项 Bug 修复：设计与开发总结</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 36px 24px; background: #0e161c; color: #e4edf2;
+      font: 16px/1.85 ui-monospace, "SFMono-Regular", "Cascadia Code", "PingFang SC", monospace; }
+    .document { max-width: 1120px; margin: auto; background: #141d24; border: 1px solid #32454f; }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      padding: 20px 28px; background: #10171d; border-bottom: 1px solid #32454f;
+      color: #a0b2bd; font-size: 12px; letter-spacing: 1.4px; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; }
+    .brand::before { content: ""; width: 7px; height: 7px; background: #a8e3b1; border-radius: 50%; }
+    .layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); }
+    .outline { padding: 36px 22px; border-right: 1px dashed #32454f; font-size: 13px; }
+    .outline-label { margin: 0 0 24px; color: #a8e3b1; font-size: 12px; letter-spacing: 1px; }
+    .outline ol { padding: 0; margin: 0; list-style: none; }
+    .outline li { margin: 0 0 16px; }
+    .outline a { display: block; color: #a0b2bd; text-decoration: none; }
+    .outline a:hover { color: #a8e3b1; }
+    main { min-width: 0; padding: 38px 42px; counter-reset: section;
+      overflow-wrap: anywhere; }
+    h1 { margin: 0 0 36px; padding-bottom: 30px; border-bottom: 1px solid #32454f;
+      font-size: clamp(28px, 3.5vw, 38px); line-height: 1.35; font-weight: 600; letter-spacing: -.8px; }
+    h1::after { content: "_"; color: #a8e3b1; }
+    h2 { margin: 38px 0 16px; color: #a8e3b1; font-size: 19px; line-height: 1.5;
+      font-weight: 600; counter-increment: section; scroll-margin-top: 24px; }
+    h2::before { content: counter(section, decimal-leading-zero) " / ";
+      padding-right: 8px; color: #a0b2bd; font-size: 12px; font-weight: 400; }
+    h3 { margin: 24px 0 12px; font-size: 16px; font-weight: 600; }
+    h4, h5, h6 { font-size: 15px; }
+    p { margin: 12px 0; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+    li > ul, li > ol { margin: 8px 0; }
+    a { color: #a8e3b1; text-underline-offset: 4px; }
+    a:focus-visible { outline: 2px solid #a8e3b1; outline-offset: 4px; }
+    code { padding: 2px 5px; background: #1e3034; color: #bee9c5;
+      font: .9em/1.7 ui-monospace, "SFMono-Regular", "Cascadia Code", monospace; }
+    pre { margin: 20px 0; padding: 20px; border-left: 2px solid #527861;
+      background: #101a20; color: #bee9c5; overflow-x: auto; font-size: 14px; line-height: 1.8; }
+    pre code { padding: 0; background: transparent; }
+    blockquote { margin: 20px 0; padding: 10px 20px; border-left: 2px solid #a8e3b1;
+      background: #1e3034; color: #d5e4df; }
+    .table-wrap { max-width: 100%; margin: 20px 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.75; }
+    th { padding: 12px 16px; background: #1b2a32; color: #a0b2bd;
+      font-size: 12px; font-weight: 500; text-align: left; }
+    td { padding: 14px 16px; vertical-align: top; }
+    th, td { border-bottom: 1px solid #32454f; min-width: 110px; }
+    tbody tr:nth-child(even) { background: #17232b; }
+    hr { margin: 28px 0; border: 0; border-top: 1px solid #32454f; }
+    img { max-width: 100%; height: auto; }
+    .document-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
+      padding: 20px 28px; border-top: 1px solid #32454f; color: #a0b2bd; font-size: 12px; }
+    @media (max-width: 720px) {
+      body { padding: 16px 12px; font-size: 15px; }
+      .layout { grid-template-columns: 1fr; }
+      .outline { padding: 22px; border-right: 0; border-bottom: 1px solid #32454f; }
+      .outline-label { margin-bottom: 12px; }
+      .outline ol { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+      .outline li { margin: 0; }
+      main { padding: 28px 22px; }
+      .masthead, .document-footer { padding: 18px 22px; }
+      h1 { margin-bottom: 28px; padding-bottom: 24px; }
+      th, td { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="document">
+    <header class="masthead"><span class="brand">MDF / WORKSPACE</span><span>工作材料</span></header>
+    <div class="layout">
+      <nav class="outline" aria-label="文档目录">
+        <p class="outline-label">INDEX /</p>
+        <ol><li><a href="#scope">交付范围与结果</a></li>
+<li><a href="#process">完整交付过程</a></li>
+<li><a href="#decisions">设计决策与取舍</a></li>
+<li><a href="#implementation">开发与测试实现</a></li>
+<li><a href="#deviations">偏差与范围变化</a></li>
+<li><a href="#evidence">审查与验证证据</a></li>
+<li><a href="#follow-up">交付与后续事项</a></li></ol>
+      </nav>
+      <main>
+<h1>V3 升级五项 Bug 修复：设计与开发总结</h1>
+<h2 id="scope">交付范围与结果</h2>
+<p>本次为 bugfix/bug-1MW9 交付，汇入 bug-2AN6、bug-GH7A、bug-Y68Q、bug-P4KU 与 bug-1MW9。固定起点沿用 delivery.json 的 start_commit。</p>
+<p>目标是修正 PHP 8.5 升级后的生成器、缓存恢复与测试失败判定。实际完成红绿回归、独立审查、完整分支验证及事实审计；没有改变数据格式或增加迁移脚本。</p>
+<p>用户于 2026-11-02 批准本地合入 develop，删除当前源分支并保留 detached worktree；不推送、不发版、不创建 tag，不关闭 Bug。</p>
+<h2 id="process">完整交付过程</h2>
+<p>各 Bug 在独立 owner worktree 修复，主 Agent 协调，按冻结 solo roster 执行；qa 和 dev 为零，reviewer 为一人。</p>
+<div class="table-wrap"><table><thead><tr><th>顺序</th><th>参与者与动作</th><th>实际结果与证据</th></tr></thead><tbody>
+<tr><td>start 与开发</td><td>用户确认五项顺序、独立分支、本地提交，并授权 Agent 代执行红灯。</td><td>逐项确认有效红灯，再修实现与复测。<a href="objectives.md">目标与约束</a></td></tr>
+<tr><td>design</td><td>冻结 needs_design: no。</td><td>修正现有 API 和失败处理，不增加架构层或数据迁移。</td></tr>
+<tr><td>converge / lint</td><td>owner 执行者逐分支核对回归；主 Agent 核记录。</td><td>smart、PHPStan 与代码规模检查通过；生成器因体积限制按职责抽出四个 trait。<a href="converge-report.md">converge</a>、<a href="lint-report.md">lint</a></td></tr>
+<tr><td>独立审查</td><td>各项静态审查只读，主 Agent 裁定。</td><td>路径归属记录问题已修正；无未解决项。<a href="code-review.md">审查终稿</a></td></tr>
+<tr><td>统一集成</td><td>用户确认四条来源分支合入当前分支。</td><td>四次 no-ff；模板 add/add 冲突保留 ORM 与 Level 修复，关键实现逐项核对。<a href="integration-sources.json">来源核对</a></td></tr>
+<tr><td>branch 验证与续办</td><td>首轮失败先落盘，单用例复测；用户批准最小 fixture 修正。</td><td>memcached 重复加载污染 JSON；改用真实空目录隔离 INI 扫描，同一场景及全量验证转绿。<a href="verification-report.md">验证报告</a></td></tr>
+<tr><td>增量复审</td><td>独立一人覆盖四项合并、suite 配置和环境隔离。</td><td>未发现新问题，原 P3 仍已解决。</td></tr>
+<tr><td>hook / fact</td><td>未配置 hook；事实审计发现过期陈述与引用缺口后，fact update 修订并重审。</td><td>20 页与 9 个实现双向核对；strict validation 零 finding。<a href="fact-audit.md">事实审计</a></td></tr>
+<tr><td>close-out 准备</td><td>主 Agent 核对源与 develop 干净、无未结束 merge，develop 已在源分支历史中。</td><td>Change 与本总结已准备；尚未执行 finish-gitflow。<a href="CHANGE.md">Change</a></td></tr>
+</tbody></table></div>
+<h2 id="decisions">设计决策与取舍</h2>
+<p>以下决定以最小行为修正为边界，未另立 ADR。</p>
+<div class="table-wrap"><table><thead><tr><th>问题与候选</th><th>选择与理由</th><th>代价与依据</th></tr></thead><tbody>
+<tr><td>ORM 旧 API：兼容壳或支持的构造方式</td><td>DriverManager 加 EntityManager 构造，启用原生 lazy objects。</td><td>保持 PHP 8.5 与锁定依赖；不承诺旧 ORM API 兼容。</td></tr>
+<tr><td>损坏缓存：迁移格式或复用重建</td><td>先校验数组类型，再进入原解析路径。</td><td>不改文件格式，不作业务数据迁移。</td></tr>
+<tr><td>fork 测试：强制覆盖率或显式请求</td><td>普通测试不启用采集，COVERAGE_FILE 按既有布尔判断显式请求。</td><td>保留真实 fork 行为及失败断言。</td></tr>
+<tr><td>JSON 污染：放宽解析或隔离 INI 扫描</td><td>使用测试专属空目录。</td><td>用户于 2026-11-02 批准；断言、预期与套件成员未变。</td></tr>
+<tr><td>验证选题：替代 smoke 或单独 named suite</td><td>新增 coverage-script-regression，保留完整 branch 入口。</td><td>用户确认配置；named 不作为全套通过的替代证据。</td></tr>
+</tbody></table></div>
+<h2 id="implementation">开发与测试实现</h2>
+<p>正式回归位于 tests/ut/Regression，随 smoke 运行。测试断言正确行为，修复前的有效红灯与修复后通过记录保留。</p>
+<div class="table-wrap"><table><thead><tr><th>对象</th><th>实现与边界</th><th>正式 testcase</th></tr></thead><tbody>
+<tr><td>bug-2AN6</td><td>执行生成 ORM 工厂并创建 EntityManager；不依赖真实数据库连接。</td><td>Bug2AN6Test</td></tr>
+<tr><td>bug-GH7A</td><td>执行生成 bootstrap，以 Level::Critical 调用日志 API。</td><td>BugGH7ATest</td></tr>
+<tr><td>bug-Y68Q</td><td>正常数组缓存对照，及损坏、标量、false 缓存恢复。</td><td>BugY68QTest</td></tr>
+<tr><td>bug-P4KU</td><td>四个普通 fork 场景无需覆盖率驱动；业务 255 排除致命错误。</td><td>BugP4KUTest、ForkProcessTest</td></tr>
+<tr><td>bug-1MW9</td><td>真实 shell 编排正常对照及五类失败；保留状态与输出，缺覆盖率文件同样失败。</td><td>Bug1MW9Test</td></tr>
+</tbody></table></div>
+<p>使用方真实数据库、生产部署和业务测试不属于本轮自动验收。命令替身只验证编排，不证明真实覆盖率报告能合并。</p>
+<h2 id="deviations">偏差与范围变化</h2>
+<p>实际范围变化均有用户确认或既定体积契约依据。</p>
+<div class="table-wrap"><table><thead><tr><th>计划与实际</th><th>原因与影响</th><th>接受与后续</th></tr></thead><tbody>
+<tr><td>五条独立修复，后统一验收</td><td>部分 smoke 原先仍受其它已知缺陷影响；用户批准汇入四条分支。</td><td>保留来源分支与证据，统一运行完整 branch。</td></tr>
+<tr><td>生成器模板拆分</td><td>原文件超过体积限制，按职责抽取四个 trait。</td><td>原触发拆分目标 700 行已满足，不改变生成入口。</td></tr>
+<tr><td>首轮环境 error</td><td>空字符串环境变量未隔离扫描，重复加载扩展。</td><td>用户批准真实空目录；复现、修正与回归报告保留。</td></tr>
+<tr><td>事实审计首轮未通过</td><td>18 条 stale、3 条覆盖警告及迁移文案、链接问题。</td><td>15 页修订，完整内部审计与 strict validation 通过。</td></tr>
+</tbody></table></div>
+<h2 id="evidence">审查与验证证据</h2>
+<p>本节区分正式 branch、named 选题与静态审查证据。</p>
+<ul><li>正式 branch：lint、build、quick 46 tests / 1282 assertions、smoke 208 tests / 2318 assertions 全部通过，零跳过。</li>
+<li>coverage-script-regression：6 tests / 31 assertions，通过；不替代完整 smoke。</li>
+<li>环境修正：同一失败场景 1 test / 19 assertions、相关四场景 4 tests / 58 assertions 通过。</li>
+<li>一人增量审查未发现新问题，旧路径归属 P3 已解决；审查者未运行测试或写文件。</li>
+<li>事实审计：20 页、9 个实现，零 finding、零 warning；strict validation 通过。</li></ul>
+<p><a href="verification-report.json">机器验证报告</a>、<a href="verification-report.md">完整命令与报告路径</a>、<a href="code-review.md">审查终稿</a>、<a href="fact-audit.md">逐页事实核对</a>和<a href="repair-evidence.md">原修复证据</a>保留具体结果。</p>
+<h2 id="follow-up">交付与后续事项</h2>
+<p>用户已批准 no-ff 合并 bugfix/bug-1MW9 到本地 develop。finish-gitflow 将删除该本地源分支，令当前 worktree detached 并保留目录。</p>
+<ul><li>不 fetch、不 push，不创建版本 tag，不运行 release-closeout。</li><li>五个 Bug 保持 fixed，后续发布阶段再独立验证并关闭。</li><li>另外四条 bugfix 分支与 worktree 保留，不代其清理或改写。</li><li>当前 worktree 保留路径为 /Users/xuchang/Projects/OAS-Git/php-slimapp-worktrees/bugfix/bug-1MW9；删除需另行确认。</li></ul>
+<p>材料生成时尚未合并或删除分支；实际 Gitflow 结果以随后 CLI 日志和最终报告为准。
+HTML 结构和链接检查已通过；宿主预览排队，浏览器阻止本地 file 协议，未完成视觉检查。</p>
+
+      </main>
+    </div>
+    <footer class="document-footer"><span>Mars Development Flow</span><span>范围 / 决定 / 证据</span></footer>
+  </div>
+</body>
+</html>

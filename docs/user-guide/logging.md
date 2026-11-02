@@ -9,6 +9,7 @@ evidence:
 # 日志配置
 
 通过应用服务的 `logging` 属性设置日志目录、级别、文件模式和额外 handler。
+框架将级别解析为 Monolog Level，再用于日志 handler 与 Console。
 
 ## 配置示例
 

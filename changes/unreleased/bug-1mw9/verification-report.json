@@ -1,0 +1,254 @@
+{
+  "all_passed": true,
+  "branch": "bugfix/bug-1MW9",
+  "kind": "bugfix",
+  "modules": [
+    "default"
+  ],
+  "results": [
+    {
+      "budget": null,
+      "command": "vendor/bin/phpstan analyse --no-progress --debug",
+      "entry": "lint",
+      "exit_code": 0,
+      "id": "lint:default",
+      "lint_modules": null,
+      "log": ".mdf/reports/20261102T023226879256000Z-lint",
+      "module": "default",
+      "passed": true,
+      "report": {
+        "all_passed": true,
+        "command_passed": true,
+        "findings": [],
+        "structure_passed": true
+      }
+    },
+    {
+      "budget": null,
+      "command": "git diff --check",
+      "entry": "build",
+      "exit_code": 0,
+      "id": "build:default",
+      "log": ".mdf/reports/20261102T023228771820000Z-build",
+      "module": "default",
+      "passed": true
+    },
+    {
+      "budget": 30,
+      "command": "vendor/bin/phpunit --testsuite quick --log-junit \"$MDF_REPORT_DIR/junit.xml\"",
+      "entry": "quick",
+      "exit_code": 0,
+      "id": "quick:default",
+      "log": ".mdf/reports/20261102T023228815743000Z-quick",
+      "module": "default",
+      "passed": true,
+      "report": {
+        "cases": [
+          {
+            "name": "Oasis.SlimApp.Tests.ConfigParserTest",
+            "result": "passed",
+            "time": 0.006
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.NamespaceResolverTest",
+            "result": "passed",
+            "time": 0.005
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.CommandConfigurationTest",
+            "result": "passed",
+            "time": 0.007
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.SlimAppCompilerPassTest",
+            "result": "passed",
+            "time": 0.005
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Pbt.ConfigParserPbtTest",
+            "result": "passed",
+            "time": 0.134
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Pbt.NamespaceResolverPbtTest",
+            "result": "passed",
+            "time": 0.005
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Pbt.CommandConfigurationPbtTest",
+            "result": "passed",
+            "time": 0.015
+          }
+        ],
+        "error": 0,
+        "failed": 0,
+        "passed": 46,
+        "path": ".mdf/reports/20261102T023228815743000Z-quick",
+        "skipped": 0,
+        "suite": "quick",
+        "tests": 46
+      }
+    },
+    {
+      "budget": 300,
+      "command": "vendor/bin/phpunit --testsuite ut,pbt --log-junit \"$MDF_REPORT_DIR/junit.xml\"",
+      "entry": "smoke",
+      "exit_code": 0,
+      "id": "smoke:default",
+      "log": ".mdf/reports/20261102T023229116748000Z-smoke",
+      "module": "default",
+      "passed": true,
+      "report": {
+        "cases": [
+          {
+            "name": "Oasis.SlimApp.Tests.AbstractAlertableCommandTest",
+            "result": "passed",
+            "time": 0.021
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.AbstractParallelCommandPcntlTest",
+            "result": "passed",
+            "time": 0.065
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.AbstractParallelCommandTest",
+            "result": "passed",
+            "time": 0.006
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.BuiltInCommands.ClearCacheCommandTest",
+            "result": "passed",
+            "time": 0.009
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.BuiltInCommands.InitializeProjectCommandTest",
+            "result": "passed",
+            "time": 0.002
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.BuiltInCommands.ValidateServicesCommandTest",
+            "result": "passed",
+            "time": 0.002
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.CommandConfigurationTest",
+            "result": "passed",
+            "time": 0.006
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.CommandRunnerPcntlTest",
+            "result": "passed",
+            "time": 0.016
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.CommandRunnerTest",
+            "result": "passed",
+            "time": 0.01
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.ConfigParserTest",
+            "result": "passed",
+            "time": 0.003
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.ConsoleApplicationTest",
+            "result": "passed",
+            "time": 0.013
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.ForkProcessTest",
+            "result": "passed",
+            "time": 0.714
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.NamespaceResolverTest",
+            "result": "passed",
+            "time": 0.009
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Regression.Bug1MW9Test",
+            "result": "passed",
+            "time": 3.876
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Regression.Bug2AN6Test",
+            "result": "passed",
+            "time": 0.07
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Regression.BugGH7ATest",
+            "result": "passed",
+            "time": 0.121
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Regression.BugP4KUTest",
+            "result": "passed",
+            "time": 1.317
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Regression.BugY68QTest",
+            "result": "passed",
+            "time": 0.246
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.SentinelCommand.DaemonSentinelCommandPcntlTest",
+            "result": "passed",
+            "time": 0.424
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.SentinelCommand.DaemonSentinelCommandTest",
+            "result": "passed",
+            "time": 0.01
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.SlimAppCompilerPassTest",
+            "result": "passed",
+            "time": 0.007
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.SlimAppTest",
+            "result": "passed",
+            "time": 0.042
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Pbt.CommandConfigurationPbtTest",
+            "result": "passed",
+            "time": 0.018
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Pbt.CommandRunnerSchedulingPbtTest",
+            "result": "passed",
+            "time": 0.006
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Pbt.ConfigParserPbtTest",
+            "result": "passed",
+            "time": 0.128
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Pbt.NamespaceResolverPbtTest",
+            "result": "passed",
+            "time": 0.002
+          },
+          {
+            "name": "Oasis.SlimApp.Tests.Pbt.VerbosityMappingPbtTest",
+            "result": "passed",
+            "time": 0.042
+          }
+        ],
+        "error": 0,
+        "failed": 0,
+        "passed": 208,
+        "path": ".mdf/reports/20261102T023229116748000Z-smoke",
+        "skipped": 0,
+        "suite": "smoke",
+        "tests": 208
+      }
+    }
+  ],
+  "scope": "branch",
+  "suites": [
+    "quick",
+    "smoke"
+  ]
+}

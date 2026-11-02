@@ -3,6 +3,7 @@ title: "已知偏差"
 doc_type: system-deviations
 evidence:
   - path: "src/BuiltInCommands/InitializeProjectCommand.php"
+  - path: "src/BuiltInCommands/Templates/DatabaseTemplates.php"
   - path: "src/BuiltInCommands/ValidateServicesCommand.php"
   - path: "src/SlimAppCompilerPass.php"
   - path: "composer.lock"
@@ -14,12 +15,7 @@ evidence:
 
 ## 当前偏差
 
-ORM 工程生成模板仍含不匹配 Doctrine ORM 3.x 的 API。
-
-- 生成代码仍调用 `Configuration::addEntityNamespace()` 和 `EntityManager::create()`。
-- `composer.lock` 锁定 ORM 3.x；安装版本不提供上述方法。
-- 影响启用 ORM 的新工程；本次 MDF 迁移只记录，不修改业务实现。
-- 使用方应先修正并验证生成代码，不能把生成成功视为 ORM 可运行。
+本页未列出额外的 ORM 工程生成 API 偏差；迁移规则见[ORM 迁移](../user-guide/migration-orm.md)。
 
 ## 其他限制入口
 

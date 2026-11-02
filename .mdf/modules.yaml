@@ -50,7 +50,8 @@ modules:
       tests:
         - "tests/ut/**"
         - "tests/pbt/**"
-    named: []
+    named:
+      - coverage-script-regression
 budgets:
   quick: 30
   smoke: 300

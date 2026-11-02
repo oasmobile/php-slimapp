@@ -21,7 +21,7 @@ evidence:
 - 更新 Composer autoload，并执行依赖安装相关命令。
 - 已存在的生成文件会经过覆盖询问；`composer.json` 由命令直接更新。
 
-操作步骤见[快速开始](getting-started.md)；ORM 限制见[已知偏差](../system/deviations.md)。
+操作步骤见[快速开始](getting-started.md)；数据库适配见[ORM 迁移](migration-orm.md)。
 
 ## 清缓存
 

@@ -36,7 +36,8 @@ $app->getHttpKernel()->run();
 
 ## 使用 Kernel
 
-HTTP 方法调用在 `getHttpKernel()` 返回的对象上，而非 SlimApp 本身。
+HTTP 方法调用在 `getHttpKernel()` 返回的对象上。
+SlimApp 首次获取时创建 Kernel，后续获取复用该对象；重新设置 http 属性会清除该引用。
 
 - SlimApp 将自身注入控制器参数，并向 Kernel 提供容器参数。
 - routing、Twig、middleware、CORS 和 security 由 oasis/http 处理。
