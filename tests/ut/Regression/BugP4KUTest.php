@@ -23,7 +23,9 @@ final class BugP4KUTest extends BugReproductionTestCase
     public function testOrdinaryForkTestNeedsNoCoverageDriver(string $method): void
     {
         $ini = $this->withoutCoverageIni();
-        $environment = ['PHPRC' => $ini, 'PHP_INI_SCAN_DIR' => '', 'COVERAGE_FILE' => ''];
+        $scanDir = $this->work . '/empty-ini-scan';
+        mkdir($scanDir);
+        $environment = ['PHPRC' => $ini, 'PHP_INI_SCAN_DIR' => $scanDir, 'COVERAGE_FILE' => ''];
         $preflight = $this->runProcess([
             PHP_BINARY, '-c', $ini, __DIR__ . '/Fixtures/coverage_environment.php',
         ], $environment);
