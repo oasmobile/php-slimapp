@@ -15,7 +15,7 @@
 - [x] code-review
 - [x] verify branch
 - [x] fact audit
-- [ ] close-out
+- [x] close-out
 
 ## 需求来源
 
@@ -24,7 +24,9 @@
 ## 目标与非目标
 
 目标：覆盖率脚本保留非预期失败状态，并正确识别预期业务失败。
-按用户 2026-11-01 的确认，汇入另外四项已审修复并统一完成 verify branch；不合入 develop、不推送、不发版、不关闭 Bug。
+按用户 2026-11-01 的确认，汇入另外四项已审修复并统一完成 verify branch。
+用户于 2026-11-02 进一步批准合入本地 develop、删除当前源分支并保留 detached worktree。
+另外四条分支与 worktree 保留；不推送、不发版、不创建 tag、不关闭 Bug。
 
 ## 约束
 

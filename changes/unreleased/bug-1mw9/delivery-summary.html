@@ -92,7 +92,7 @@
 <h2 id="scope">交付范围与结果</h2>
 <p>本次为 bugfix/bug-1MW9 交付，汇入 bug-2AN6、bug-GH7A、bug-Y68Q、bug-P4KU 与 bug-1MW9。固定起点沿用 delivery.json 的 start_commit。</p>
 <p>目标是修正 PHP 8.5 升级后的生成器、缓存恢复与测试失败判定。实际完成红绿回归、独立审查、完整分支验证及事实审计；没有改变数据格式或增加迁移脚本。</p>
-<p>本地合入 develop 尚待用户解除此前限制；不推送、不发版、不创建 tag，不关闭 Bug。</p>
+<p>用户于 2026-11-02 批准本地合入 develop，删除当前源分支并保留 detached worktree；不推送、不发版、不创建 tag，不关闭 Bug。</p>
 <h2 id="process">完整交付过程</h2>
 <p>各 Bug 在独立 owner worktree 修复，主 Agent 协调，按冻结 solo roster 执行；qa 和 dev 为零，reviewer 为一人。</p>
 <div class="table-wrap"><table><thead><tr><th>顺序</th><th>参与者与动作</th><th>实际结果与证据</th></tr></thead><tbody>
@@ -142,9 +142,10 @@
 <li>事实审计：20 页、9 个实现，零 finding、零 warning；strict validation 通过。</li></ul>
 <p><a href="verification-report.json">机器验证报告</a>、<a href="verification-report.md">完整命令与报告路径</a>、<a href="code-review.md">审查终稿</a>、<a href="fact-audit.md">逐页事实核对</a>和<a href="repair-evidence.md">原修复证据</a>保留具体结果。</p>
 <h2 id="follow-up">交付与后续事项</h2>
-<p>待授权后，计划 no-ff 合并 bugfix/bug-1MW9 到本地 develop。finish-gitflow 将删除该本地源分支，令当前 worktree detached 并保留目录。</p>
+<p>用户已批准 no-ff 合并 bugfix/bug-1MW9 到本地 develop。finish-gitflow 将删除该本地源分支，令当前 worktree detached 并保留目录。</p>
 <ul><li>不 fetch、不 push，不创建版本 tag，不运行 release-closeout。</li><li>五个 Bug 保持 fixed，后续发布阶段再独立验证并关闭。</li><li>另外四条 bugfix 分支与 worktree 保留，不代其清理或改写。</li><li>当前 worktree 保留路径为 /Users/xuchang/Projects/OAS-Git/php-slimapp-worktrees/bugfix/bug-1MW9；删除需另行确认。</li></ul>
-<p>尚未合并或删除分支；实际 Gitflow 结果以随后 CLI 日志和最终报告为准。</p>
+<p>材料生成时尚未合并或删除分支；实际 Gitflow 结果以随后 CLI 日志和最终报告为准。
+HTML 结构和链接检查已通过；宿主预览排队，浏览器阻止本地 file 协议，未完成视觉检查。</p>
 
       </main>
     </div>

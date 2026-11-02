@@ -49,7 +49,8 @@ evidence:
 完整 branch 验证通过：quick 46 tests、1282 assertions；smoke 208 tests、2318 assertions，零跳过。
 lint、build、独立审查和事实审计均通过；详情见 [验证报告](verification-report.md)与[事实审计](fact-audit.md)。
 本 Change 记录修复结果，Bug 保持 fixed；没有声明独立 bug close 或已发布版本。
-本地 develop 合并尚待授权，尚未执行；没有推送、tag 或发版。
+用户于 2026-11-02 批准本地 develop 合并；Gitflow 将随后执行，结果以实际命令日志为准。
+不推送、不创建 tag、不发版；源 worktree 保留为 detached，另外四条分支和 worktree 保留。
 
 ## 已更新的当前文档
 
