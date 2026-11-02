@@ -1,23 +1,39 @@
-# 统一分支验收的增量审查草稿
+# bug-1MW9 代码审查终稿
 
-## 父阶段与范围
+## 结论
 
-来源为 verify，原请求为 `verify --scope branch`，所有 module 和原有完整验证入口保持不变。
-交付起点为 `7e343f79ce671892c91a5a53bf5b8cf3ee558d9e`。
-本轮左端点为 `a617f318571c35b561787f36340bc4d309d01b1a`，审查终点在分支转绿后固定。
+通过。首轮完整审查和本轮一人增量审查均已完成，未解决项和未完成项均为空。
+独立 reviewer 全程只读，未运行测试或修改工作区。
 
-## 已确认变更
+## 范围与规则
 
-用户明确确认新增 named suite，并将另外四条已审修复分支合入当前分支。
-模板 add/add 冲突逐处核对，分别保留 bug-2AN6 的 ORM 修复和 bug-GH7A 的 Level 修复。
-其它模板及复现断言均保持原样，不降低验证门槛。
+本节记录审查范围及适用规则。
 
-## 旧问题复核
+- 首轮覆盖本交付实现、必要模板拆分、回归测试、事实文档与交付材料。
+- 增量覆盖四项修复合并、模板冲突结果、named suite 配置、INI 隔离及相关文档。
+- 项目阶段 rule 未配置；MDF rule 来源为 `.agents/skills/mdf/references/reviewer-protocol.md`。
+- rule 内容指纹（不是提交标识）：`18dcf03a1e9aa2805baa9b0480c4269ca7bf322b58a9f9a222a639bb67d9efb5`。
+- lint 和只读测量均满足硬限制；原生成器拆分结果符合 700 行目标。
 
-上一轮 review-1mw9-001 为 P3 报告路径归属问题，已修正；本轮复核是否仍成立。
-上一轮无未解决项，原终稿保存在 code-review.previous.md。
+## 裁定与旧问题复核
 
-## 当前状态
+本节汇总各轮发现及最终裁定。
 
-首轮 branch 已执行并保留失败报告；用户于 2026-11-02 批准修正；单场景 1 test / 19 assertions、完整 BugP4KUTest 4 tests / 58 assertions 通过，待原 branch 转绿后做一人增量审查。
-code-review、verify branch 及后续阶段保持未勾，未合入 develop。
+| 项目 | 裁定 | 证据 |
+| --- | --- | --- |
+| review-1mw9-001，P3 | 已采纳并修正；增量复核仍解决 | converge/lint 报告路径归属已写为本工作区 |
+| 本轮新增 finding | 无 | 独立 reviewer 覆盖整个增量范围，无未完成项 |
+| 未解决项 | 无 | owner 核对实现、报告与工作区只读边界 |
+
+旧 P3 为记录问题，没有伪造行为 failing test。
+四项来源分支和合并后关键实现一致，见 [来源核对](integration-sources.json)。
+
+## 验证与边界
+
+本节区分独立审查与主链验证证据。
+
+本轮独立审查没有修改实现、测试或验证配置，因此跳过审查内部 smart。
+父阶段 branch 已通过 lint、build、quick 和 smoke，详情见 [验证报告](verification-report.md)。
+quick 复现由父 verify 记录；原六场景正式回归和完整 smoke 均保留。
+四项合入分别保留 ORM、日志级别、缓存恢复和普通 fork 测试修复，没有降低验证门槛。
+没有合入 develop、推送或发版；后续 fact audit 和 close-out 仍待执行。

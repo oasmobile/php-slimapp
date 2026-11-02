@@ -12,8 +12,8 @@
 - [x] owner 开发：确认有效红灯，修复 bug-1MW9 并让对应回归转绿
 - [x] converge
 - [x] lint
-- [ ] code-review
-- [ ] verify branch
+- [x] code-review
+- [x] verify branch
 - [ ] fact audit
 - [ ] close-out
 
@@ -39,14 +39,3 @@ Agent 在新 worktree 准备本地依赖和独立 autoload，无需凭据或外�
 修复前记录针对本 Bug 的有效红灯；修复后相同用例通过，quick 与静态检查通过。
 本轮增量审查覆盖四项合并、冲突解决和 suite 配置，记录实际验证范围与未完成阶段。
 未执行收口或分支整体验收时，不勾选对应阶段，不宣称已合入 develop。
-
-## verify branch 续办
-
-本段记录父阶段的固定请求，完成验证与增量复审后清理。
-
-- source: verify
-- scope: branch；全部 module，保留 lint、build、quick、smoke 的完整入口。
-- 原请求：`python3 -B .agents/skills/mdf/scripts/mdf.py verify --repo . --scope branch`。
-- 操作左端点：`a617f318571c35b561787f36340bc4d309d01b1a`。
-- 状态：首轮 branch 的 lint/build/quick 通过，smoke 为 207 通过、1 个环境设施错误；用户于 2026-11-02 批准环境隔离修正；同一失败场景及四场景回归已通过，待重跑原 branch 并增量复审。
-- 用户于 2026-11-01 明确确认新增 coverage-script-regression 并汇入四条已审修复分支。

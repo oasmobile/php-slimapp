@@ -1,4 +1,4 @@
-# 分支验收现场
+# 分支验收环境错误记录（已解决）
 
 ## 已完成
 
@@ -22,8 +22,8 @@ proc_open 启动子进程时，空字符串形式的 PHP_INI_SCAN_DIR 未按预�
 最小补丁只将空字符串改为每个测试的专属空目录，不改断言、预期、套件成员或失败规则。
 用户于 2026-11-02 批准并已应用补丁。同一失败场景通过（1 test / 19 assertions），四场景回归通过（4 tests / 58 assertions）。报告为本工作区 `.mdf/reports/ini-scan-single-green.xml` 和 `.mdf/reports/ini-scan-regression-green.xml`。
 
-## 边界与续办
+## 最终状态
 
-verify branch、code-review 和后续阶段保持未勾，没有合入 develop、推送或发版。
-环境隔离阻塞已解除；接着运行原完整 branch 请求，转绿后做一人增量复审。
-原 scope、原命令和最早待审左端点保存在 objectives，不能用 named 或临时副本通过代替。
+环境隔离错误已解决；原完整 branch 请求已通过，一人增量审查已完成。
+code-review 和 verify branch 已完成，证据见 verification-report.md。
+fact audit 和 close-out 尚未执行，没有合入 develop、推送或发版。
