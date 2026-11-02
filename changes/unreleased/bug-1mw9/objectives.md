@@ -14,7 +14,7 @@
 - [x] lint
 - [x] code-review
 - [x] verify branch
-- [ ] fact audit
+- [x] fact audit
 - [ ] close-out
 
 ## 需求来源
