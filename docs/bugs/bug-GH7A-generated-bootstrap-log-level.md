@@ -1,9 +1,10 @@
 ---
 id: bug-GH7A
 type: bug
-status: fixed
+status: closed
 severity: major
 found_in: 3.2.1
+fixed_in: 3.2.2
 ---
 
 # 生成的 PHPUnit bootstrap 传入旧整数日志级别

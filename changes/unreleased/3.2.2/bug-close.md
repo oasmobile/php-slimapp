@@ -24,3 +24,17 @@ ORM 工厂移除旧 API，使用 DriverManager 和 EntityManager 构造器，并
 
 无未解决问题，允许关闭并写入 fixed_in: 3.2.2。
 
+## bug-GH7A
+
+本项复现通过，主 Agent 已独立审查对应修复。
+
+- HEAD：`5a17024ddbc25795ce65fa1226faedc6d01b069d`。
+- 审查路径：`src/BuiltInCommands/Templates/UnitTestTemplates.php`。
+- 修复提交：`dfb5027f4ad21c9e58077c0912acd9bb44c92725`。
+- 结果：1 个复现场景 passed；复用退出 0 的 release 报告。
+- `BugGH7ATest::testGeneratedBootstrapCanRunAMinimalTest`：passed。
+
+默认 bootstrap 将整数级别改为 Level::Critical，匹配锁定日志 API。生成 bootstrap 已执行最小用例。
+
+无未解决问题，允许关闭并写入 fixed_in: 3.2.2。
+
