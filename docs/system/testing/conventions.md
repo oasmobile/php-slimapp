@@ -2,6 +2,7 @@
 title: "测试约定"
 doc_type: system-testing
 evidence:
+  - path: "tests/ut/Regression/Fixtures/"
   - path: "src/BuiltInCommands/Templates/UnitTestTemplates.php"
   - path: "tests/bootstrap.php"
   - path: "tests/integration/bootstrap.php"
