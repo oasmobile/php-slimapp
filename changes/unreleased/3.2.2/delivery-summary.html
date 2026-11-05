@@ -1,0 +1,161 @@
+<!doctype html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>3.2.2：设计与开发总结</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 36px 24px; background: #0e161c; color: #e4edf2;
+      font: 16px/1.85 ui-monospace, "SFMono-Regular", "Cascadia Code", "PingFang SC", monospace; }
+    .document { max-width: 1120px; margin: auto; background: #141d24; border: 1px solid #32454f; }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 16px;
+      padding: 20px 28px; background: #10171d; border-bottom: 1px solid #32454f;
+      color: #a0b2bd; font-size: 12px; letter-spacing: 1.4px; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; }
+    .brand::before { content: ""; width: 7px; height: 7px; background: #a8e3b1; border-radius: 50%; }
+    .layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); }
+    .outline { padding: 36px 22px; border-right: 1px dashed #32454f; font-size: 13px; }
+    .outline-label { margin: 0 0 24px; color: #a8e3b1; font-size: 12px; letter-spacing: 1px; }
+    .outline ol { padding: 0; margin: 0; list-style: none; }
+    .outline li { margin: 0 0 16px; }
+    .outline a { display: block; color: #a0b2bd; text-decoration: none; }
+    .outline a:hover { color: #a8e3b1; }
+    main { min-width: 0; padding: 38px 42px; counter-reset: section;
+      overflow-wrap: anywhere; }
+    h1 { margin: 0 0 36px; padding-bottom: 30px; border-bottom: 1px solid #32454f;
+      font-size: clamp(28px, 3.5vw, 38px); line-height: 1.35; font-weight: 600; letter-spacing: -.8px; }
+    h1::after { content: "_"; color: #a8e3b1; }
+    h2 { margin: 38px 0 16px; color: #a8e3b1; font-size: 19px; line-height: 1.5;
+      font-weight: 600; counter-increment: section; scroll-margin-top: 24px; }
+    h2::before { content: counter(section, decimal-leading-zero) " / ";
+      padding-right: 8px; color: #a0b2bd; font-size: 12px; font-weight: 400; }
+    h3 { margin: 24px 0 12px; font-size: 16px; font-weight: 600; }
+    h4, h5, h6 { font-size: 15px; }
+    p { margin: 12px 0; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+    li > ul, li > ol { margin: 8px 0; }
+    a { color: #a8e3b1; text-underline-offset: 4px; }
+    a:focus-visible { outline: 2px solid #a8e3b1; outline-offset: 4px; }
+    code { padding: 2px 5px; background: #1e3034; color: #bee9c5;
+      font: .9em/1.7 ui-monospace, "SFMono-Regular", "Cascadia Code", monospace; }
+    pre { margin: 20px 0; padding: 20px; border-left: 2px solid #527861;
+      background: #101a20; color: #bee9c5; overflow-x: auto; font-size: 14px; line-height: 1.8; }
+    pre code { padding: 0; background: transparent; }
+    blockquote { margin: 20px 0; padding: 10px 20px; border-left: 2px solid #a8e3b1;
+      background: #1e3034; color: #d5e4df; }
+    .table-wrap { max-width: 100%; margin: 20px 0; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.75; }
+    th { padding: 12px 16px; background: #1b2a32; color: #a0b2bd;
+      font-size: 12px; font-weight: 500; text-align: left; }
+    td { padding: 14px 16px; vertical-align: top; }
+    th, td { border-bottom: 1px solid #32454f; min-width: 110px; }
+    tbody tr:nth-child(even) { background: #17232b; }
+    hr { margin: 28px 0; border: 0; border-top: 1px solid #32454f; }
+    img { max-width: 100%; height: auto; }
+    .document-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;
+      padding: 20px 28px; border-top: 1px solid #32454f; color: #a0b2bd; font-size: 12px; }
+    @media (max-width: 720px) {
+      body { padding: 16px 12px; font-size: 15px; }
+      .layout { grid-template-columns: 1fr; }
+      .outline { padding: 22px; border-right: 0; border-bottom: 1px solid #32454f; }
+      .outline-label { margin-bottom: 12px; }
+      .outline ol { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+      .outline li { margin: 0; }
+      main { padding: 28px 22px; }
+      .masthead, .document-footer { padding: 18px 22px; }
+      h1 { margin-bottom: 28px; padding-bottom: 24px; }
+      th, td { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="document">
+    <header class="masthead"><span class="brand">MDF / WORKSPACE</span><span>工作材料</span></header>
+    <div class="layout">
+      <nav class="outline" aria-label="文档目录">
+        <p class="outline-label">INDEX /</p>
+        <ol><li><a href="#scope">交付范围与结果</a></li>
+<li><a href="#process">完整交付过程</a></li>
+<li><a href="#decisions">设计决策与取舍</a></li>
+<li><a href="#implementation">开发与测试实现</a></li>
+<li><a href="#deviations">偏差与范围变化</a></li>
+<li><a href="#evidence">审查与验证证据</a></li>
+<li><a href="#follow-up">交付与后续事项</a></li></ol>
+      </nav>
+      <main>
+<h1>3.2.2：设计与开发总结</h1>
+<h2 id="scope">交付范围与结果</h2>
+<p>本次 release 发布已验收的 PHP 8.5 升级修复；用户于 2026-11-05 确认正式发布。</p>
+<ul>
+<li>起点为 develop 的已验收结果；目标为 master 和 v3.2.2，再回合本地 develop。</li>
+<li>纳入 bug-2AN6、bug-GH7A、bug-Y68Q、bug-P4KU、bug-1MW9；五项已独立复核并关闭，fixed_in 为 3.2.2。</li>
+<li>聚合 mdf-init、v3-upgrade-review-bugs、v3-bug-reproduction-tests、bug-1mw9 四份 Change。</li>
+<li>没有新增功能、依赖升级、数据迁移或真实数据库联调；保留全部现有 worktree。</li>
+</ul>
+<h2 id="process">完整交付过程</h2>
+<p>以下按实际执行顺序记录参与者、动作和阶段结果。</p>
+<table><thead><tr><th>阶段</th><th>参与与动作</th><th>结果与证据</th></tr></thead><tbody>
+<tr><td>start</td><td>owner 从已验收 develop 建立 release/3.2.2；配置 owner 1、qa 0、dev 0、reviewer 3。</td><td><a href="objectives.md">范围与账本</a>；独立锁定依赖和 autoload。</td></tr>
+<tr><td>design / 开发 / converge</td><td>needs_design:no、has_dev:no；发布已有结果，无新业务开发和角色分支集成。</td><td><a href="prerelease.md">预发布核对</a>；未配置 hook。</td></tr>
+<tr><td>目标集成</td><td>发现历史 master 尚非 develop 祖先，先 no-ff 合入 release。</td><td>集成前后树一致；之后的三人审查包含完整上一版本至发布变化。</td></tr>
+<tr><td>lint 与审查</td><td>三名 reviewer 按生成器、运行时、测试及工作流分工；owner 汇总裁定。</td><td><a href="code-review.md">审查终稿</a>；两项材料问题已修复并复核。</td></tr>
+<tr><td>branch 验证</td><td>PHP 8.5.12、PCOV 1.0.12；本地 PHPStan 内存设为 512M，不修改系统配置。</td><td><a href="verification-report.md">quick 46 / release 208 项通过</a>。</td></tr>
+<tr><td>事实审计</td><td>owner 审阅 25 页事实文档与 30 个实现路径，补充 fixture 目录证据。</td><td><a href="fact-audit.md">审计通过</a>；8 条目录证据警告已逐条人工处置。</td></tr>
+<tr><td>close-out</td><td>用户批准后，owner 按五个 Bug 的实际修复提交逐块审查，引用当前 release 的 16 个通过场景。</td><td><a href="bug-close.md">五项独立关闭记录</a>；归档与版本记录由 release-closeout 生成。</td></tr>
+</tbody></table>
+<h2 id="decisions">设计决策与取舍</h2>
+<p>本阶段只做发布决策；既有修复的设计和验证细节保留在 child 材料中。</p>
+<table><thead><tr><th>问题与候选</th><th>选择及依据</th><th>影响</th></tr></thead><tbody>
+<tr><td>patch 或 minor</td><td>选择 3.2.2；公开运行行为仅修复缺陷，没有新功能和 breaking change。</td><td>用户确认版本；不改变 PHP 8.5 基线。</td></tr>
+<tr><td>历史 master 集成或改写历史</td><td>选择 no-ff 保留历史；检查实际树无变化。</td><td>审查基线固定 v3.2.1，覆盖完整交付变化。</td></tr>
+<tr><td>四份旧交付材料缺少 CHANGE.md</td><td>将原目录完整纳入 bug-1mw9/source-deliveries，保留历史内容并修正链接。</td><td>不伪造独立已交付记录；四条 bugfix 分支和 worktree 保留。</td></tr>
+<tr><td>重复运行或复用逐例结果</td><td>确认验证后非 docs/changes 路径没有变化，逐一匹配 summary.json 的 test 名及 passed 状态。</td><td>五项关闭使用本版真实复现证据，未以总套件全绿代替逐例核验。</td></tr>
+</tbody></table>
+<h2 id="implementation">开发与测试实现</h2>
+<p>本次不再修改业务实现；下表说明收入的行为和实际验收边界。</p>
+<table><thead><tr><th>Bug</th><th>修复行为</th><th>复现与边界</th></tr></thead><tbody>
+<tr><td>bug-2AN6</td><td>生成 ORM 工厂使用 ORM 3 构造方式和原生 lazy objects。</td><td>真实生成工厂创建 EntityManager；1 个场景，无真实数据库连接。</td></tr>
+<tr><td>bug-GH7A</td><td>生成 bootstrap 使用 Monolog Level::Critical。</td><td>默认参数执行最小 PHPUnit 用例；1 个场景。</td></tr>
+<tr><td>bug-Y68Q</td><td>非法配置缓存先做数组检查，再进入原有重建路径。</td><td>合法、截断、标量、false 缓存共 4 场景；先确认 freshness。</td></tr>
+<tr><td>bug-P4KU</td><td>普通 fork 不强制覆盖率驱动；255 失败排除致命异常。</td><td>隔离扩展后 4 场景通过；真实空 INI 扫描目录，保留断言。</td></tr>
+<tr><td>bug-1MW9</td><td>覆盖率脚本保留失败输出并传播非预期失败状态。</td><td>1 个成功对照及 5 个失败场景；命令替身测试不代表真实覆盖率合并测试。</td></tr>
+</tbody></table>
+<h2 id="deviations">偏差与范围变化</h2>
+<p>实际处理的偏差均属于发布材料或本地验证准备，没有扩大业务范围。</p>
+<ul>
+<li>release-closeout 预检查发现旧交付目录无 CHANGE.md；修复目录组织后，输入核对得到四份 child、五项唯一 fixed outcome。</li>
+<li>start 账本未勾选的问题已修正；历史 deferred 列表已更新为本版最终 fixed 结果，保留阶段说明。</li>
+<li>事实审计器按文件精确匹配 evidence，不能展开目录；8 条原始警告保留，人工审阅后未解决数为 0。</li>
+<li>宿主文件预览受限；HTML 使用固定模板生成并检查结构和链接，未宣称完成视觉检查。</li>
+</ul>
+<h2 id="evidence">审查与验证证据</h2>
+<p>审查、测试和事实审计已完成；本次关闭仅增加对象状态和验收记录。</p>
+<ul>
+<li><a href="code-review.md">三人 partition 审查</a>：两项材料问题已解决，无未解决项。</li>
+<li><a href="verification-report.json">机器验证报告</a>：all_passed:true；lint、build、quick、release 命令均退出 0。</li>
+<li>quick：46 tests、1282 assertions；release：208 tests、2322 assertions；无失败、错误或跳过。</li>
+<li><a href="bug-validation-readiness.json">逐例证据</a>与<a href="bug-close.md">关闭审查</a>覆盖五项 Bug 的 16 个复现场景。</li>
+<li><a href="fact-audit-findings.json">事实审计原始结果</a>：0 findings；原始 8 条警告已在人工终稿逐项处置。</li>
+<li>严格文档校验通过；命令日志保留于主仓库 .mdf/logs，原始 suite 报告保留于发布 worktree .mdf/reports。</li>
+</ul>
+<h2 id="follow-up">交付与后续事项</h2>
+<p>用户已批准完整收口方案；Gitflow 实际结果以命令日志和最终回报为准。</p>
+<ol>
+<li>release-closeout 归档四份 Change 和五项 closed Bug，生成 3.2.2 版本根及 CHANGELOG。</li>
+<li>no-ff 合入 master，创建 v3.2.2 注释 tag，再 no-ff 回合本地 develop。</li>
+<li>仅原子推送 master 与 v3.2.2 至 origin；不推送 develop。</li>
+<li>删除本地 release/3.2.2 分支，发布 worktree 转 detached 并保留；其余四条 bugfix 分支及全部 worktree 保留。</li>
+</ol>
+<p>Gitflow 前不提前声称合并、tag 或推送成功。发布说明见最终版本根 CHANGE.md 与仓库 CHANGELOG.md。</p>
+
+      </main>
+    </div>
+    <footer class="document-footer"><span>Mars Development Flow</span><span>范围 / 决定 / 证据</span></footer>
+  </div>
+</body>
+</html>

@@ -20,7 +20,7 @@
 - [x] code-review
 - [x] verify branch
 - [x] fact audit
-- [ ] close-out
+- [x] close-out
 
 ## 工作线
 
