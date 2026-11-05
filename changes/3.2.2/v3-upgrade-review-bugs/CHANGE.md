@@ -14,11 +14,11 @@ evidence:
     - python3 -B .agents/skills/mdf/scripts/mdf.py validate --repo . --level basic
     - git diff --check
   artifacts:
-    - docs/bugs/bug-2AN6-generated-orm-removed-api.md
-    - docs/bugs/bug-GH7A-generated-bootstrap-log-level.md
-    - docs/bugs/bug-Y68Q-corrupted-config-cache-recovery.md
-    - docs/bugs/bug-P4KU-fork-tests-require-coverage-driver.md
-    - docs/bugs/bug-1MW9-coverage-script-masks-test-failures.md
+    - docs/bugs/archive/3.2/bug-2AN6-generated-orm-removed-api.md
+    - docs/bugs/archive/3.2/bug-GH7A-generated-bootstrap-log-level.md
+    - docs/bugs/archive/3.2/bug-Y68Q-corrupted-config-cache-recovery.md
+    - docs/bugs/archive/3.2/bug-P4KU-fork-tests-require-coverage-driver.md
+    - docs/bugs/archive/3.2/bug-1MW9-coverage-script-masks-test-failures.md
 ---
 
 # V3 升级审查问题登记

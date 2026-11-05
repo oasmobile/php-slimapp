@@ -19,7 +19,7 @@
 
 ## 需求来源
 
-范围来自 [bug-P4KU](../../../../../docs/bugs/bug-P4KU-fork-tests-require-coverage-driver.md)。
+范围来自 [bug-P4KU](../../../../../docs/bugs/archive/3.2/bug-P4KU-fork-tests-require-coverage-driver.md)。
 
 ## 目标与非目标
 

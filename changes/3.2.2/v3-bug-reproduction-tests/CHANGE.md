@@ -19,7 +19,7 @@ evidence:
     - python3 -B .agents/skills/mdf/scripts/mdf.py validate --repo . --level basic
     - git diff --check
   artifacts:
-    - changes/unreleased/v3-bug-reproduction-tests/HANDOFF.md
+    - changes/3.2.2/v3-bug-reproduction-tests/HANDOFF.md
 ---
 
 # V3 升级 Bug 复现测试

@@ -25,11 +25,11 @@ evidence:
     - "python3 -B .agents/skills/mdf/scripts/mdf.py verify --repo . --scope named --suites coverage-script-regression"
     - "python3 -B .agents/skills/mdf/scripts/mdf.py validate --repo . --level strict"
   artifacts:
-    - changes/unreleased/bug-1mw9/code-review.md
-    - changes/unreleased/bug-1mw9/verification-report.json
-    - changes/unreleased/bug-1mw9/verification-report.md
-    - changes/unreleased/bug-1mw9/fact-audit.md
-    - changes/unreleased/bug-1mw9/integration-sources.json
+    - changes/3.2.2/bug-1mw9/code-review.md
+    - changes/3.2.2/bug-1mw9/verification-report.json
+    - changes/3.2.2/bug-1mw9/verification-report.md
+    - changes/3.2.2/bug-1mw9/fact-audit.md
+    - changes/3.2.2/bug-1mw9/integration-sources.json
 ---
 
 # V3 升级缺陷修复

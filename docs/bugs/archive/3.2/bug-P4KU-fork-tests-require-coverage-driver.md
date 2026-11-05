@@ -54,7 +54,7 @@ fixed_in: 3.2.2
 
 复现测试已编写：`tests/ut/Regression/BugP4KUTest.php`，包含原进程测试对应的 4 个场景。
 测试保留其它 PHP 配置并禁用覆盖率驱动，同时检查预期失败场景是否混入 fatal error。
-已按本次授权执行，红灯与转绿证据见下方记录；统一运行见 [复现测试交接](../../changes/unreleased/v3-bug-reproduction-tests/HANDOFF.md)。
+已按本次授权执行，红灯与转绿证据见下方记录；统一运行见 [复现测试交接](../../../../changes/3.2.2/v3-bug-reproduction-tests/HANDOFF.md)。
 
 ## 修复与验证记录
 

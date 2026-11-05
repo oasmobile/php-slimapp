@@ -19,7 +19,7 @@
 
 ## 需求来源
 
-范围来自 [bug-2AN6](../../../../../docs/bugs/bug-2AN6-generated-orm-removed-api.md)。
+范围来自 [bug-2AN6](../../../../../docs/bugs/archive/3.2/bug-2AN6-generated-orm-removed-api.md)。
 
 ## 目标与非目标
 

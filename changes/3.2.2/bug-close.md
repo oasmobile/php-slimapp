@@ -68,7 +68,7 @@ ORM 工厂移除旧 API，使用 DriverManager 和 EntityManager 构造器，并
 - `BugP4KUTest::testOrdinaryForkTestNeedsNoCoverageDriver with data set "sentinel_once"`：passed。
 - `BugP4KUTest::testOrdinaryForkTestNeedsNoCoverageDriver with data set "sentinel_parallel"`：passed。
 
-普通 fork 仅在显式请求时设置 COVERAGE_FILE；预期 255 额外排除 fatal/uncaught。复现环境使用真实空 INI 扫描目录，未削弱断言。显式覆盖率历史证据见 ../bug-1mw9/source-deliveries/bug-p4ku/converge-report.md；四份产物已成功反序列化。
+普通 fork 仅在显式请求时设置 COVERAGE_FILE；预期 255 额外排除 fatal/uncaught。复现环境使用真实空 INI 扫描目录，未削弱断言。显式覆盖率历史证据见 bug-1mw9/source-deliveries/bug-p4ku/converge-report.md；四份产物已成功反序列化。
 
 无未解决问题，允许关闭并写入 fixed_in: 3.2.2。
 

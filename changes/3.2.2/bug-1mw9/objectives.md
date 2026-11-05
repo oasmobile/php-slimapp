@@ -19,7 +19,7 @@
 
 ## 需求来源
 
-范围来自 [bug-1MW9](../../../docs/bugs/bug-1MW9-coverage-script-masks-test-failures.md)。
+范围来自 [bug-1MW9](../../../docs/bugs/archive/3.2/bug-1MW9-coverage-script-masks-test-failures.md)。
 
 ## 目标与非目标
 

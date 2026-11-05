@@ -1,4 +1,4 @@
-# bug-Y68Q 修复交付
+# bug-GH7A 修复交付
 
 ## 流程
 
@@ -9,7 +9,7 @@
 按序执行，每项完成后才勾选；已有测试不代表已确认红灯。
 
 - [x] 确认目标与约束（start）
-- [x] owner 开发：确认有效红灯，修复 bug-Y68Q 并让对应回归转绿
+- [x] owner 开发：确认有效红灯，修复 bug-GH7A 并让对应回归转绿
 - [x] converge
 - [x] lint
 - [x] code-review
@@ -19,11 +19,11 @@
 
 ## 需求来源
 
-范围来自 [bug-Y68Q](../../../../../docs/bugs/bug-Y68Q-corrupted-config-cache-recovery.md)。
+范围来自 [bug-GH7A](../../../../../docs/bugs/archive/3.2/bug-GH7A-generated-bootstrap-log-level.md)。
 
 ## 目标与非目标
 
-目标：非法配置缓存进入重建分支，保留正常缓存读取。
+目标：适配生成 bootstrap 的 Monolog Level 类型，执行最小 PHPUnit 用例。
 仅修复本 Bug，不改其它已登记 Bug，不推送、不发版、不关闭 Bug。
 
 ## 约束

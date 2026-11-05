@@ -53,7 +53,7 @@ fixed_in: 3.2.2
 
 复现测试已编写：`tests/ut/Regression/BugY68QTest.php`，包含正常、截断、标量和 false 缓存 4 个场景。
 测试先确认缓存仍被判定为 fresh；已按本次授权执行，红灯与转绿证据见下方记录。
-统一运行与交接见 [复现测试交接](../../changes/unreleased/v3-bug-reproduction-tests/HANDOFF.md)。
+统一运行与交接见 [复现测试交接](../../../../changes/3.2.2/v3-bug-reproduction-tests/HANDOFF.md)。
 
 ## 修复与验证记录
 

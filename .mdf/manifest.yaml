@@ -3,7 +3,7 @@ state: ready
 logo: "📍"
 versioning:
   strategy: semver
-  latest_release: "3.2.1"
+  latest_release: "3.2.2"
 implementation_roots:
   - "src"
 baselines:
