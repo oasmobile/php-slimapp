@@ -1,9 +1,10 @@
 ---
 id: bug-Y68Q
 type: bug
-status: fixed
+status: closed
 severity: major
 found_in: 3.2.1
+fixed_in: 3.2.2
 ---
 
 # 配置缓存损坏时类型错误阻断自动重建

@@ -38,3 +38,20 @@ ORM 工厂移除旧 API，使用 DriverManager 和 EntityManager 构造器，并
 
 无未解决问题，允许关闭并写入 fixed_in: 3.2.2。
 
+## bug-Y68Q
+
+本项复现通过，主 Agent 已独立审查对应修复。
+
+- HEAD：`8129c59928823689d535fc6dc43923ee7f6215b8`。
+- 审查路径：`src/SlimApp.php`。
+- 修复提交：`bded35fef6807578e0ac327b9ac213dd5b677081`。
+- 结果：4 个复现场景 passed；复用退出 0 的 release 报告。
+- `BugY68QTest::testConfigurationRemainsAvailable with data set "正常缓存对照"`：passed。
+- `BugY68QTest::testConfigurationRemainsAvailable with data set "截断缓存"`：passed。
+- `BugY68QTest::testConfigurationRemainsAvailable with data set "标量缓存"`：passed。
+- `BugY68QTest::testConfigurationRemainsAvailable with data set "false缓存"`：passed。
+
+反序列化结果先检查数组类型，非法值回到已有配置重建路径。四场景覆盖合法缓存、截断、标量、false。
+
+无未解决问题，允许关闭并写入 fixed_in: 3.2.2。
+
