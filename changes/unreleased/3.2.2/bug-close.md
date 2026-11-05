@@ -55,3 +55,20 @@ ORM 工厂移除旧 API，使用 DriverManager 和 EntityManager 构造器，并
 
 无未解决问题，允许关闭并写入 fixed_in: 3.2.2。
 
+## bug-P4KU
+
+本项复现通过，主 Agent 已独立审查对应修复。
+
+- HEAD：`03a426a9c32b6fdb17a21f45dfe195dedc192b5a`。
+- 审查路径：`tests/ut/ForkProcessTest.php、tests/ut/Regression/BugP4KUTest.php`。
+- 修复提交：`6e434f178cb1ec90b94cf317787bd0a7b499060f`, `6eedd33760c6c6e47c40b3378cd301c4aabce0b8`。
+- 结果：4 个复现场景 passed；复用退出 0 的 release 报告。
+- `BugP4KUTest::testOrdinaryForkTestNeedsNoCoverageDriver with data set "parallel_ok"`：passed。
+- `BugP4KUTest::testOrdinaryForkTestNeedsNoCoverageDriver with data set "parallel_fail"`：passed。
+- `BugP4KUTest::testOrdinaryForkTestNeedsNoCoverageDriver with data set "sentinel_once"`：passed。
+- `BugP4KUTest::testOrdinaryForkTestNeedsNoCoverageDriver with data set "sentinel_parallel"`：passed。
+
+普通 fork 仅在显式请求时设置 COVERAGE_FILE；预期 255 额外排除 fatal/uncaught。复现环境使用真实空 INI 扫描目录，未削弱断言。显式覆盖率历史证据见 ../bug-1mw9/source-deliveries/bug-p4ku/converge-report.md；四份产物已成功反序列化。
+
+无未解决问题，允许关闭并写入 fixed_in: 3.2.2。
+

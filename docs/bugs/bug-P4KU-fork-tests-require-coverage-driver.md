@@ -1,9 +1,10 @@
 ---
 id: bug-P4KU
 type: bug
-status: fixed
+status: closed
 severity: major
 found_in: 3.2.1
+fixed_in: 3.2.2
 ---
 
 # 普通进程测试无条件要求覆盖率驱动
