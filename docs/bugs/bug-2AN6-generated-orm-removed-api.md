@@ -1,9 +1,10 @@
 ---
 id: bug-2AN6
 type: bug
-status: fixed
+status: closed
 severity: major
 found_in: 3.2.1
+fixed_in: 3.2.2
 ---
 
 # 生成项目的 ORM 工厂仍调用已移除的 API
