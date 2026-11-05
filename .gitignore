@@ -15,3 +15,8 @@ agent-playbook.zip
 graphify-out/.graphify_python
 graphify-out/cache/
 graphify-out/manifest.json
+
+# MDF local execution artifacts
+/.mdf/logs/
+/.mdf/reports/
+/.mdf/tmp/

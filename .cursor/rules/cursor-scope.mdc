@@ -1,15 +1,13 @@
 ---
-description: Cursor 平台专属规则，始终生效
+description: Cursor 项目入口
 alwaysApply: true
 ---
 
-# Cursor Scope Rules
+# 项目入口
 
-## `<spec-dir>` 取值
+本项目采用 MDF；旧 spec 工作流仅作为历史材料保存。
 
-- `<spec-dir>` = `.cursor/specs`
-
-## 强制读取
-
-- 每次对话开始时，agent 必须先读取项目根目录下的 `AGENTS.md` 并遵守其中的指令。
-- Agent 首次接触项目时，必须先读取根目录下的 `PROJECT.md` 获取项目的技术栈、构建命令、运行入口、敏感文件清单等项目特定信息。
+- 先读取根 `AGENTS.md`，再读取 `PROJECT.md`。
+- 按 `docs/README.md` 定位本次相关的一份主题页。
+- 使用项目级 MDF Skill；不再创建旧平台专属 specs。
+- 通用安全和 Git 规则继续生效；流程冲突以 MDF 为准。

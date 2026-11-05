@@ -1,0 +1,57 @@
+modules:
+  default:
+    sourceset:
+      - "src/**"
+      - "tests/**"
+      - "bin/**"
+      - "config/**"
+      - "composer.json"
+      - "phpunit.xml"
+      - "changes/3.*/*"
+      - "docs/context/research/legacy-agent-workflow/**"
+      - ".agents/skills/**"
+      - ".cursor/skills/**"
+      - ".kiro/skills/**"
+      - "graphify-out/**"
+    ignore:
+      - pattern: "tests/integration/config/credentials.yml"
+        reason: "人工集成入口的凭据 fixture，仅核对加载关系，不将配置值纳入事实审阅"
+      - pattern: "changes/3.*/*"
+        reason: "已交付历史材料与交付记录不作为当前实现或文档规范检查对象"
+      - pattern: "docs/context/research/legacy-agent-workflow/**"
+        reason: "已停用旧工作流的原文档案，保留原文供历史追溯"
+      - pattern: ".agents/skills/**"
+        reason: "完整安装的上游工具，不属于框架实现"
+      - pattern: ".cursor/skills/**"
+        reason: "完整安装的上游工具，不属于框架实现"
+      - pattern: ".kiro/skills/**"
+        reason: "完整安装的上游工具，不属于框架实现"
+      - pattern: "graphify-out/**"
+        reason: "可陈旧的 Graphify 辅助生成物，不作为当前事实"
+    lint: "vendor/bin/phpstan analyse --no-progress --debug"
+    build: "git diff --check"
+    quick:
+      command: 'vendor/bin/phpunit --testsuite quick --log-junit "$MDF_REPORT_DIR/junit.xml"'
+      tests:
+        - "tests/ut/ConfigParserTest.php"
+        - "tests/ut/NamespaceResolverTest.php"
+        - "tests/ut/CommandConfigurationTest.php"
+        - "tests/ut/SlimAppCompilerPassTest.php"
+        - "tests/pbt/ConfigParserPbtTest.php"
+        - "tests/pbt/NamespaceResolverPbtTest.php"
+        - "tests/pbt/CommandConfigurationPbtTest.php"
+    smoke:
+      command: 'vendor/bin/phpunit --testsuite ut,pbt --log-junit "$MDF_REPORT_DIR/junit.xml"'
+      tests:
+        - "tests/ut/**"
+        - "tests/pbt/**"
+    release:
+      command: 'vendor/bin/phpunit --testsuite ut,pbt --log-junit "$MDF_REPORT_DIR/junit.xml"'
+      tests:
+        - "tests/ut/**"
+        - "tests/pbt/**"
+    named:
+      - coverage-script-regression
+budgets:
+  quick: 30
+  smoke: 300

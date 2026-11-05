@@ -50,7 +50,7 @@ conflicts resolved:
 
 - 禁止 rebase 改写历史
 - 禁止 squash merge
-- 跨分支合并禁止 fast-forward（必须 `--no-ff`），同分支同步（如 pull 同名远程分支）允许 fast-forward
+- 跨分支合并使用 `--no-ff`；MDF local 模式下 planning/develop 同步按 MDF 契约允许 fast-forward
 - merge commit 应清晰表达来源分支与目标分支
 
 ---
@@ -75,3 +75,7 @@ worktree 放在项目同级的 `${repo-name}-worktrees/` 目录下，按分支�
 - Agent 执行的所有 git 命令必须是非交互式的，不得触发编辑器或等待用户输入
 - `git merge --no-ff` 时必须附带 `-m "<message>"` 参数，避免打开编辑器
 - 未经过用户允许，不要使用 `git -C` 切换目录
+
+## MDF 工作流
+
+交付、规划、未共享提交整理和收口以项目 MDF Skill 为准；不得改写共享历史。

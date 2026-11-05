@@ -1,0 +1,14 @@
+{
+  "branch": "release/3.2.2",
+  "needs_design": false,
+  "roster": {
+    "dev": 0,
+    "dev_strategy": "best-of-n",
+    "qa": 0,
+    "qa_strategy": "best-of-n",
+    "review_strategy": "partition",
+    "reviewers": 3
+  },
+  "slug": "3.2.2",
+  "start_commit": "65b5abddb1bb3177c069ee8858371f5c9d548bb9"
+}

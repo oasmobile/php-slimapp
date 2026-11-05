@@ -1,0 +1,123 @@
+{
+  "purpose": "release close-out 后续独立关闭流程的逐例证据，不是关闭完成记录",
+  "recorded_head": "657c9e72e3f931c7ed749bf76f0e258074bfd6fd",
+  "summary": ".mdf/reports/20261105T081432022548000Z-release/summary.json",
+  "cases": [
+    {
+      "name": "Oasis.SlimApp.Tests.Regression.Bug1MW9Test",
+      "tests": [
+        {
+          "name": "testCoverageScriptPreservesUnexpectedFailures with data set \"成功及预期业务失败对照\"",
+          "result": "passed",
+          "time": 0.932927
+        },
+        {
+          "name": "testCoverageScriptPreservesUnexpectedFailures with data set \"PHPUnit失败\"",
+          "result": "passed",
+          "time": 0.707894
+        },
+        {
+          "name": "testCoverageScriptPreservesUnexpectedFailures with data set \"parallel异常\"",
+          "result": "passed",
+          "time": 0.698861
+        },
+        {
+          "name": "testCoverageScriptPreservesUnexpectedFailures with data set \"parallel_fail非预期错误\"",
+          "result": "passed",
+          "time": 0.695861
+        },
+        {
+          "name": "testCoverageScriptPreservesUnexpectedFailures with data set \"sentinel_once异常\"",
+          "result": "passed",
+          "time": 0.731176
+        },
+        {
+          "name": "testCoverageScriptPreservesUnexpectedFailures with data set \"sentinel_parallel异常\"",
+          "result": "passed",
+          "time": 0.714067
+        }
+      ],
+      "result": "passed",
+      "time": 4.481
+    },
+    {
+      "name": "Oasis.SlimApp.Tests.Regression.Bug2AN6Test",
+      "tests": [
+        {
+          "name": "testGeneratedOrmFactoryCreatesAnEntityManager",
+          "result": "passed",
+          "time": 0.072612
+        }
+      ],
+      "result": "passed",
+      "time": 0.073
+    },
+    {
+      "name": "Oasis.SlimApp.Tests.Regression.BugGH7ATest",
+      "tests": [
+        {
+          "name": "testGeneratedBootstrapCanRunAMinimalTest",
+          "result": "passed",
+          "time": 0.132494
+        }
+      ],
+      "result": "passed",
+      "time": 0.132
+    },
+    {
+      "name": "Oasis.SlimApp.Tests.Regression.BugP4KUTest",
+      "tests": [
+        {
+          "name": "testOrdinaryForkTestNeedsNoCoverageDriver with data set \"parallel_ok\"",
+          "result": "passed",
+          "time": 0.196649
+        },
+        {
+          "name": "testOrdinaryForkTestNeedsNoCoverageDriver with data set \"parallel_fail\"",
+          "result": "passed",
+          "time": 0.304597
+        },
+        {
+          "name": "testOrdinaryForkTestNeedsNoCoverageDriver with data set \"sentinel_once\"",
+          "result": "passed",
+          "time": 0.414701
+        },
+        {
+          "name": "testOrdinaryForkTestNeedsNoCoverageDriver with data set \"sentinel_parallel\"",
+          "result": "passed",
+          "time": 0.424429
+        }
+      ],
+      "result": "passed",
+      "time": 1.34
+    },
+    {
+      "name": "Oasis.SlimApp.Tests.Regression.BugY68QTest",
+      "tests": [
+        {
+          "name": "testConfigurationRemainsAvailable with data set \"正常缓存对照\"",
+          "result": "passed",
+          "time": 0.074415
+        },
+        {
+          "name": "testConfigurationRemainsAvailable with data set \"截断缓存\"",
+          "result": "passed",
+          "time": 0.066474
+        },
+        {
+          "name": "testConfigurationRemainsAvailable with data set \"标量缓存\"",
+          "result": "passed",
+          "time": 0.064002
+        },
+        {
+          "name": "testConfigurationRemainsAvailable with data set \"false缓存\"",
+          "result": "passed",
+          "time": 0.060961
+        }
+      ],
+      "result": "passed",
+      "time": 0.266
+    }
+  ],
+  "status_changed": false
+}

@@ -1,0 +1,156 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        3
+      ]
+    },
+    "rules_sha256": {
+      "type": "string"
+    },
+    "context_sha256": {
+      "type": "string"
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "changes_requested",
+        "needs-review",
+        "error"
+      ]
+    },
+    "incomplete": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "against"
+      ]
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3
+          },
+          "trigger": {
+            "type": "string"
+          },
+          "impact": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "path",
+          "line",
+          "priority",
+          "trigger",
+          "impact",
+          "evidence"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "fact-audit"
+      ]
+    },
+    "implementation_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "document_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "disposition": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "finding",
+              "needs-review"
+            ]
+          },
+          "evidence": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "disposition",
+          "evidence"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "against": {
+      "type": "string"
+    },
+    "worktree_sha256": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "rules_sha256",
+    "context_sha256",
+    "decision",
+    "incomplete",
+    "mode",
+    "paths",
+    "findings",
+    "operation",
+    "implementation_paths",
+    "document_paths",
+    "warnings",
+    "against",
+    "worktree_sha256"
+  ],
+  "additionalProperties": false
+}

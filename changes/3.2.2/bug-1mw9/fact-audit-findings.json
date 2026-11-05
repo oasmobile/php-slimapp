@@ -1,0 +1,21 @@
+{
+  "scope": "branch",
+  "passed": true,
+  "audit_log": ".mdf/logs/20261102T024923441461000Z-fact-audit",
+  "validation_log": ".mdf/logs/20261102T024938569662000Z-validate",
+  "cli_findings": [],
+  "warnings": [],
+  "validation_findings": [],
+  "semantic_findings": [],
+  "resolved": [
+    "FA-001",
+    "FA-002",
+    "FA-003",
+    "FA-004"
+  ],
+  "previous": {
+    "stale": 18,
+    "warnings": 3,
+    "audit_log": ".mdf/logs/20261102T023614921988000Z-fact-audit"
+  }
+}

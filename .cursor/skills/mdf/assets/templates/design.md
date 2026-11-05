@@ -1,0 +1,27 @@
+# 交付设计
+
+## 目标对应
+
+{{MDF_OBJECTIVES_MAPPING}}
+
+## 当前事实锚点
+
+{{MDF_RELATED_CURRENT_FACT_PAGES_OR_PAGES_TO_ADD}}
+
+## 共享契约与底座
+
+{{MDF_COMMITTED_SHARED_CODEBASE_FOR_WRITE_TESTS_AND_IMPLEMENT}}
+
+## 测试策略
+
+项目级 kind 与失败语义见 `docs/system/testing/`。本页只写本次交付映射。
+
+{{MDF_ACCEPTANCE_TO_QUICK_AND_DELIVERY_SUITE_MAPPING}}
+
+## 验证配置
+
+{{MDF_VERIFICATION_SUITES_AND_PROTECTED_PATHS}}
+
+## 已确认取舍
+
+{{MDF_USER_CONFIRMED_DECISIONS}}

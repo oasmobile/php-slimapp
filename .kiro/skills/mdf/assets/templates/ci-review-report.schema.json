@@ -1,0 +1,211 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        3
+      ]
+    },
+    "source": {
+      "type": "string"
+    },
+    "delivery_base": {
+      "type": "string"
+    },
+    "review_base": {
+      "type": "string"
+    },
+    "review_head": {
+      "type": "string"
+    },
+    "policy_ref": {
+      "type": "string"
+    },
+    "rules_sha256": {
+      "type": "string"
+    },
+    "context_sha256": {
+      "type": "string"
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "changes_requested",
+        "needs-review",
+        "error"
+      ]
+    },
+    "incomplete": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reviewers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reviewer"
+      }
+    },
+    "adjudications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "accepted",
+              "rejected",
+              "needs-review"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "needs_reproduction": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "decision",
+          "reason",
+          "evidence",
+          "needs_reproduction"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "source",
+    "delivery_base",
+    "review_base",
+    "review_head",
+    "policy_ref",
+    "rules_sha256",
+    "context_sha256",
+    "decision",
+    "incomplete",
+    "reviewers",
+    "adjudications"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "reviewer": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "rules_sha256": {
+          "type": "string"
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "incomplete": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 3
+              },
+              "trigger": {
+                "type": "string"
+              },
+              "impact": {
+                "type": "string"
+              },
+              "evidence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "path",
+              "line",
+              "priority",
+              "trigger",
+              "impact",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "previous_findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "resolved",
+                  "reopened",
+                  "not_applicable"
+                ]
+              },
+              "evidence": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "state",
+              "evidence"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "rules_sha256",
+        "paths",
+        "incomplete",
+        "findings",
+        "previous_findings"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

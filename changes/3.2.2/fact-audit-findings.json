@@ -1,0 +1,228 @@
+{
+  "scope": "branch",
+  "passed": true,
+  "audit_log": ".mdf/logs/20261105T081721700473000Z-fact-audit",
+  "validation_log": ".mdf/logs/20261105T081736110016000Z-validate",
+  "findings": [],
+  "cli_warnings": [
+    {
+      "code": "audit.uncovered",
+      "id": "MDF-0001",
+      "message": "implementation file has no fact evidence",
+      "path": "tests/ut/Regression/Fixtures/BugReproductionTestCase.php",
+      "severity": "warning"
+    },
+    {
+      "code": "audit.uncovered",
+      "id": "MDF-0002",
+      "message": "implementation file has no fact evidence",
+      "path": "tests/ut/Regression/Fixtures/GeneratedProject.php",
+      "severity": "warning"
+    },
+    {
+      "code": "audit.uncovered",
+      "id": "MDF-0003",
+      "message": "implementation file has no fact evidence",
+      "path": "tests/ut/Regression/Fixtures/GeneratedSmokeCase.php",
+      "severity": "warning"
+    },
+    {
+      "code": "audit.uncovered",
+      "id": "MDF-0004",
+      "message": "implementation file has no fact evidence",
+      "path": "tests/ut/Regression/Fixtures/config_cache.php",
+      "severity": "warning"
+    },
+    {
+      "code": "audit.uncovered",
+      "id": "MDF-0005",
+      "message": "implementation file has no fact evidence",
+      "path": "tests/ut/Regression/Fixtures/coverage_environment.php",
+      "severity": "warning"
+    },
+    {
+      "code": "audit.uncovered",
+      "id": "MDF-0006",
+      "message": "implementation file has no fact evidence",
+      "path": "tests/ut/Regression/Fixtures/fork_failure_evidence.php",
+      "severity": "warning"
+    },
+    {
+      "code": "audit.uncovered",
+      "id": "MDF-0007",
+      "message": "implementation file has no fact evidence",
+      "path": "tests/ut/Regression/Fixtures/generated_autoload.php",
+      "severity": "warning"
+    },
+    {
+      "code": "audit.uncovered",
+      "id": "MDF-0008",
+      "message": "implementation file has no fact evidence",
+      "path": "tests/ut/Regression/Fixtures/generated_orm.php",
+      "severity": "warning"
+    }
+  ],
+  "warning_disposition": {
+    "tests/ut/Regression/Fixtures/BugReproductionTestCase.php": "covered by docs/system/testing/conventions.md evidence tests/ut/Regression/Fixtures/; inspected source and callers",
+    "tests/ut/Regression/Fixtures/GeneratedProject.php": "covered by docs/system/testing/conventions.md evidence tests/ut/Regression/Fixtures/; inspected source and callers",
+    "tests/ut/Regression/Fixtures/GeneratedSmokeCase.php": "covered by docs/system/testing/conventions.md evidence tests/ut/Regression/Fixtures/; inspected source and callers",
+    "tests/ut/Regression/Fixtures/config_cache.php": "covered by docs/system/testing/conventions.md evidence tests/ut/Regression/Fixtures/; inspected source and callers",
+    "tests/ut/Regression/Fixtures/coverage_environment.php": "covered by docs/system/testing/conventions.md evidence tests/ut/Regression/Fixtures/; inspected source and callers",
+    "tests/ut/Regression/Fixtures/fork_failure_evidence.php": "covered by docs/system/testing/conventions.md evidence tests/ut/Regression/Fixtures/; inspected source and callers",
+    "tests/ut/Regression/Fixtures/generated_autoload.php": "covered by docs/system/testing/conventions.md evidence tests/ut/Regression/Fixtures/; inspected source and callers",
+    "tests/ut/Regression/Fixtures/generated_orm.php": "covered by docs/system/testing/conventions.md evidence tests/ut/Regression/Fixtures/; inspected source and callers"
+  },
+  "unresolved_warnings": [],
+  "implementation_coverage": {
+    "phpunit.xml": [
+      "docs/system/testing/conventions.md",
+      "docs/user-guide/migration-data-and-tests.md"
+    ],
+    "src/BuiltInCommands/InitializeProjectCommand.php": [
+      "docs/system/architecture/current.md",
+      "docs/system/deviations.md",
+      "docs/user-guide/cli-commands.md",
+      "docs/user-guide/getting-started.md",
+      "docs/user-guide/migration-orm.md",
+      "docs/user-guide/migration-v2-to-v3.md"
+    ],
+    "src/BuiltInCommands/Templates/ConfigurationTemplate.php": [
+      "docs/system/architecture/current.md",
+      "docs/user-guide/cli-commands.md",
+      "docs/user-guide/getting-started.md"
+    ],
+    "src/BuiltInCommands/Templates/DatabaseTemplates.php": [
+      "docs/system/architecture/current.md",
+      "docs/system/deviations.md",
+      "docs/user-guide/cli-commands.md",
+      "docs/user-guide/migration-orm.md"
+    ],
+    "src/BuiltInCommands/Templates/ServicesTemplate.php": [
+      "docs/system/architecture/current.md",
+      "docs/user-guide/cli-commands.md",
+      "docs/user-guide/getting-started.md"
+    ],
+    "src/BuiltInCommands/Templates/UnitTestTemplates.php": [
+      "docs/system/architecture/current.md",
+      "docs/system/testing/conventions.md",
+      "docs/user-guide/cli-commands.md"
+    ],
+    "src/SlimApp.php": [
+      "docs/system/architecture/current.md",
+      "docs/system/data/cache.md",
+      "docs/system/interfaces/errors.md",
+      "docs/system/interfaces/internal.md",
+      "docs/system/operations/configuration.md",
+      "docs/system/operations/limits-and-recovery.md",
+      "docs/system/operations/observability.md",
+      "docs/user-guide/configuration.md",
+      "docs/user-guide/http.md",
+      "docs/user-guide/logging.md",
+      "docs/user-guide/migration-data-and-tests.md",
+      "docs/user-guide/migration-v2-to-v3.md",
+      "docs/user-guide/service-container.md"
+    ],
+    "tests/run_all_coverage.sh": [
+      "docs/system/testing/conventions.md",
+      "docs/system/testing/coverage-script-regression.md"
+    ],
+    "tests/ut/AbstractParallelCommandPcntlTest.php": [
+      "docs/system/testing/conventions.md",
+      "docs/user-guide/console.md"
+    ],
+    "tests/ut/AbstractParallelCommandTest.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/CommandRunnerPcntlTest.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/CommandRunnerTest.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Fixtures/ConcreteParallelCommand.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/ForkProcessTest.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/Bug1MW9Test.php": [
+      "docs/system/testing/conventions.md",
+      "docs/system/testing/coverage-script-regression.md"
+    ],
+    "tests/ut/Regression/Bug2AN6Test.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/BugGH7ATest.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/BugP4KUTest.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/BugY68QTest.php": [
+      "docs/system/data/cache.md",
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/Fixtures/BugReproductionTestCase.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/Fixtures/GeneratedProject.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/Fixtures/GeneratedSmokeCase.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/Fixtures/config_cache.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/Fixtures/coverage_environment.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/Fixtures/coverage_php.php": [
+      "docs/system/testing/conventions.md",
+      "docs/system/testing/coverage-script-regression.md"
+    ],
+    "tests/ut/Regression/Fixtures/fork_failure_evidence.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/Fixtures/generated_autoload.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/Regression/Fixtures/generated_orm.php": [
+      "docs/system/testing/conventions.md"
+    ],
+    "tests/ut/SentinelCommand/DaemonSentinelCommandPcntlTest.php": [
+      "docs/system/testing/conventions.md",
+      "docs/user-guide/daemon-sentinel.md"
+    ],
+    "tests/ut/SentinelCommand/DaemonSentinelCommandTest.php": [
+      "docs/system/testing/conventions.md"
+    ]
+  },
+  "documents_reviewed": [
+    "docs/system/architecture/current.md",
+    "docs/system/data/cache.md",
+    "docs/system/deviations.md",
+    "docs/system/interfaces/errors.md",
+    "docs/system/interfaces/internal.md",
+    "docs/system/operations/configuration.md",
+    "docs/system/operations/limits-and-recovery.md",
+    "docs/system/operations/observability.md",
+    "docs/system/operations/runbook.md",
+    "docs/system/overview.md",
+    "docs/system/testing/conventions.md",
+    "docs/system/testing/coverage-script-regression.md",
+    "docs/system/testing/index.md",
+    "docs/user-guide/README.md",
+    "docs/user-guide/cli-commands.md",
+    "docs/user-guide/configuration.md",
+    "docs/user-guide/console.md",
+    "docs/user-guide/daemon-sentinel.md",
+    "docs/user-guide/getting-started.md",
+    "docs/user-guide/http.md",
+    "docs/user-guide/logging.md",
+    "docs/user-guide/migration-data-and-tests.md",
+    "docs/user-guide/migration-orm.md",
+    "docs/user-guide/migration-v2-to-v3.md",
+    "docs/user-guide/service-container.md"
+  ]
+}

@@ -1,19 +1,13 @@
 ---
 inclusion: auto
-description: Kiro 平台专属规则，始终生效
+description: Kiro 项目入口
 ---
 
-# Kiro Scope Rules
+# 项目入口
 
-## `<spec-dir>` 取值
+本项目采用 MDF；旧 spec 工作流仅作为历史材料保存。
 
-- `<spec-dir>` = `.kiro/specs`
-
-## 项目信息来源
-
-- Agent 首次接触项目时，必须先读取根目录下的 `PROJECT.md` 获取项目的技术栈、构建命令、运行入口、敏感文件清单等项目特定信息。
-
-## 禁止读取 `.cursor` 目录
-
-- 不要读取、引用或参考 `.cursor/` 目录下的任何文件（包括 `.cursor/rules/` 中的 rule 文件）。
-- `.cursor/` 是另一个编辑器的配置目录，与 Kiro 无关。Kiro 的 steering 规则仅来自 `.kiro/steering/`。
+- 先读取根 `AGENTS.md`，再读取 `PROJECT.md`。
+- 按 `docs/README.md` 定位本次相关的一份主题页。
+- 使用项目级 MDF Skill；不再创建旧平台专属 specs。
+- 通用安全和 Git 规则继续生效；流程冲突以 MDF 为准。

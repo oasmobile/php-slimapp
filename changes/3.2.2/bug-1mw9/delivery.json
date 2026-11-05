@@ -1,0 +1,15 @@
+{
+  "branch": "bugfix/bug-1MW9",
+  "bug": "bug-1MW9",
+  "needs_design": false,
+  "roster": {
+    "dev": 0,
+    "dev_strategy": "best-of-n",
+    "qa": 0,
+    "qa_strategy": "best-of-n",
+    "review_strategy": "replicate",
+    "reviewers": 1
+  },
+  "slug": "bug-1mw9",
+  "start_commit": "7e343f79ce671892c91a5a53bf5b8cf3ee558d9e"
+}

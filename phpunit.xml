@@ -6,8 +6,20 @@
     backupGlobals="false"
     colors="true"
     failOnAllIssues="true"
+    failOnEmptyTestSuite="true"
+    failOnSkipped="true"
+    failOnIncomplete="true"
 >
     <testsuites>
+        <testsuite name="quick">
+            <file>tests/ut/ConfigParserTest.php</file>
+            <file>tests/ut/NamespaceResolverTest.php</file>
+            <file>tests/ut/CommandConfigurationTest.php</file>
+            <file>tests/ut/SlimAppCompilerPassTest.php</file>
+            <file>tests/pbt/ConfigParserPbtTest.php</file>
+            <file>tests/pbt/NamespaceResolverPbtTest.php</file>
+            <file>tests/pbt/CommandConfigurationPbtTest.php</file>
+        </testsuite>
         <testsuite name="ut">
             <directory suffix="Test.php">tests/ut</directory>
         </testsuite>
