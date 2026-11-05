@@ -19,7 +19,7 @@
 
 ## 需求来源
 
-范围来自 [bug-GH7A](../../../docs/bugs/bug-GH7A-generated-bootstrap-log-level.md)。
+范围来自 [bug-GH7A](../../../../../docs/bugs/bug-GH7A-generated-bootstrap-log-level.md)。
 
 ## 目标与非目标
 

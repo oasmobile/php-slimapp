@@ -11,13 +11,13 @@
 
 各阶段按实际结果自勾；发布前保留独立的用户确认。
 
-- [ ] 确认工作线与范围（start）
+- [x] 确认工作线与范围（start）
 - [x] integrate（不联调，无需执行）
 - [x] 完成预发布工作（owner；核对四份 child Change 与五项 Bug outcomes）
 - [x] owner 开发（has_dev: no，无新开发）
 - [x] converge（has_dev: no，无开发分支集成）
 - [x] lint
-- [ ] code-review
+- [x] code-review
 - [ ] verify branch
 - [ ] fact audit
 - [ ] close-out

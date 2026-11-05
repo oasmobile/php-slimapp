@@ -1,4 +1,4 @@
-# bug-P4KU 修复交付
+# bug-2AN6 修复交付
 
 ## 流程
 
@@ -9,7 +9,7 @@
 按序执行，每项完成后才勾选；已有测试不代表已确认红灯。
 
 - [x] 确认目标与约束（start）
-- [x] owner 开发：确认有效红灯，修复 bug-P4KU 并让对应回归转绿
+- [x] owner 开发：确认有效红灯，修复 bug-2AN6 并让对应回归转绿
 - [x] converge
 - [x] lint
 - [x] code-review
@@ -19,11 +19,11 @@
 
 ## 需求来源
 
-范围来自 [bug-P4KU](../../../docs/bugs/bug-P4KU-fork-tests-require-coverage-driver.md)。
+范围来自 [bug-2AN6](../../../../../docs/bugs/bug-2AN6-generated-orm-removed-api.md)。
 
 ## 目标与非目标
 
-目标：普通进程测试不要求覆盖率驱动，显式收集模式保留且排除假通过。
+目标：适配 ORM 3 工厂 API，创建 EntityManager，保持连接惰性且不连接数据库。
 仅修复本 Bug，不改其它已登记 Bug，不推送、不发版、不关闭 Bug。
 
 ## 约束

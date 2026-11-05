@@ -29,3 +29,12 @@ PHPStan 使用本地 PHPRC 的 512M 内存上限，不修改系统配置。
 必须通过 lint、build、quick、release 与事实审计。
 五项 Bug 的正式复现报告将供收口阶段独立关闭流程逐例核对，不在此提前改状态。
 实际 master 合并、tag、回合 develop 与推送，均等待最终发布确认。
+
+## 历史与材料复核
+
+本节记录发布审查前后确认的历史结构问题。
+
+本地 v3.2.1 在 master 历史，但未在原 develop 祖先链中。
+已仅向 release 合入该正式发布历史；与合入前文件树完全相同，没有覆盖修复。
+四份没有独立 CHANGE.md 的来源修复材料已移入 bug-1mw9/source-deliveries，保持四份正式 child Change 范围。
+文件链接按搬迁后的真实位置改写，来源分支及独立 worktree 未变。

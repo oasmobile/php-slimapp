@@ -19,7 +19,7 @@
 
 ## 需求来源
 
-范围来自 [bug-Y68Q](../../../docs/bugs/bug-Y68Q-corrupted-config-cache-recovery.md)。
+范围来自 [bug-Y68Q](../../../../../docs/bugs/bug-Y68Q-corrupted-config-cache-recovery.md)。
 
 ## 目标与非目标
 
