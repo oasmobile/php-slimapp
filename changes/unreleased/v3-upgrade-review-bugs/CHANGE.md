@@ -4,12 +4,7 @@ source_branch: develop
 proposals: []
 fixed: []
 closed: []
-deferred:
-  - bug-2AN6
-  - bug-GH7A
-  - bug-Y68Q
-  - bug-P4KU
-  - bug-1MW9
+deferred: []
 adrs: []
 release_notes: none
 breaking: false
@@ -57,3 +52,13 @@ MDF severity 均为 major，表示功能或验证可靠性受影响，不等同�
 3. 由人工明确启动修复流程，再修改实现并执行回归。
 
 本次登记不启动测试编写或修复，五项均保留 open 状态。
+
+## 3.2.2 发布归类
+
+本节说明历史阶段记录与本次发布最终结果的关系。
+
+上述 open、未运行测试与人工门槛描述保留为该阶段的历史事实。
+用户随后授权 Agent 执行红灯及修复，并已完成人工验收。
+五项 Bug 的最终 fixed outcome 由 [统一修复 Change](../bug-1mw9/CHANGE.md) 记录。
+本 Change 的旧 deferred 列表已清空，避免发布时把同一 Bug 同时归入 fixed 与 deferred。
+独立关闭验证将在本次 release 收口阶段完成；此处不提前声明已关闭或已发布。
