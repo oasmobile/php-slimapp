@@ -18,7 +18,7 @@
 - [x] converge（has_dev: no，无开发分支集成）
 - [x] lint
 - [x] code-review
-- [ ] verify branch
+- [x] verify branch
 - [ ] fact audit
 - [ ] close-out
 
