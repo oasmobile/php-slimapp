@@ -72,3 +72,22 @@ ORM 工厂移除旧 API，使用 DriverManager 和 EntityManager 构造器，并
 
 无未解决问题，允许关闭并写入 fixed_in: 3.2.2。
 
+## bug-1MW9
+
+本项复现通过，主 Agent 已独立审查对应修复。
+
+- HEAD：`a26bf64e1fac5762700e4b2127d1aaffdcd68bf7`。
+- 审查路径：`tests/run_all_coverage.sh`。
+- 修复提交：`26df9b5aa58667e01095d98b07a8626f77114aaf`。
+- 结果：6 个复现场景 passed；复用退出 0 的 release 报告。
+- `Bug1MW9Test::testCoverageScriptPreservesUnexpectedFailures with data set "成功及预期业务失败对照"`：passed。
+- `Bug1MW9Test::testCoverageScriptPreservesUnexpectedFailures with data set "PHPUnit失败"`：passed。
+- `Bug1MW9Test::testCoverageScriptPreservesUnexpectedFailures with data set "parallel异常"`：passed。
+- `Bug1MW9Test::testCoverageScriptPreservesUnexpectedFailures with data set "parallel_fail非预期错误"`：passed。
+- `Bug1MW9Test::testCoverageScriptPreservesUnexpectedFailures with data set "sentinel_once异常"`：passed。
+- `Bug1MW9Test::testCoverageScriptPreservesUnexpectedFailures with data set "sentinel_parallel异常"`：passed。
+
+保留各阶段输出和累计失败状态，区分 parallel_fail 预期 255 与致命异常，检查覆盖率产物并传播合并失败。六场景包含成功对照与五种失败。
+
+无未解决问题，允许关闭并写入 fixed_in: 3.2.2。
+

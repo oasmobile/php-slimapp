@@ -1,9 +1,10 @@
 ---
 id: bug-1MW9
 type: bug
-status: fixed
+status: closed
 severity: major
 found_in: 3.2.1
+fixed_in: 3.2.2
 ---
 
 # 覆盖率脚本吞掉测试失败并可能返回成功
